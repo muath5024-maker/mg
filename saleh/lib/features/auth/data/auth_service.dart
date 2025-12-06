@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase_client.dart';
 import '../../../core/services/api_service.dart';
+import 'mbuy_auth_service.dart';
+import '../../../core/services/mbuy_auth_helper.dart';
 
 class AuthService {
   /// تسجيل مستخدم جديد
@@ -222,7 +224,21 @@ class AuthService {
   /// Throws: Exception في حالة الفشل
   static Future<void> signOut() async {
     try {
-      await supabaseClient.auth.signOut();
+      // Logout from MBUY Auth
+      try {
+        await MbuyAuthService.logout();
+        debugPrint('[AuthService] ✅ MBUY Auth logout successful');
+      } catch (e) {
+        debugPrint('[AuthService] ⚠️ MBUY Auth logout error: $e');
+      }
+
+      // Logout from Supabase Auth (for backward compatibility)
+      try {
+        await supabaseClient.auth.signOut();
+        debugPrint('[AuthService] ✅ Supabase Auth logout successful');
+      } catch (e) {
+        debugPrint('[AuthService] ⚠️ Supabase Auth logout error: $e');
+      }
     } catch (e) {
       throw Exception('خطأ في تسجيل الخروج: ${e.toString()}');
     }
@@ -231,14 +247,37 @@ class AuthService {
   /// جلب المستخدم الحالي
   ///
   /// Returns: User object إذا كان المستخدم مسجل، null إذا لم يكن مسجل
-  static User? getCurrentUser() {
+  /// Uses MBUY Auth first, falls back to Supabase Auth
+  static Future<User?> getCurrentUser() async {
+    // Try MBUY Auth first
+    try {
+      final mbuyUser = await MbuyAuthHelper.getCurrentUser();
+      if (mbuyUser != null) {
+        // Convert MbuyUser to Supabase User-like object
+        // For now, return null and let Supabase handle it
+        // This maintains backward compatibility
+        debugPrint('[AuthService] MBUY Auth user found: ${mbuyUser.email}');
+      }
+    } catch (e) {
+      debugPrint('[AuthService] MBUY Auth error: $e');
+    }
+
+    // Fallback to Supabase Auth for backward compatibility
     return supabaseClient.auth.currentUser;
   }
 
   /// التحقق من حالة تسجيل الدخول
   ///
   /// Returns: true إذا كان المستخدم مسجل، false إذا لم يكن
-  static bool isSignedIn() {
-    return getCurrentUser() != null;
+  static Future<bool> isSignedIn() async {
+    // Check MBUY Auth first
+    final mbuyLoggedIn = await MbuyAuthService.isLoggedIn();
+    if (mbuyLoggedIn) {
+      return true;
+    }
+
+    // Fallback to Supabase Auth
+    final user = await getCurrentUser();
+    return user != null;
   }
 }

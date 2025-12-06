@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../supabase_client.dart';
 import '../errors/app_error_codes.dart';
 import 'logger_service.dart';
+import 'secure_storage_service.dart';
 
 /// MBUY API Service
 /// Handles all API calls to Cloudflare Worker (API Gateway)
@@ -18,11 +19,24 @@ class ApiService {
   static const Duration retryDelay = Duration(seconds: 2);
   static const List<int> retryableStatusCodes = [408, 429, 500, 502, 503, 504];
 
-  /// Get JWT token from current session
+  /// Get JWT token from Secure Storage (MBUY Custom Auth)
+  /// Falls back to Supabase Auth for backward compatibility
   static Future<String?> _getJwtToken() async {
     try {
-      final session = supabaseClient.auth.currentSession;
-      return session?.accessToken;
+      // Try MBUY Custom Auth first
+      final mbuyToken = await SecureStorageService.getToken();
+      if (mbuyToken != null && mbuyToken.isNotEmpty) {
+        return mbuyToken;
+      }
+
+      // Fallback to Supabase Auth (for backward compatibility)
+      try {
+        final session = supabaseClient.auth.currentSession;
+        return session?.accessToken;
+      } catch (e) {
+        // Supabase Auth not available, return null
+        return null;
+      }
     } catch (e) {
       logger.error('Error getting JWT', error: e);
       return null;

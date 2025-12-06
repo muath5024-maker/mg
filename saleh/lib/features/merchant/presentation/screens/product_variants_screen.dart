@@ -174,7 +174,9 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen> {
 
                 if (context.mounted) {
                   Navigator.pop(context);
-                  await _loadVariants();
+                }
+                await _loadVariants();
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(isEditing

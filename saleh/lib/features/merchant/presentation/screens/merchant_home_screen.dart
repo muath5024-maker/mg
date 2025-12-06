@@ -66,7 +66,7 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
       // جلب المتجر عبر Worker API
       final result = await ApiService.get('/secure/merchant/store');
       
-      debugPrint('📥 [MerchantHome] استجابة API: ok=${result['ok']}, hasData=${result['data'] != null}, error=${result['error'] ?? null}');
+      debugPrint('📥 [MerchantHome] استجابة API: ok=${result['ok']}, hasData=${result['data'] != null}, error=${result['error']}');
 
       if (result['ok'] == true && result['data'] != null) {
         final store = result['data'] as Map<String, dynamic>;

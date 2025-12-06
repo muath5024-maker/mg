@@ -11,6 +11,8 @@ import '../shared/widgets/mbuy_loader.dart';
 import '../features/customer/presentation/screens/customer_shell.dart';
 import '../features/merchant/presentation/screens/merchant_home_screen.dart';
 import 'services/api_service.dart';
+import 'services/mbuy_auth_helper.dart';
+import '../features/auth/data/mbuy_auth_service.dart';
 
 class RootWidget extends StatefulWidget {
   final ThemeProvider themeProvider;
@@ -69,54 +71,96 @@ class _RootWidgetState extends State<RootWidget> {
       _isLoading = true;
     });
 
-    // جلب المستخدم الحالي من الجلسة المحفوظة
-    final session = supabaseClient.auth.currentSession;
-    final user = session?.user;
+    // جلب المستخدم الحالي من MBUY Auth أولاً
+    User? user;
+    bool isMbuyAuth = false;
 
-    debugPrint(
-      '🔍 فحص حالة المصادقة: user=${user?.email}, session=${session != null}',
-    );
-    debugPrint('🔍 Session expires at: ${session?.expiresAt}');
-    debugPrint('🔍 User ID: ${user?.id}');
-    debugPrint('🔍 Email confirmed: ${user?.emailConfirmedAt != null}');
-
-    // التحقق من انتهاء الجلسة
-    if (session != null && session.expiresAt != null) {
-      final expiresAt = DateTime.fromMillisecondsSinceEpoch(
-        session.expiresAt! * 1000,
-      );
-      final now = DateTime.now();
-      if (expiresAt.isBefore(now)) {
-        debugPrint('⚠️ الجلسة منتهية - محاولة تحديث...');
-        try {
-          await supabaseClient.auth.refreshSession();
-          debugPrint('✅ تم تحديث الجلسة بنجاح');
-        } catch (e) {
-          debugPrint('❌ فشل تحديث الجلسة: $e');
+    try {
+      final mbuyLoggedIn = await MbuyAuthService.isLoggedIn();
+      if (mbuyLoggedIn) {
+        isMbuyAuth = true;
+        debugPrint('🔍 [MBUY Auth] User is logged in');
+        
+        // Try to get user info from MBUY Auth
+        final mbuyUser = await MbuyAuthHelper.getCurrentUser();
+        if (mbuyUser != null) {
+          debugPrint('🔍 [MBUY Auth] User found: ${mbuyUser.email}');
+          // For now, we'll still use Supabase User structure
+          // but we know the user is authenticated via MBUY Auth
         }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [MBUY Auth] Error checking auth state: $e');
+    }
+
+    // Fallback to Supabase Auth for backward compatibility
+    if (!isMbuyAuth) {
+      final session = supabaseClient.auth.currentSession;
+      user = session?.user;
+
+      debugPrint(
+        '🔍 [Supabase Auth] فحص حالة المصادقة: user=${user?.email}, session=${session != null}',
+      );
+      debugPrint('🔍 Session expires at: ${session?.expiresAt}');
+      debugPrint('🔍 User ID: ${user?.id}');
+      debugPrint('🔍 Email confirmed: ${user?.emailConfirmedAt != null}');
+
+      // التحقق من انتهاء الجلسة
+      if (session != null && session.expiresAt != null) {
+        final expiresAt = DateTime.fromMillisecondsSinceEpoch(
+          session.expiresAt! * 1000,
+        );
+        final now = DateTime.now();
+        if (expiresAt.isBefore(now)) {
+          debugPrint('⚠️ الجلسة منتهية - محاولة تحديث...');
+          try {
+            await supabaseClient.auth.refreshSession();
+            debugPrint('✅ تم تحديث الجلسة بنجاح');
+          } catch (e) {
+            debugPrint('❌ فشل تحديث الجلسة: $e');
+          }
+        }
+      }
+    } else {
+      // For MBUY Auth, get user ID from storage
+      final userId = await MbuyAuthService.getUserId();
+      final userEmail = await MbuyAuthService.getUserEmail();
+      debugPrint('🔍 [MBUY Auth] User ID: $userId, Email: $userEmail');
+      
+      // Create a mock User object for compatibility
+      // We'll use the user ID to fetch from user_profiles
+      if (userId != null) {
+        // We'll handle this in the user_profiles query below
       }
     }
 
-    if (user != null) {
+    // Get user from user_profiles (works for both MBUY and Supabase Auth)
+    final userId = isMbuyAuth 
+        ? await MbuyAuthService.getUserId()
+        : user?.id;
+
+    if (userId != null) {
       // تعيين User ID في Analytics
-      await FirebaseService.setUserId(user.id);
+      await FirebaseService.setUserId(userId);
 
       // جلب role من user_profiles
       try {
         final response = await supabaseClient
             .from('user_profiles')
             .select('role, display_name')
-            .eq('id', user.id)
+            .eq('id', userId)
             .maybeSingle();
 
         if (response != null) {
           final role = response['role'] as String? ?? 'customer';
 
           debugPrint('✅ تم جلب role: $role');
-          debugPrint('✅ User ID: ${user.id}');
+          debugPrint('✅ User ID: $userId');
           debugPrint('✅ Display Name: ${response['display_name']}');
 
           setState(() {
+            // Keep user object for backward compatibility
+            // If MBUY Auth, user will be null but userId is available
             _user = user;
             _userRole = role;
             // تحديد AppMode بناءً على role
@@ -133,11 +177,15 @@ class _RootWidgetState extends State<RootWidget> {
         } else {
           // إذا لم يوجد سجل في user_profiles، أنشئه عبر Worker API
           try {
+            final userEmail = isMbuyAuth 
+                ? await MbuyAuthService.getUserEmail()
+                : user?.email;
+            
             await ApiService.post(
               '/secure/auth/initialize-user',
               data: {
                 'role': 'customer',
-                'display_name': user.email?.split('@')[0] ?? 'مستخدم',
+                'display_name': userEmail?.split('@')[0] ?? 'مستخدم',
               },
             );
             debugPrint('✅ تم إنشاء user_profile + wallet عبر Worker API');
@@ -146,7 +194,7 @@ class _RootWidgetState extends State<RootWidget> {
           }
 
           setState(() {
-            _user = user;
+            _user = user; // May be null for MBUY Auth
             _userRole = 'customer';
             _appModeProvider.setCustomerMode();
           });
@@ -155,7 +203,7 @@ class _RootWidgetState extends State<RootWidget> {
         debugPrint('⚠️ خطأ في جلب بيانات المستخدم: $e');
         // في حالة الخطأ، افترض customer
         setState(() {
-          _user = user;
+          _user = user; // May be null for MBUY Auth
           _userRole = 'customer';
           _appModeProvider.setCustomerMode();
         });
@@ -178,9 +226,20 @@ class _RootWidgetState extends State<RootWidget> {
       final storeSession = context.read<StoreSession>();
       
       // جلب معلومات المستخدم الحالي
-      final user = supabaseClient.auth.currentUser;
-      final userId = user?.id;
-      final userEmail = user?.email;
+      // Try MBUY Auth first
+      String? userId;
+      String? userEmail;
+      
+      final mbuyLoggedIn = await MbuyAuthService.isLoggedIn();
+      if (mbuyLoggedIn) {
+        userId = await MbuyAuthService.getUserId();
+        userEmail = await MbuyAuthService.getUserEmail();
+      } else {
+        // Fallback to Supabase Auth
+        final user = supabaseClient.auth.currentUser;
+        userId = user?.id;
+        userEmail = user?.email;
+      }
       
       debugPrint('🔍 [StoreSession] بدء جلب معلومات المتجر...');
       debugPrint('🔍 [StoreSession] User ID من Flutter: $userId');
@@ -198,7 +257,7 @@ class _RootWidgetState extends State<RootWidget> {
       // جلب المتجر عبر Worker API
       final result = await ApiService.get('/secure/merchant/store');
       
-      debugPrint('📥 [StoreSession] استجابة API: ok=${result['ok']}, hasData=${result['data'] != null}, error=${result['error'] ?? null}');
+      debugPrint('📥 [StoreSession] استجابة API: ok=${result['ok']}, hasData=${result['data'] != null}, error=${result['error']}');
 
       if (result['ok'] == true && result['data'] != null) {
         final store = result['data'] as Map<String, dynamic>;

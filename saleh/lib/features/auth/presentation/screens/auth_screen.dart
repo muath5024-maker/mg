@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../data/auth_service.dart';
-import '../../../../core/supabase_client.dart';
+import '../../data/mbuy_auth_service.dart';
+import '../../../../core/services/api_service.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -43,35 +43,47 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       if (_isSignUp) {
         // تسجيل جديد
-        final user = await AuthService.signUp(
+        final result = await MbuyAuthService.register(
           email: _emailController.text.trim(),
           password: _passwordController.text,
-          displayName: _displayNameController.text.trim(),
-          role: _selectedRole,
-          storeName: _selectedRole == 'merchant'
-              ? _storeNameController.text.trim()
-              : null,
-          city: _selectedRole == 'merchant'
-              ? _cityController.text.trim()
-              : null,
+          fullName: _displayNameController.text.trim(),
         );
 
         if (mounted) {
-          debugPrint('✅ تم تسجيل المستخدم: ${user.email}');
+          final user = result['user'] as Map<String, dynamic>;
+          debugPrint('✅ تم تسجيل المستخدم: ${user['email']}');
 
-          // التحقق من وجود جلسة بعد التسجيل
-          final session = supabaseClient.auth.currentSession;
-          if (session != null) {
+          // التحقق من وجود token بعد التسجيل
+          final isLoggedIn = await MbuyAuthService.isLoggedIn();
+          if (mounted && isLoggedIn) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('تم التسجيل بنجاح! جاري تحميل التطبيق...'),
                 backgroundColor: Colors.green,
               ),
             );
+
+            // إذا كان تاجر، قم بإنشاء المتجر عبر API
+            if (_selectedRole == 'merchant') {
+              try {
+                await ApiService.post(
+                  '/secure/merchant/store',
+                  data: {
+                    'name': _storeNameController.text.trim(),
+                    'city': _cityController.text.trim(),
+                  },
+                );
+                debugPrint('✅ تم إنشاء المتجر بنجاح');
+              } catch (e) {
+                debugPrint('⚠️ فشل إنشاء المتجر: $e');
+                // لا نرمي خطأ - يمكن إنشاء المتجر لاحقاً
+              }
+            }
+
             // الانتظار قليلاً ثم إعادة بناء
             await Future.delayed(const Duration(milliseconds: 500));
-          } else {
-            // إذا لم تكن هناك جلسة، قد يتطلب تأكيد البريد
+          } else if (mounted) {
+            // إذا لم يكن هناك token محفوظ
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('تم إنشاء الحساب! يرجى تسجيل الدخول الآن'),
@@ -92,19 +104,19 @@ class _AuthScreenState extends State<AuthScreen> {
 
         debugPrint('🔐 محاولة تسجيل الدخول: $email');
 
-        final session = await AuthService.signIn(
+        final result = await MbuyAuthService.login(
           email: email,
           password: password,
         );
 
         if (mounted) {
-          debugPrint('✅ تم تسجيل الدخول: ${session.user.email}');
-          debugPrint('✅ Session expires: ${session.expiresAt}');
+          final user = result['user'] as Map<String, dynamic>;
+          debugPrint('✅ تم تسجيل الدخول: ${user['email']}');
 
-          // التحقق من أن Session محفوظة
-          final currentSession = supabaseClient.auth.currentSession;
-          if (currentSession != null) {
-            debugPrint('✅ Session محفوظة بنجاح');
+          // التحقق من أن Token محفوظ
+          final isLoggedIn = await MbuyAuthService.isLoggedIn();
+          if (mounted && isLoggedIn) {
+            debugPrint('✅ Token محفوظ بنجاح');
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('تم تسجيل الدخول بنجاح! جاري تحميل التطبيق...'),
@@ -115,7 +127,7 @@ class _AuthScreenState extends State<AuthScreen> {
             // الانتظار قليلاً ثم إعادة بناء
             await Future.delayed(const Duration(milliseconds: 1000));
           } else {
-            debugPrint('⚠️ Session غير محفوظة - إعادة المحاولة...');
+            debugPrint('⚠️ Token غير محفوظ - إعادة المحاولة...');
             throw Exception('فشل حفظ الجلسة. يرجى المحاولة مرة أخرى.');
           }
         }
