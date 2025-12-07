@@ -281,7 +281,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
       backgroundColor: Colors.white,
       elevation: 0,
       title: Text(
-        'القائمة',
+        'لوحة التحكم',
         style: GoogleFonts.cairo(
           fontSize: 24,
           fontWeight: FontWeight.bold,
@@ -289,14 +289,25 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
         ),
       ),
       // في RTL: leading على اليمين، actions على اليسار
-      // نريد: الإعدادات على اليسار (actions)، الانتقال على اليمين (leading)
-      leadingWidth: 60,
-      leading: IconButton(
-        icon: Icon(Icons.swap_horiz, color: MbuyColors.textPrimary),
-        onPressed: () {
-          widget.appModeProvider.setCustomerMode();
-        },
-        tooltip: 'الانتقال إلى تطبيق العميل',
+      // زر للتنقل إلى تطبيق العميل
+      leadingWidth: 80,
+      leading: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: OutlinedButton.icon(
+          onPressed: () {
+            widget.appModeProvider.setCustomerMode();
+          },
+          icon: const Icon(Icons.shopping_bag, size: 18),
+          label: const Text(
+            'التطبيق',
+            style: TextStyle(fontSize: 12),
+          ),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            minimumSize: const Size(0, 32),
+            side: BorderSide(color: MbuyColors.textPrimary.withValues(alpha: 0.3)),
+          ),
+        ),
       ),
       actions: [
         IconButton(

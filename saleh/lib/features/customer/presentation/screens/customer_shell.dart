@@ -63,6 +63,7 @@ class _CustomerShellState extends State<CustomerShell> {
             right: 0,
             child: StickySearchBar(
               hintText: 'البحث عن المنتجات...',
+              appModeProvider: widget.appModeProvider,
               onTap: () {
                 // TODO: الانتقال إلى صفحة البحث
                 // Navigator.push(context, MaterialPageRoute(builder: (_) => SearchScreen()));

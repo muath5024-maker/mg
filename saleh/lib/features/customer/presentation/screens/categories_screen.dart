@@ -36,9 +36,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         // تصفية الفئات الرئيسية فقط (parent_id = null)
         final allCategories = List<Map<String, dynamic>>.from(response['data']);
         final mainCategories = allCategories
-            .where((cat) => cat['parent_id'] == null && (cat['is_active'] == true))
+            .where(
+              (cat) => cat['parent_id'] == null && (cat['is_active'] == true),
+            )
             .toList();
-        
+
         // ترتيب حسب display_order
         mainCategories.sort((a, b) {
           final orderA = a['display_order'] as int? ?? 0;
@@ -57,7 +59,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ في جلب الفئات: ${response['message'] ?? 'خطأ غير معروف'}'),
+              content: Text(
+                'خطأ في جلب الفئات: ${response['message'] ?? 'خطأ غير معروف'}',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -103,7 +107,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.category_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(
+                    Icons.category_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'لا توجد فئات متاحة',
@@ -138,8 +146,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => CategoryProductsScreen(
-                categoryId: category['id'],
-                categoryName: category['name'],
+                categoryId: category['id']?.toString() ?? '',
+                categoryName: category['name']?.toString() ?? '',
               ),
             ),
           );
