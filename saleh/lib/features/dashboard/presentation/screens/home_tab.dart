@@ -8,6 +8,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
+import '../../../../shared/widgets/app_search_delegate.dart';
+import '../../../onboarding/presentation/widgets/feature_spotlight.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
 import '../../../auth/data/auth_controller.dart';
@@ -49,6 +51,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   void _openProfileDrawer() {
     _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  void _openSearch(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showSearch(context: context, delegate: AppSearchDelegate());
   }
 
   @override
@@ -218,6 +225,30 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       ),
                     ),
                   ],
+                ),
+              ),
+              // زر البحث مع Spotlight
+              FeatureSpotlight(
+                featureId: 'global_search',
+                title: 'البحث السريع ✨',
+                description:
+                    'ابحث في جميع ميزات التطبيق بنقرة واحدة! جرب البحث عن "كوبونات" أو "منتجات"',
+                position: SpotlightPosition.bottom,
+                child: Semantics(
+                  label: 'البحث في التطبيق',
+                  button: true,
+                  child: IconButton(
+                    icon: SvgPicture.asset(
+                      AppIcons.search,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        AppTheme.darkSlate,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onPressed: () => _openSearch(context),
+                  ),
                 ),
               ),
               // زر الإشعارات
@@ -825,48 +856,47 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 padding: EdgeInsets.zero,
                 children: [
                   _buildDrawerItem(
-                    iconPath: AppIcons.lock,
-                    title: 'تغيير كلمة السر',
+                    iconPath: AppIcons.settings,
+                    title: 'إعدادات الحساب',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('تغيير كلمة السر')}',
-                      );
+                      context.push('/settings');
                     },
                   ),
                   _buildDrawerItem(
-                    iconPath: AppIcons.edit,
-                    title: 'تعديل معلومات الحساب',
+                    iconPath: AppIcons.supportAgent,
+                    title: 'الدعم والمساعدة',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('تعديل معلومات الحساب')}',
-                      );
+                      context.push('/support');
                     },
                   ),
                   _buildDrawerItem(
-                    iconPath: AppIcons.bulb,
-                    title: 'الاقتراحات',
+                    iconPath: AppIcons.info,
+                    title: 'عن التطبيق',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('الاقتراحات')}',
-                      );
+                      context.push('/about');
+                    },
+                  ),
+                  const Divider(height: 32),
+                  _buildDrawerItem(
+                    iconPath: AppIcons.document,
+                    title: 'سياسة الخصوصية',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/privacy-policy');
                     },
                   ),
                   _buildDrawerItem(
-                    iconPath: AppIcons.delete,
-                    title: 'حذف المتجر',
+                    iconPath: AppIcons.document,
+                    title: 'شروط الاستخدام',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('حذف المتجر')}',
-                      );
+                      context.push('/terms');
                     },
-                    textColor: Colors.red,
-                    iconColor: Colors.red,
                   ),
-                  const Divider(),
+                  const Divider(height: 32),
                   _buildDrawerItem(
                     iconPath: AppIcons.share,
                     title: 'شارك التطبيق',
@@ -880,37 +910,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       );
                     },
                   ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.document,
-                    title: 'الشروط و الأحكام',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('الشروط و الأحكام')}',
-                      );
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.cardMembership,
-                    title: 'باقة المتجر',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('باقة المتجر')}',
-                      );
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.supportAgent,
-                    title: 'اتصل بنا',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('اتصل بنا')}',
-                      );
-                    },
-                  ),
-                  const Divider(),
+                  const Divider(height: 32),
                   _buildDrawerItem(
                     iconPath: AppIcons.logout,
                     title: 'تسجيل الخروج',

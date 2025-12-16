@@ -18,9 +18,15 @@ export 'mbuy_card.dart';
 export 'glass_card.dart';
 export 'app_icon.dart';
 
+// UX Enhancement Components
+export 'app_search_delegate.dart';
+export 'app_breadcrumb.dart';
+export 'accessible_button.dart';
+
 // Base Screen & Error Handling
 export 'base_screen.dart';
 export 'error_boundary.dart';
 
 // Utils
 export '../utils/dialog_helper.dart';
+export '../utils/haptic_helper.dart';

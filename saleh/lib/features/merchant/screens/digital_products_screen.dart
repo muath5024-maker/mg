@@ -107,11 +107,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: SvgPicture.asset(
-              AppIcons.arrowBack,
-              width: 24,
-              height: 24,
-            ),
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
             onPressed: () => context.pop(),
           ),
           title: const Text('المنتجات الرقمية'),

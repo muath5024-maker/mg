@@ -310,11 +310,7 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
           foregroundColor: Colors.black87,
           elevation: 0,
           leading: IconButton(
-            icon: SvgPicture.asset(
-              AppIcons.arrowBack,
-              width: 24,
-              height: 24,
-            ),
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
             onPressed: () => context.pop(),
           ),
           title: const Text(
