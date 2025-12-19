@@ -8,9 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../ai_studio/data/mbuy_studio_service.dart';
-import '../../../ai_studio/data/ai_results_service.dart';
 import '../../../auth/data/auth_controller.dart';
-import '../../../merchant/data/merchant_repository.dart';
 
 /// صفحة اختصاراتي المُعاد تصميمها
 /// - صفحة فارغة مع نص توضيحي في البداية
@@ -1199,8 +1197,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   final TextEditingController _promptController = TextEditingController();
   String _result = '';
   bool _isLoading = false;
-  String? _generatedImageUrl;
-  String? _lastGeneratedType; // 'logo', 'banner', 'image'
+  String _selectedTool = 'text'; // الأداة المحددة حالياً
+  String? _generatedImageUrl; // رابط الصورة المولدة
+  String? _currentTaskId; // معرف مهمة NanoBanana
+
+  // إعدادات إضافية لكل أداة
+  String _textTone = 'marketing'; // تسويقي / رسمي / مختصر
+  String _textLength = 'medium'; // قصير / متوسط / طويل
+  String _productTone = 'friendly'; // ودية / احترافية
 
   @override
   void dispose() {
@@ -1222,7 +1226,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   Future<void> _testGenerateText() async {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل نص أولاً');
+      setState(() => _result = '⚠️ أدخل موضوع النص أولاً');
       return;
     }
 
@@ -1233,84 +1237,26 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
 
     try {
       final service = widget.ref.read(mbuyStudioServiceProvider);
-      final response = await service.generateText(_promptController.text);
+      // بناء prompt مناسب لتوليد نص عام
+      final toneMap = {
+        'marketing': 'تسويقي جذاب',
+        'formal': 'رسمي واحترافي',
+        'short': 'مختصر ومباشر',
+      };
+      final lengthMap = {
+        'short': 'جملتين',
+        'medium': '3-4 جمل',
+        'long': 'فقرة كاملة',
+      };
+
+      final fullPrompt =
+          'اكتب نص ${toneMap[_textTone]} عن "${_promptController.text}" بطول ${lengthMap[_textLength]}';
+
+      final response = await service.generateText(fullPrompt);
       setState(() {
-        _result =
-            '✅ نجح!\n\n${response['text'] ?? response['data'] ?? response}';
-      });
-    } catch (e) {
-      setState(() {
-        _result = '❌ فشل: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _testGenerateImage() async {
-    if (!_checkAuth()) return;
-    if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل وصف الصورة أولاً');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _result = '⏳ جاري توليد الصورة...';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'image';
-    });
-
-    try {
-      final service = widget.ref.read(mbuyStudioServiceProvider);
-      final response = await service.generateImage(_promptController.text);
-
-      final imageUrl =
-          response['image_url'] ?? response['url'] ?? response['image'];
-      setState(() {
-        if (imageUrl != null) {
-          _generatedImageUrl = imageUrl;
-          _result = '✅ تم توليد الصورة بنجاح!';
-        } else {
-          _result = '✅ Response: $response';
-        }
-      });
-    } catch (e) {
-      setState(() {
-        _result = '❌ فشل: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _testGenerateBanner() async {
-    if (!_checkAuth()) return;
-    if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل وصف البانر أولاً');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _result = '⏳ جاري توليد البانر...';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'banner';
-    });
-
-    try {
-      final service = widget.ref.read(mbuyStudioServiceProvider);
-      final response = await service.generateBanner(_promptController.text);
-
-      final bannerUrl =
-          response['banner_url'] ?? response['url'] ?? response['image'];
-      setState(() {
-        if (bannerUrl != null) {
-          _generatedImageUrl = bannerUrl;
-          _result = '✅ تم توليد البانر بنجاح!';
-        } else {
-          _result = '✅ Response: $response';
-        }
+        final text =
+            response['text'] ?? response['content'] ?? response['data'];
+        _result = '✅ النص المولّد:\n\n$text';
       });
     } catch (e) {
       setState(() {
@@ -1324,7 +1270,10 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   Future<void> _testGenerateProductDescription() async {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل اسم المنتج أولاً');
+      setState(
+        () => _result =
+            '⚠️ أدخل اسم المنتج ومميزاته\n(مثال: ساعة ذكية - مقاومة للماء - بطارية طويلة - شاشة AMOLED)',
+      );
       return;
     }
 
@@ -1337,10 +1286,17 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       final service = widget.ref.read(mbuyStudioServiceProvider);
       final response = await service.generateProductDescription(
         prompt: _promptController.text,
+        tone: _productTone,
+        language: 'ar',
       );
+
+      final description =
+          response['description'] ??
+          response['content'] ??
+          response['text'] ??
+          response['data'];
       setState(() {
-        _result =
-            '✅ نجح!\n\n${response['description'] ?? response['text'] ?? response['data'] ?? response}';
+        _result = '✅ وصف المنتج:\n\n$description';
       });
     } catch (e) {
       setState(() {
@@ -1354,7 +1310,9 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   Future<void> _testGenerateKeywords() async {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل اسم/وصف المنتج أولاً');
+      setState(
+        () => _result = '⚠️ أدخل اسم المنتج أو الفئة\n(مثال: حقيبة جلد نسائية)',
+      );
       return;
     }
 
@@ -1367,48 +1325,16 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       final service = widget.ref.read(mbuyStudioServiceProvider);
       final response = await service.generateKeywords(
         prompt: _promptController.text,
-      );
-      setState(() {
-        _result =
-            '✅ نجح!\n\n${response['keywords'] ?? response['data'] ?? response}';
-      });
-    } catch (e) {
-      setState(() {
-        _result = '❌ فشل: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _testGenerateLogo() async {
-    if (!_checkAuth()) return;
-    if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل اسم العلامة التجارية أولاً');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _result = '⏳ جاري توليد الشعار...';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'logo';
-    });
-
-    try {
-      final service = widget.ref.read(mbuyStudioServiceProvider);
-      final response = await service.generateLogo(
-        brandName: _promptController.text,
+        language: 'ar',
       );
 
-      final logoUrl =
-          response['logo_url'] ?? response['url'] ?? response['image'];
+      final keywords = response['keywords'];
       setState(() {
-        if (logoUrl != null) {
-          _generatedImageUrl = logoUrl;
-          _result = '✅ تم توليد الشعار بنجاح!';
+        if (keywords is List && keywords.isNotEmpty) {
+          _result =
+              '✅ الكلمات المفتاحية:\n\n${keywords.map((k) => '• $k').join('\n')}';
         } else {
-          _result = '✅ Response: $response';
+          _result = '✅ ${response['data'] ?? response}';
         }
       });
     } catch (e) {
@@ -1420,32 +1346,168 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     }
   }
 
-  Future<void> _showSaveOptions() async {
-    if (_generatedImageUrl == null) return;
+  // ============= AI Image Generation =============
+  Future<void> _testNanoBananaGenerate() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(
+        () => _result =
+            '⚠️ أدخل وصف الصورة بالإنجليزية\n(مثال: Professional product photo of a smartwatch on white background)',
+      );
+      return;
+    }
 
-    // الحصول على معرف المتجر
-    String? storeId;
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد الصورة عبر NanoBanana...';
+      _generatedImageUrl = null;
+      _currentTaskId = null;
+    });
+
     try {
-      final merchantRepo = widget.ref.read(merchantRepositoryProvider);
-      final store = await merchantRepo.getMerchantStore();
-      storeId = store?.id;
-    } catch (_) {}
+      final service = widget.ref.read(mbuyStudioServiceProvider);
 
-    if (!mounted) return;
+      // توليد الصورة
+      final response = await service.nanoBananaGenerate(_promptController.text);
 
-    showAiResultActions(
-      context: context,
-      imageUrl: _generatedImageUrl!,
-      type: _lastGeneratedType ?? 'image',
-      ref: widget.ref,
-      prompt: _promptController.text,
-      storeId: storeId,
-      onApplied: () {
+      // التحقق من النتيجة
+      final status = response['status'];
+      final imageUrl = response['image_url'] ?? response['imageUrl'];
+
+      if (status == 'completed' && imageUrl != null) {
         setState(() {
-          _result = '✅ تم التطبيق بنجاح!';
+          _generatedImageUrl = imageUrl;
+          _result = '✅ تم توليد الصورة بنجاح!';
         });
-      },
-    );
+      } else {
+        setState(() {
+          _result =
+              '❌ فشل: ${response['error'] ?? response['details'] ?? 'استجابة غير متوقعة'}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // ignore: unused_element - محفوظة للاستخدام المستقبلي
+  Future<void> _pollTaskStatus(String taskId) async {
+    final service = widget.ref.read(mbuyStudioServiceProvider);
+    int attempts = 0;
+    const maxAttempts = 30; // 30 محاولة × 2 ثانية = دقيقة واحدة كحد أقصى
+
+    while (attempts < maxAttempts) {
+      attempts++;
+      await Future.delayed(const Duration(seconds: 2));
+
+      try {
+        final taskResponse = await service.nanoBananaGetTask(taskId);
+        final status = taskResponse['status']?.toString().toLowerCase();
+
+        if (status == 'completed' || status == 'success') {
+          // البحث عن رابط الصورة في النتيجة
+          final result = taskResponse['result'];
+          String? imageUrl;
+
+          if (result is List && result.isNotEmpty) {
+            imageUrl = result[0]?.toString();
+          } else if (result is Map) {
+            imageUrl = result['url'] ?? result['image_url'] ?? result['image'];
+          } else if (result is String) {
+            imageUrl = result;
+          }
+
+          // أيضاً تحقق من المستوى الأعلى
+          imageUrl ??=
+              taskResponse['url'] ??
+              taskResponse['image_url'] ??
+              taskResponse['image'];
+
+          setState(() {
+            _generatedImageUrl = imageUrl;
+            _result = imageUrl != null
+                ? '✅ تم توليد الصورة بنجاح!'
+                : '✅ اكتملت المهمة لكن لم يتم العثور على رابط الصورة\n\nالنتيجة: $taskResponse';
+          });
+          return;
+        } else if (status == 'failed' || status == 'error') {
+          final error =
+              taskResponse['error'] ??
+              taskResponse['message'] ??
+              'خطأ غير معروف';
+          setState(() {
+            _result = '❌ فشلت المهمة: $error';
+          });
+          return;
+        } else {
+          // لا زالت قيد التنفيذ
+          setState(() {
+            _result =
+                '⏳ حالة المهمة: ${status ?? 'processing'}\nالمحاولة: $attempts/$maxAttempts';
+          });
+        }
+      } catch (e) {
+        debugPrint('[NanoBanana] Poll error: $e');
+        // استمر في المحاولة
+      }
+    }
+
+    setState(() {
+      _result = '⚠️ انتهت المهلة. يمكنك التحقق لاحقاً من المهمة: $taskId';
+    });
+  }
+
+  Future<void> _checkTaskStatus() async {
+    if (_currentTaskId == null) {
+      setState(() => _result = '⚠️ لا توجد مهمة للتحقق منها');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري التحقق من حالة المهمة...';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.nanoBananaGetTask(_currentTaskId!);
+
+      final status = response['status'];
+      final result = response['result'];
+
+      setState(() {
+        _result =
+            '📋 حالة المهمة: $status\n\nالتفاصيل:\n${_formatJson(response)}';
+
+        // إذا اكتملت، حاول استخراج الصورة
+        if (status == 'completed' || status == 'success') {
+          String? imageUrl;
+          if (result is List && result.isNotEmpty) {
+            imageUrl = result[0]?.toString();
+          } else if (result is Map) {
+            imageUrl = result['url'] ?? result['image_url'];
+          }
+          imageUrl ??= response['url'] ?? response['image_url'];
+          _generatedImageUrl = imageUrl;
+        }
+      });
+    } catch (e) {
+      setState(() => _result = '❌ فشل التحقق: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  String _formatJson(Map<String, dynamic> json) {
+    try {
+      return json.entries.map((e) => '${e.key}: ${e.value}').join('\n');
+    } catch (_) {
+      return json.toString();
+    }
   }
 
   @override
@@ -1496,25 +1558,9 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           ),
           const SizedBox(height: 16),
 
-          // حقل الإدخال
-          TextField(
-            controller: _promptController,
-            maxLines: 3,
-            decoration: InputDecoration(
-              labelText: 'النص / الوصف',
-              hintText: 'أدخل نص أو وصف للتجربة...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // أزرار الأدوات
+          // اختيار الأداة
           Text(
-            'أدوات التوليد:',
+            'اختر الأداة:',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -1527,45 +1573,178 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _buildToolButton(
+              _buildToolChip(
+                'text',
                 'توليد نص',
                 Icons.text_fields,
                 Colors.blue,
-                _testGenerateText,
               ),
-              _buildToolButton(
-                'توليد صورة',
-                Icons.image,
-                Colors.purple,
-                _testGenerateImage,
-              ),
-              _buildToolButton(
-                'توليد بانر',
-                Icons.panorama,
-                Colors.orange,
-                _testGenerateBanner,
-              ),
-              _buildToolButton(
+              _buildToolChip(
+                'description',
                 'وصف منتج',
                 Icons.description,
                 Colors.teal,
-                _testGenerateProductDescription,
               ),
-              _buildToolButton(
+              _buildToolChip(
+                'keywords',
                 'كلمات مفتاحية',
                 Icons.key,
                 Colors.indigo,
-                _testGenerateKeywords,
               ),
-              _buildToolButton(
-                'شعار',
-                Icons.brush,
-                Colors.pink,
-                _testGenerateLogo,
+              _buildToolChip(
+                'nano_banana',
+                '🍌 صورة AI',
+                Icons.image,
+                Colors.orange,
               ),
             ],
           ),
+          const SizedBox(height: 16),
+
+          // حقل الإدخال مع تلميح مخصص
+          TextField(
+            controller: _promptController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelText: _getInputLabel(),
+              hintText: _getInputHint(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // خيارات إضافية حسب الأداة
+          _buildToolOptions(),
+          const SizedBox(height: 16),
+
+          // زر التوليد
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading ? null : _executeSelectedTool,
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.auto_awesome),
+              label: Text(_isLoading ? 'جاري التوليد...' : 'توليد'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _getToolColor(),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
+
+          // عرض الصورة المولدة (NanoBanana)
+          if (_generatedImageUrl != null) ...[
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange, width: 2),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  _generatedImageUrl!,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      color: Colors.grey[200],
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.broken_image,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'فشل تحميل الصورة',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        const SizedBox(height: 4),
+                        SelectableText(
+                          _generatedImageUrl!,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _generatedImageUrl!));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('تم نسخ الرابط')),
+                    );
+                  },
+                  icon: const Icon(Icons.copy, size: 16),
+                  label: const Text('نسخ الرابط'),
+                ),
+                const SizedBox(width: 16),
+                TextButton.icon(
+                  onPressed: () => setState(() {
+                    _generatedImageUrl = null;
+                    _result = '';
+                  }),
+                  icon: const Icon(Icons.close, size: 16),
+                  label: const Text('إخفاء'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // زر التحقق من المهمة (NanoBanana)
+          if (_selectedTool == 'nano_banana' &&
+              _currentTaskId != null &&
+              !_isLoading)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: OutlinedButton.icon(
+                onPressed: _checkTaskStatus,
+                icon: const Icon(Icons.refresh),
+                label: Text(
+                  'تحقق من المهمة: ${_currentTaskId!.substring(0, 8)}...',
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.orange,
+                  side: const BorderSide(color: Colors.orange),
+                ),
+              ),
+            ),
 
           // نتيجة
           Container(
@@ -1597,54 +1776,11 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                if (_generatedImageUrl != null) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      _generatedImageUrl!,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 100,
-                          color: Colors.red[100],
-                          child: Center(
-                            child: Text('فشل تحميل الصورة: $error'),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // زر خيارات الحفظ
-                  ElevatedButton.icon(
-                    onPressed: () => _showSaveOptions(),
-                    icon: const Icon(Icons.save_alt, size: 18),
-                    label: const Text('حفظ / تطبيق'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SelectableText(
-                    'URL: $_generatedImageUrl',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 12),
-                ],
                 SelectableText(
                   _result.isEmpty ? 'اضغط على أي أداة للتجربة' : _result,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.6,
                     color: _result.contains('❌')
                         ? Colors.red[800]
                         : _result.contains('✅')
@@ -1660,22 +1796,202 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     );
   }
 
-  Widget _buildToolButton(
+  // دوال مساعدة للأداة المختارة
+  String _getInputLabel() {
+    switch (_selectedTool) {
+      case 'text':
+        return 'موضوع النص (عربي)';
+      case 'description':
+        return 'اسم المنتج ومميزاته (عربي)';
+      case 'keywords':
+        return 'اسم المنتج/الفئة (عربي)';
+      case 'nano_banana':
+        return 'وصف الصورة (إنجليزي أفضل)';
+      default:
+        return 'الإدخال';
+    }
+  }
+
+  String _getInputHint() {
+    switch (_selectedTool) {
+      case 'text':
+        return 'مثال: منشور ترحيبي بالعملاء الجدد';
+      case 'description':
+        return 'مثال: ساعة ذكية - مقاومة للماء - شاشة AMOLED';
+      case 'keywords':
+        return 'مثال: حقيبة جلد نسائية';
+      case 'nano_banana':
+        return 'مثال: Professional product photo of a smartwatch on white background';
+      default:
+        return '';
+    }
+  }
+
+  Color _getToolColor() {
+    switch (_selectedTool) {
+      case 'text':
+        return Colors.blue;
+      case 'description':
+        return Colors.teal;
+      case 'keywords':
+        return Colors.indigo;
+      case 'nano_banana':
+        return Colors.orange;
+      default:
+        return Colors.blue;
+    }
+  }
+
+  void _executeSelectedTool() {
+    switch (_selectedTool) {
+      case 'text':
+        _testGenerateText();
+        break;
+      case 'description':
+        _testGenerateProductDescription();
+        break;
+      case 'keywords':
+        _testGenerateKeywords();
+        break;
+      case 'nano_banana':
+        _testNanoBananaGenerate();
+        break;
+    }
+  }
+
+  Widget _buildToolChip(
+    String value,
     String label,
     IconData icon,
     Color color,
-    VoidCallback onPressed,
   ) {
-    return ElevatedButton.icon(
-      onPressed: _isLoading ? null : onPressed,
-      icon: Icon(icon, size: 18),
+    final isSelected = _selectedTool == value;
+    return FilterChip(
+      selected: isSelected,
+      onSelected: (_) => setState(() {
+        _selectedTool = value;
+        _result = '';
+      }),
+      avatar: Icon(icon, size: 18, color: isSelected ? Colors.white : color),
       label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      selectedColor: color,
+      checkmarkColor: Colors.white,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : Colors.black87,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
+  }
+
+  Widget _buildToolOptions() {
+    switch (_selectedTool) {
+      case 'text':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'نوع النص:',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text('تسويقي'),
+                  selected: _textTone == 'marketing',
+                  onSelected: (_) => setState(() => _textTone = 'marketing'),
+                ),
+                ChoiceChip(
+                  label: const Text('رسمي'),
+                  selected: _textTone == 'formal',
+                  onSelected: (_) => setState(() => _textTone = 'formal'),
+                ),
+                ChoiceChip(
+                  label: const Text('مختصر'),
+                  selected: _textTone == 'short',
+                  onSelected: (_) => setState(() => _textTone = 'short'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text('الطول:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text('قصير'),
+                  selected: _textLength == 'short',
+                  onSelected: (_) => setState(() => _textLength = 'short'),
+                ),
+                ChoiceChip(
+                  label: const Text('متوسط'),
+                  selected: _textLength == 'medium',
+                  onSelected: (_) => setState(() => _textLength = 'medium'),
+                ),
+                ChoiceChip(
+                  label: const Text('طويل'),
+                  selected: _textLength == 'long',
+                  onSelected: (_) => setState(() => _textLength = 'long'),
+                ),
+              ],
+            ),
+          ],
+        );
+      case 'description':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'نبرة الوصف:',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text('ودية'),
+                  selected: _productTone == 'friendly',
+                  onSelected: (_) => setState(() => _productTone = 'friendly'),
+                ),
+                ChoiceChip(
+                  label: const Text('احترافية'),
+                  selected: _productTone == 'professional',
+                  onSelected: (_) =>
+                      setState(() => _productTone = 'professional'),
+                ),
+                ChoiceChip(
+                  label: const Text('فاخرة'),
+                  selected: _productTone == 'luxury',
+                  onSelected: (_) => setState(() => _productTone = 'luxury'),
+                ),
+              ],
+            ),
+          ],
+        );
+      case 'nano_banana':
+        return const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '🍌 NanoBanana',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'توليد صور بالذكاء الاصطناعي عبر OpenRouter',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }
