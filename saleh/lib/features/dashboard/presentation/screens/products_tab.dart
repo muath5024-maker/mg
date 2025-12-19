@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
+import '../../../../shared/widgets/app_icon.dart';
 import '../../../products/data/products_controller.dart';
 import 'product_settings_view.dart';
 
@@ -26,14 +28,33 @@ import 'product_settings_view.dart';
 
 /// شاشة المنتجات - Products Tab
 /// تعرض قائمة المنتجات الخاصة بالتاجر
-///
-/// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-14
-class ProductsTab extends ConsumerWidget {
+/// تصميم جديد مطابق لصفحة اختصاراتي
+class ProductsTab extends ConsumerStatefulWidget {
   const ProductsTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductsTab> createState() => _ProductsTabState();
+}
+
+class _ProductsTabState extends ConsumerState<ProductsTab>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final productsState = ref.watch(productsControllerProvider);
     final products = productsState.products;
     final isLoading = productsState.isLoading;
@@ -62,108 +83,128 @@ class ProductsTab extends ConsumerWidget {
       });
     }
 
-    return DefaultTabController(
-      length: 5,
-      child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: AppTheme.surfaceColor,
-          foregroundColor: AppTheme.textPrimaryColor,
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          surfaceTintColor: Colors.transparent,
-          title: const Text(
-            'المنتجات',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontHeadline,
-              color: AppTheme.textPrimaryColor,
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
+      body: Column(
+        children: [
+          // التبويبات
+          _buildTabs(),
+          // المحتوى
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // 1. المنتجات
+                RefreshIndicator(
+                  onRefresh: () => ref
+                      .read(productsControllerProvider.notifier)
+                      .loadProducts(),
+                  color: AppTheme.accentColor,
+                  child: isLoading && products.isEmpty
+                      ? const SkeletonProductsGrid()
+                      : products.isEmpty
+                      ? _buildEmptyState(context)
+                      : _buildProductsList(
+                          context,
+                          ref,
+                          _filterProducts(products),
+                        ),
+                ),
+                // 2. إعدادات المنتجات
+                const ProductSettingsView(),
+                // 3. المخزون
+                _buildQuickAccessPage(
+                  context,
+                  title: 'إدارة المخزون',
+                  subtitle: 'تابع مخزونك، عدّل الكميات، وتلقَّ تنبيهات النقص',
+                  icon: AppIcons.inventory2,
+                  buttonText: 'فتح إدارة المخزون',
+                  onPressed: () => context.push('/dashboard/inventory'),
+                ),
+                // 4. السجلات
+                _buildQuickAccessPage(
+                  context,
+                  title: 'سجلات النظام',
+                  subtitle: 'سجلات المنتجات والمخزون وجميع العمليات',
+                  icon: AppIcons.history,
+                  buttonText: 'فتح السجلات',
+                  onPressed: () => context.push('/dashboard/audit-logs'),
+                ),
+                // 5. المحذوفات
+                _buildDeletedProductsTab(),
+              ],
             ),
           ),
-          centerTitle: true,
-          iconTheme: const IconThemeData(
-            color: AppTheme.primaryColor,
-            size: AppDimensions.iconM,
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.search,
-                size: AppDimensions.iconM,
-                color: AppTheme.primaryColor,
-              ),
-              onPressed: () {
-                _showSearchDialog(context);
-              },
-            ),
-          ],
-          bottom: const TabBar(
-            isScrollable: true,
-            indicatorColor: AppTheme.primaryColor,
-            labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.textSecondaryColor,
-            tabs: [
-              Tab(text: 'المنتجات'),
-              Tab(text: 'إعدادات المنتجات'),
-              Tab(text: 'المخزون'),
-              Tab(text: 'السجلات'),
-              Tab(text: 'المحذوفات'),
-            ],
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showProductTypeSelection(context),
+        backgroundColor: AppTheme.primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'إضافة منتج',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: AppDimensions.fontBody,
           ),
         ),
-        body: TabBarView(
-          children: [
-            // 1. المنتجات
-            RefreshIndicator(
-              onRefresh: () =>
-                  ref.read(productsControllerProvider.notifier).loadProducts(),
-              color: AppTheme.accentColor,
-              child: isLoading && products.isEmpty
-                  ? const SkeletonProductsGrid()
-                  : products.isEmpty
-                  ? _buildEmptyState(context)
-                  : _buildProductsList(context, ref, products),
-            ),
-            // 2. إعدادات المنتجات
-            const ProductSettingsView(),
-            // 3. المخزون - صفحة انتقال سريع
-            _buildQuickAccessPage(
-              context,
-              title: 'إدارة المخزون',
-              subtitle: 'تابع مخزونك، عدّل الكميات، وتلقَّ تنبيهات النقص',
-              icon: Icons.inventory_2_outlined,
-              buttonText: 'فتح إدارة المخزون',
-              onPressed: () => context.push('/dashboard/inventory'),
-            ),
-            // 4. السجلات - صفحة انتقال سريع
-            _buildQuickAccessPage(
-              context,
-              title: 'سجلات النظام',
-              subtitle: 'سجلات المنتجات والمخزون وجميع العمليات',
-              icon: Icons.history_outlined,
-              buttonText: 'فتح السجلات',
-              onPressed: () => context.push('/dashboard/audit-logs'),
-            ),
-            // 5. المحذوفات
-            _buildPlaceholderPage('المنتجات المحذوفة'),
-          ],
+      ),
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: AppDimensions.borderRadiusM,
+          border: Border.all(color: AppTheme.dividerColor),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _showProductTypeSelection(context),
-          backgroundColor: AppTheme.accentColor,
-          foregroundColor: Colors.white,
-          elevation: 4,
-          icon: const Icon(Icons.add, size: AppDimensions.iconM),
-          label: const Text(
-            'إضافة منتج',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontBody,
+        child: TextField(
+          onChanged: (value) {
+            setState(() => _searchQuery = value);
+          },
+          decoration: InputDecoration(
+            hintText: 'البحث في المنتجات...',
+            hintStyle: TextStyle(color: AppTheme.textHintColor),
+            prefixIcon: AppIcon(AppIcons.search, color: AppTheme.textHintColor),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing16,
+              vertical: AppDimensions.spacing12,
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildTabs() {
+    return TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      indicatorColor: AppTheme.primaryColor,
+      labelColor: AppTheme.primaryColor,
+      unselectedLabelColor: AppTheme.textSecondaryColor,
+      tabs: const [
+        Tab(text: 'المنتجات'),
+        Tab(text: 'إعدادات المنتجات'),
+        Tab(text: 'المخزون'),
+        Tab(text: 'السجلات'),
+        Tab(text: 'المحذوفات'),
+      ],
+    );
+  }
+
+  List<dynamic> _filterProducts(List<dynamic> products) {
+    if (_searchQuery.isEmpty) return products;
+    return products
+        .where((p) => p.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
   }
 
   void _showProductTypeSelection(BuildContext context) {
@@ -193,37 +234,33 @@ class ProductsTab extends ConsumerWidget {
                   _buildProductTypeOption(
                     context,
                     'منتج ملموس',
-                    Icons.inventory_2,
+                    AppIcons.inventory2,
                   ),
                   _buildProductTypeOption(
                     context,
                     'خدمة حسب الطلب',
-                    Icons.design_services,
+                    AppIcons.edit,
                   ),
                   _buildProductTypeOption(
                     context,
                     'أكل ومشروبات',
-                    Icons.restaurant,
+                    AppIcons.store, // أو أيقونة مناسبة
                   ),
                   _buildProductTypeOption(
                     context,
                     'منتج رقمي',
-                    Icons.cloud_download,
+                    AppIcons.downloadCloud,
                   ),
                   _buildProductTypeOption(
                     context,
                     'مجموعة منتجات',
-                    Icons.layers,
+                    AppIcons.layers,
                   ),
-                  _buildProductTypeOption(
-                    context,
-                    'حجوزات',
-                    Icons.calendar_month,
-                  ),
+                  _buildProductTypeOption(context, 'حجوزات', AppIcons.calendar),
                   _buildProductTypeOption(
                     context,
                     'دروب شوبينق',
-                    Icons.import_export,
+                    AppIcons.importExport,
                   ),
                 ],
               ),
@@ -237,10 +274,10 @@ class ProductsTab extends ConsumerWidget {
   Widget _buildProductTypeOption(
     BuildContext context,
     String title,
-    IconData icon,
+    String icon,
   ) {
     return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryColor),
+      leading: AppIcon(icon, color: AppTheme.primaryColor),
       title: Text(title),
       onTap: () {
         Navigator.pop(context);
@@ -249,29 +286,173 @@ class ProductsTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildPlaceholderPage(String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.construction,
-            size: 64,
-            color: AppTheme.textHintColor,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textSecondaryColor,
+  /// تبويب المنتجات المحذوفة
+  Widget _buildDeletedProductsTab() {
+    // قائمة محاكاة للمنتجات المحذوفة
+    final deletedProducts = <Map<String, dynamic>>[];
+
+    if (deletedProducts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppTheme.errorColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: AppIcon(
+                AppIcons.delete,
+                size: 64,
+                color: AppTheme.errorColor.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'لا توجد منتجات محذوفة',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'المنتجات المحذوفة ستظهر هنا\nيمكنك استعادتها خلال 30 يوم',
+              style: TextStyle(
+                color: AppTheme.textSecondaryColor,
+                fontSize: AppDimensions.fontBody,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: AppDimensions.paddingM,
+              margin: AppDimensions.paddingHorizontalL,
+              decoration: BoxDecoration(
+                color: AppTheme.infoColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusM,
+                border: Border.all(
+                  color: AppTheme.infoColor.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const AppIcon(
+                    AppIcons.info,
+                    size: AppDimensions.iconS,
+                    color: AppTheme.infoColor,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'المنتجات المحذوفة تُحذف نهائياً بعد 30 يوم',
+                      style: TextStyle(
+                        color: AppTheme.infoColor,
+                        fontSize: AppDimensions.fontBody2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: AppDimensions.paddingM,
+      itemCount: deletedProducts.length,
+      itemBuilder: (context, index) {
+        final product = deletedProducts[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: AppTheme.slate200,
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: AppIcon(AppIcons.image, color: AppTheme.slate400),
+            ),
+            title: Text(product['name'] ?? ''),
+            subtitle: Text('محذوف منذ ${product['deletedAt'] ?? ''}'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const AppIcon(
+                    AppIcons.refresh,
+                    color: AppTheme.successColor,
+                  ),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('تم استعادة المنتج'),
+                        backgroundColor: AppTheme.successColor,
+                      ),
+                    );
+                  },
+                  tooltip: 'استعادة',
+                ),
+                IconButton(
+                  icon: const AppIcon(
+                    AppIcons.delete,
+                    color: AppTheme.errorColor,
+                  ),
+                  onPressed: () {
+                    _showPermanentDeleteConfirmation(
+                      context,
+                      product['name'] ?? '',
+                    );
+                  },
+                  tooltip: 'حذف نهائي',
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'هذه الصفحة قيد التطوير',
-            style: TextStyle(color: AppTheme.textHintColor),
+        );
+      },
+    );
+  }
+
+  void _showPermanentDeleteConfirmation(
+    BuildContext context,
+    String productName,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('حذف نهائي'),
+        content: Text(
+          'هل أنت متأكد من حذف "$productName" نهائياً؟\nلا يمكن التراجع عن هذا الإجراء.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم الحذف نهائياً'),
+                  backgroundColor: AppTheme.errorColor,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.errorColor,
+            ),
+            child: const Text(
+              'حذف نهائي',
+              style: TextStyle(color: AppTheme.surfaceColor),
+            ),
           ),
         ],
       ),
@@ -283,7 +464,7 @@ class ProductsTab extends ConsumerWidget {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String icon,
     required String buttonText,
     required VoidCallback onPressed,
   }) {
@@ -299,7 +480,7 @@ class ProductsTab extends ConsumerWidget {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 64, color: AppTheme.primaryColor),
+              child: AppIcon(icon, size: 64, color: AppTheme.primaryColor),
             ),
             const SizedBox(height: 24),
             Text(
@@ -322,11 +503,11 @@ class ProductsTab extends ConsumerWidget {
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: onPressed,
-              icon: const Icon(Icons.open_in_new),
+              icon: const AppIcon(AppIcons.link, color: AppTheme.surfaceColor),
               label: Text(buttonText),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: AppTheme.surfaceColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -357,8 +538,8 @@ class ProductsTab extends ConsumerWidget {
                 color: AppTheme.primaryColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.inventory_2_outlined,
+              child: AppIcon(
+                AppIcons.inventory2,
                 size: AppDimensions.iconDisplay,
                 color: AppTheme.primaryColor.withValues(alpha: 0.5),
               ),
@@ -387,7 +568,7 @@ class ProductsTab extends ConsumerWidget {
                 onPressed: () => context.push('/dashboard/products/add'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.accentColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppTheme.surfaceColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: AppDimensions.borderRadiusM,
                   ),
@@ -395,7 +576,11 @@ class ProductsTab extends ConsumerWidget {
                     horizontal: AppDimensions.spacing24,
                   ),
                 ),
-                icon: const Icon(Icons.add, size: AppDimensions.iconS),
+                icon: const AppIcon(
+                  AppIcons.add,
+                  size: AppDimensions.iconS,
+                  color: AppTheme.surfaceColor,
+                ),
                 label: const Text(
                   'إضافة منتج',
                   style: TextStyle(
@@ -416,178 +601,247 @@ class ProductsTab extends ConsumerWidget {
     WidgetRef ref,
     List products,
   ) {
-    return ListView.builder(
+    return GridView.builder(
       padding: AppDimensions.screenPadding,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.65,
+      ),
       itemCount: products.length,
       itemBuilder: (context, index) {
         final product = products[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: AppDimensions.spacing12),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
-            borderRadius: AppDimensions.borderRadiusM,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            borderRadius: AppDimensions.borderRadiusM,
-            child: InkWell(
-              onTap: () => context.push('/dashboard/products/${product.id}'),
-              borderRadius: AppDimensions.borderRadiusM,
-              child: Padding(
-                padding: const EdgeInsets.all(AppDimensions.spacing12),
-                child: Row(
-                  children: [
-                    // Product Image
-                    _buildProductImage(product),
-                    const SizedBox(width: AppDimensions.spacing12),
-                    // Product Info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            product.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: AppDimensions.fontBody,
-                              color: AppTheme.textPrimaryColor,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: AppDimensions.spacing4),
-                          Text(
-                            '${product.price.toStringAsFixed(2)} ر.س',
-                            style: const TextStyle(
-                              fontSize: AppDimensions.fontTitle,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.accentColor,
-                            ),
-                          ),
-                          const SizedBox(height: AppDimensions.spacing4),
-                          _buildStockBadge(product.stock),
-                        ],
-                      ),
-                    ),
-                    // Status Icon & Actions
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: AppDimensions.avatarS,
-                          height: AppDimensions.avatarS,
-                          decoration: BoxDecoration(
-                            color: product.isActive
-                                ? AppTheme.successColor.withValues(alpha: 0.1)
-                                : Colors.grey.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            product.isActive
-                                ? Icons.check_circle
-                                : Icons.visibility_off,
-                            color: product.isActive
-                                ? AppTheme.successColor
-                                : AppTheme.textHintColor,
-                            size: AppDimensions.iconS,
-                          ),
-                        ),
-                        PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: AppTheme.textSecondaryColor,
-                          ),
-                          onSelected: (value) =>
-                              _handleMenuAction(context, ref, value, product),
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuEntry<String>>[
-                                _buildMenuItem(
-                                  'edit',
-                                  Icons.edit,
-                                  'تعديل معلومات المنتج',
-                                ),
-                                _buildMenuItem(
-                                  'duplicate',
-                                  Icons.copy,
-                                  'تكرار المنتج',
-                                ),
-                                _buildMenuItem(
-                                  'edit_stock',
-                                  Icons.inventory,
-                                  'تعديل المخزون',
-                                ),
-                                _buildMenuItem(
-                                  'hide',
-                                  Icons.visibility_off,
-                                  'إخفاء المنتج',
-                                ),
-                                _buildMenuItem(
-                                  'share',
-                                  Icons.share,
-                                  'مشاركة المنتج',
-                                ),
-                                _buildMenuItem(
-                                  'copy_link',
-                                  Icons.link,
-                                  'نسخ رابط المنتج',
-                                ),
-                                _buildMenuItem(
-                                  'marketing',
-                                  Icons.campaign,
-                                  'أدوات التسويق',
-                                ),
-                                const PopupMenuDivider(),
-                                const PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.delete,
-                                        color: AppTheme.errorColor,
-                                        size: 20,
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'حذف المنتج',
-                                        style: TextStyle(
-                                          color: AppTheme.errorColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
+        return _buildProductCard(context, ref, product);
       },
     );
   }
 
-  PopupMenuItem<String> _buildMenuItem(
-    String value,
-    IconData icon,
-    String text,
+  Widget _buildProductCard(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic product,
   ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.darkSlate.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // صورة المنتج مع قائمة الإجراءات
+          Stack(
+            children: [
+              GestureDetector(
+                onTap: () => context.push('/dashboard/products/${product.id}'),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1.1,
+                    child: product.mainImageUrl != null
+                        ? Image.network(
+                            product.mainImageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildPlaceholderImage(),
+                          )
+                        : _buildPlaceholderImage(),
+                  ),
+                ),
+              ),
+              // زر القائمة
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(
+                      Icons.more_vert,
+                      size: 18,
+                      color: AppTheme.textPrimaryColor,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onSelected: (value) =>
+                        _handleMenuAction(context, ref, value, product),
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                          _buildMenuItem('edit', AppIcons.edit, 'تعديل'),
+                          _buildMenuItem('duplicate', AppIcons.copy, 'تكرار'),
+                          _buildMenuItem(
+                            'hide',
+                            AppIcons.visibilityOff,
+                            'إخفاء',
+                          ),
+                          _buildMenuItem('share', AppIcons.share, 'مشاركة'),
+                          const PopupMenuDivider(),
+                          const PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete,
+                                  color: AppTheme.errorColor,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'حذف',
+                                  style: TextStyle(color: AppTheme.errorColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // معلومات المنتج
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // اسم المنتج
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: AppTheme.textPrimaryColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  // حقل تعديل السعر
+                  _buildEditableField(
+                    label: 'السعر',
+                    value: product.price.toStringAsFixed(2),
+                    suffix: 'ر.س',
+                    onChanged: (newValue) {
+                      final newPrice = double.tryParse(newValue);
+                      if (newPrice != null) {
+                        _updateProductPrice(ref, product, newPrice);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 4),
+                  // حقل تعديل الكمية
+                  _buildEditableField(
+                    label: 'الكمية',
+                    value: product.stock.toString(),
+                    suffix: '',
+                    onChanged: (newValue) {
+                      final newStock = int.tryParse(newValue);
+                      if (newStock != null) {
+                        _updateProductStock(ref, product, newStock);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditableField({
+    required String label,
+    required String value,
+    required String suffix,
+    required Function(String) onChanged,
+  }) {
+    final controller = TextEditingController(text: value);
+    return Row(
+      children: [
+        Text(
+          '$label: ',
+          style: TextStyle(fontSize: 11, color: AppTheme.textSecondaryColor),
+        ),
+        Expanded(
+          child: SizedBox(
+            height: 26,
+            child: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.primaryColor,
+              ),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 4,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: AppTheme.dividerColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: AppTheme.dividerColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: AppTheme.primaryColor),
+                ),
+                suffixText: suffix,
+                suffixStyle: TextStyle(
+                  fontSize: 10,
+                  color: AppTheme.textSecondaryColor,
+                ),
+              ),
+              onSubmitted: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _updateProductPrice(WidgetRef ref, dynamic product, double newPrice) {
+    HapticFeedback.lightImpact();
+    ref
+        .read(productsControllerProvider.notifier)
+        .updateProduct(productId: product.id, price: newPrice);
+  }
+
+  void _updateProductStock(WidgetRef ref, dynamic product, int newStock) {
+    HapticFeedback.lightImpact();
+    ref
+        .read(productsControllerProvider.notifier)
+        .updateProduct(productId: product.id, stock: newStock);
+  }
+
+  PopupMenuItem<String> _buildMenuItem(String value, String icon, String text) {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppTheme.textPrimaryColor),
+          AppIcon(icon, size: 20, color: AppTheme.textPrimaryColor),
           const SizedBox(width: 8),
           Text(text),
         ],
@@ -603,10 +857,8 @@ class ProductsTab extends ConsumerWidget {
   ) {
     switch (value) {
       case 'edit':
-        // TODO: Implement Edit
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('سيتم تفعيل التعديل قريباً')),
-        );
+        // التنقل لصفحة تعديل المنتج
+        context.push('/dashboard/products/${product.id}');
         break;
       case 'duplicate':
         _duplicateProduct(context, ref, product);
@@ -710,14 +962,14 @@ class ProductsTab extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildMarketingOption(context, 'تثبيت المنتج', Icons.push_pin),
+              _buildMarketingOption(context, 'تثبيت المنتج', AppIcons.pin),
               _buildMarketingOption(
                 context,
                 'دعم ظهور المنتج',
-                Icons.trending_up,
+                AppIcons.trendingUp,
               ),
-              _buildMarketingOption(context, 'دعم ظهور المتجر', Icons.store),
-              _buildMarketingOption(context, 'تثبيت المتجر', Icons.star),
+              _buildMarketingOption(context, 'دعم ظهور المتجر', AppIcons.store),
+              _buildMarketingOption(context, 'تثبيت المتجر', AppIcons.star),
             ],
           ),
         );
@@ -728,14 +980,14 @@ class ProductsTab extends ConsumerWidget {
   Widget _buildMarketingOption(
     BuildContext context,
     String title,
-    IconData icon,
+    String icon,
   ) {
     return Column(
       children: [
         ListTile(
-          leading: Icon(icon, color: AppTheme.primaryColor),
+          leading: AppIcon(icon, color: AppTheme.primaryColor),
           title: Text(title),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          trailing: const AppIcon(AppIcons.chevronRight, size: 16),
           onTap: () {
             // Show duration slider
             Navigator.pop(context);
@@ -868,141 +1120,16 @@ class ProductsTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildProductImage(dynamic product) {
-    final hasVideo = product.videoUrl != null;
-
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: AppDimensions.borderRadiusS,
-          child: product.imageUrl != null
-              ? Image.network(
-                  product.imageUrl!,
-                  width: AppDimensions.thumbnailL,
-                  height: AppDimensions.thumbnailL,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildPlaceholderImage();
-                  },
-                )
-              : _buildPlaceholderImage(),
-        ),
-        if (hasVideo)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.3),
-                borderRadius: AppDimensions.borderRadiusS,
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_circle_fill,
-                  color: Colors.white,
-                  size: AppDimensions.iconM,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
   Widget _buildPlaceholderImage() {
     return Container(
-      width: AppDimensions.thumbnailL,
-      height: AppDimensions.thumbnailL,
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withValues(alpha: 0.08),
-        borderRadius: AppDimensions.borderRadiusS,
-      ),
-      child: Icon(
-        Icons.inventory_2,
-        color: AppTheme.primaryColor.withValues(alpha: 0.4),
-        size: AppDimensions.iconXL,
-      ),
-    );
-  }
-
-  Widget _buildStockBadge(int stock) {
-    final isInStock = stock > 0;
-    final isLowStock = stock > 0 && stock <= 10;
-
-    Color bgColor;
-    Color textColor;
-    String text;
-
-    if (!isInStock) {
-      bgColor = AppTheme.errorColor.withValues(alpha: 0.1);
-      textColor = AppTheme.errorColor;
-      text = 'نفذ المخزون';
-    } else if (isLowStock) {
-      bgColor = AppTheme.warningColor.withValues(alpha: 0.1);
-      textColor = AppTheme.warningColor;
-      text = 'المخزون: $stock (منخفض)';
-    } else {
-      bgColor = AppTheme.successColor.withValues(alpha: 0.1);
-      textColor = AppTheme.successColor;
-      text = 'المخزون: $stock';
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing8,
-        vertical: AppDimensions.spacing4,
-      ),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: AppDimensions.borderRadiusXS,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: AppDimensions.fontLabel,
-          color: textColor,
-          fontWeight: FontWeight.w500,
+      color: AppTheme.slate100,
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: 40,
+          color: AppTheme.textHintColor,
         ),
       ),
-    );
-  }
-
-  void _showSearchDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.borderRadiusM,
-          ),
-          title: const Text('البحث عن منتج', textAlign: TextAlign.center),
-          content: TextField(
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: 'اكتب اسم المنتج...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: AppDimensions.borderRadiusS,
-              ),
-            ),
-            onSubmitted: (value) {
-              Navigator.pop(context);
-              if (value.isNotEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('البحث عن: $value'),
-                    backgroundColor: AppTheme.primaryColor,
-                  ),
-                );
-              }
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

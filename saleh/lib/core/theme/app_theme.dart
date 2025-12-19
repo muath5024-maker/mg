@@ -5,13 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
 // ║                                                                           ║
 // ║   هذا الملف يحتوي على التصميم المعتمد والنهائي للتطبيق                     ║
-// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║   تاريخ التثبيت: 19 ديسمبر 2025                                           ║
 // ║                                                                           ║
 // ║   ⛔ ممنوع تعديل الألوان أو التصميم إلا بطلب صريح وواضح من المالك          ║
 // ║   ⛔ DO NOT MODIFY colors or design without EXPLICIT owner request        ║
 // ║                                                                           ║
 // ║   الألوان المعتمدة:                                                       ║
-// ║   • Primary: Navy Blue #1E3A5F (الثقة والاحترافية)                        ║
+// ║   • Primary: Oxford Blue #00214A (الثقة والاحترافية)                      ║
 // ║   • Secondary: Teal #00B4B4 (الحداثة والانتعاش)                           ║
 // ║   • Accent: Orange #FF6B35 (الإجراءات والتحفيز)                           ║
 // ║                                                                           ║
@@ -25,15 +25,15 @@ import 'package:google_fonts/google_fonts.dart';
 /// Do not change without explicit request
 class AppTheme {
   // ============================================================================
-  // E-commerce Color Palette (Amazon/Noon/Shopify Inspired)
+  // E-commerce Color Palette - Oxford Blue Theme
   // ============================================================================
 
-  // === Primary Colors (Blue - From FAB Button) ===
+  // === Primary Colors (Oxford Blue - الأزرق الأكسفوردي) ===
   static const Color primaryColor = Color(
-    0xFF2563EB,
-  ); // Blue - Main color from FAB
-  static const Color primaryLight = Color(0xFF3B82F6); // Blue-500
-  static const Color primaryDark = Color(0xFF1D4ED8); // Blue-700
+    0xFF00214A,
+  ); // Oxford Blue - اللون الأساسي
+  static const Color primaryLight = Color(0xFF003366); // Oxford Blue Light
+  static const Color primaryDark = Color(0xFF001830); // Oxford Blue Dark
 
   // === Purple Colors (Reduced Usage) ===
   static const Color purpleColor = Color(
@@ -669,6 +669,194 @@ class AppTheme {
       // Splash & Highlight
       splashColor: primaryColor.withValues(alpha: 0.1),
       highlightColor: primaryColor.withValues(alpha: 0.05),
+    );
+  }
+
+  // ============================================================================
+  // Dark Theme
+  // ============================================================================
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+
+      // Color Scheme for Dark Mode
+      colorScheme: const ColorScheme.dark(
+        primary: primaryColor,
+        onPrimary: Colors.white,
+        primaryContainer: primaryDark,
+        onPrimaryContainer: Colors.white,
+        secondary: secondaryColor,
+        onSecondary: Colors.white,
+        secondaryContainer: secondaryDark,
+        onSecondaryContainer: Colors.white,
+        tertiary: accentColor,
+        onTertiary: Colors.white,
+        tertiaryContainer: accentDark,
+        onTertiaryContainer: Colors.white,
+        surface: surfaceColorDark,
+        onSurface: textPrimaryColorDark,
+        surfaceContainerHighest: Color(0xFF3A3A3A),
+        error: errorColor,
+        onError: Colors.white,
+        outline: borderColorDark,
+        outlineVariant: dividerColorDark,
+      ),
+
+      // Scaffold
+      scaffoldBackgroundColor: backgroundColorDark,
+
+      // AppBar
+      appBarTheme: AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        backgroundColor: surfaceColorDark,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: textPrimaryColorDark,
+        titleTextStyle: GoogleFonts.cairo(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryColorDark,
+        ),
+        iconTheme: const IconThemeData(color: primaryColor, size: 24),
+      ),
+
+      // Text Theme
+      textTheme:
+          TextTheme(
+            displayLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            displayMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            displaySmall: GoogleFonts.cairo(color: textPrimaryColorDark),
+            headlineLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            headlineMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            headlineSmall: GoogleFonts.cairo(color: textPrimaryColorDark),
+            titleLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            titleMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            titleSmall: GoogleFonts.cairo(color: textPrimaryColorDark),
+            bodyLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            bodyMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            bodySmall: GoogleFonts.cairo(color: textSecondaryColorDark),
+            labelLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            labelMedium: GoogleFonts.cairo(color: textSecondaryColorDark),
+            labelSmall: GoogleFonts.cairo(color: textSecondaryColorDark),
+          ).apply(
+            bodyColor: textPrimaryColorDark,
+            displayColor: textPrimaryColorDark,
+          ),
+
+      // Elevated Button
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: buttonElevation,
+          shadowColor: primaryColor.withValues(alpha: 0.4),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadiusMedium),
+          ),
+          textStyle: GoogleFonts.cairo(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      // Input Decoration
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF2A2A2A), // Darker input background
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: const BorderSide(color: borderColorDark),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: const BorderSide(color: borderColorDark),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: const BorderSide(color: errorColor),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: const BorderSide(color: errorColor, width: 2),
+        ),
+        hintStyle: GoogleFonts.cairo(color: textHintColorDark, fontSize: 14),
+        labelStyle: GoogleFonts.cairo(
+          color: textSecondaryColorDark,
+          fontSize: 14,
+        ),
+        prefixIconColor: textSecondaryColorDark,
+        suffixIconColor: textSecondaryColorDark,
+      ),
+
+      // Card Theme
+      cardTheme: CardThemeData(
+        elevation: 1,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
+          side: const BorderSide(color: borderColorDark, width: 1),
+        ),
+        color: cardColorDark,
+        surfaceTintColor: Colors.transparent,
+        margin: EdgeInsets.zero,
+      ),
+
+      // Bottom Navigation Bar
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: surfaceColorDark,
+        elevation: 8,
+        selectedItemColor: primaryColor,
+        unselectedItemColor: textSecondaryColorDark,
+      ),
+
+      // Navigation Bar (M3)
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceColorDark,
+        elevation: 8,
+        indicatorColor: primaryColor.withValues(alpha: 0.2),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.selected)
+              ? primaryColor
+              : textSecondaryColorDark;
+          return GoogleFonts.cairo(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: color,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.selected)
+              ? primaryColor
+              : textSecondaryColorDark;
+          return IconThemeData(color: color, size: 24);
+        }),
+      ),
+
+      // Divider
+      dividerTheme: const DividerThemeData(
+        color: dividerColorDark,
+        thickness: 1,
+        space: 1,
+      ),
+
+      // Other components
+      dialogTheme: DialogThemeData(backgroundColor: surfaceColorDark),
+      bottomSheetTheme: BottomSheetThemeData(backgroundColor: surfaceColorDark),
+      popupMenuTheme: PopupMenuThemeData(color: surfaceColorDark),
+      snackBarTheme: SnackBarThemeData(backgroundColor: surfaceColorDark),
     );
   }
 

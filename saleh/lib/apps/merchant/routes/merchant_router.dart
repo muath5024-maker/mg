@@ -5,26 +5,37 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/go_router_refresh_stream.dart';
 import '../../../core/constants/app_icons.dart';
 import '../../../features/auth/data/auth_controller.dart';
+import '../../../shared/widgets/base_screen.dart';
+// Dashboard
 import '../../../features/dashboard/presentation/screens/dashboard_shell.dart';
 import '../../../features/dashboard/presentation/screens/home_tab.dart';
 import '../../../features/dashboard/presentation/screens/orders_tab.dart';
 import '../../../features/dashboard/presentation/screens/products_tab.dart';
-import '../../../features/dashboard/presentation/screens/store_tab.dart';
-import '../../../shared/widgets/base_screen.dart';
 import '../../../features/dashboard/presentation/screens/merchant_services_screen.dart';
 import '../../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
-import '../../../features/dashboard/presentation/screens/store_on_jock_screen.dart';
 import '../../../features/dashboard/presentation/screens/shortcuts_screen.dart';
-import '../../../features/dashboard/presentation/screens/inventory_screen.dart';
 import '../../../features/dashboard/presentation/screens/audit_logs_screen.dart';
-import '../../../features/dashboard/presentation/screens/view_my_store_screen.dart';
 import '../../../features/dashboard/presentation/screens/notifications_screen.dart';
 import '../../../features/dashboard/presentation/screens/customers_screen.dart';
-import '../../../features/dashboard/presentation/screens/wallet_screen.dart';
-import '../../../features/dashboard/presentation/screens/points_screen.dart';
-import '../../../features/dashboard/presentation/screens/sales_screen.dart';
-import '../../../features/dashboard/presentation/screens/coupons_screen.dart';
-import '../../../features/dashboard/presentation/screens/flash_sales_screen.dart';
+// Store
+import '../../../features/store/presentation/screens/store_tab.dart';
+import '../../../features/store/presentation/screens/inventory_screen.dart';
+import '../../../features/store/presentation/screens/view_my_store_screen.dart';
+// Finance
+import '../../../features/finance/presentation/screens/wallet_screen.dart';
+import '../../../features/finance/presentation/screens/points_screen.dart';
+import '../../../features/finance/presentation/screens/sales_screen.dart';
+// Marketing
+import '../../../features/marketing/presentation/screens/coupons_screen.dart';
+import '../../../features/marketing/presentation/screens/flash_sales_screen.dart';
+// Dropshipping
+import '../../../features/dropshipping/presentation/screens/dropshipping_screen.dart';
+// Reports & Packages
+import '../../../features/dashboard/presentation/screens/reports_screen.dart';
+import '../../../features/dashboard/presentation/screens/mbuy_packages_screen.dart';
+// Store Tools
+import '../../../features/store/presentation/screens/store_tools_tab.dart';
+// Merchant
 import '../../../features/merchant/screens/abandoned_cart_screen.dart';
 import '../../../features/merchant/screens/referral_screen.dart';
 import '../../../features/merchant/screens/smart_analytics_screen.dart';
@@ -117,9 +128,19 @@ class MerchantRouter {
                   redirect: (context, state) => '/dashboard',
                 ),
                 GoRoute(
-                  path: 'store-on-jock',
-                  name: 'store-on-jock',
-                  builder: (context, state) => const StoreOnJockScreen(),
+                  path: 'webstore',
+                  name: 'webstore',
+                  builder: (context, state) => const WebstoreScreen(),
+                ),
+                GoRoute(
+                  path: 'shipping',
+                  name: 'shipping',
+                  builder: (context, state) => const ShippingScreen(),
+                ),
+                GoRoute(
+                  path: 'payment-methods',
+                  name: 'payment-methods',
+                  builder: (context, state) => const PaymentMethodsScreen(),
                 ),
                 // الشاشات الجديدة v2.0
                 GoRoute(
@@ -291,6 +312,31 @@ class MerchantRouter {
                   path: 'qrcode-generator',
                   name: 'qrcode-generator',
                   builder: (context, state) => const QrCodeScreen(),
+                ),
+                // ====== المسارات المفقودة ======
+                // دروب شوبينق
+                GoRoute(
+                  path: 'dropshipping',
+                  name: 'dropshipping',
+                  builder: (context, state) => const DropshippingScreen(),
+                ),
+                // التقارير والسجلات
+                GoRoute(
+                  path: 'reports',
+                  name: 'reports',
+                  builder: (context, state) => const ReportsScreen(),
+                ),
+                // حزم التوفير
+                GoRoute(
+                  path: 'packages',
+                  name: 'packages',
+                  builder: (context, state) => const MbuyPackagesScreen(),
+                ),
+                // أدوات المتجر (تسويق + AI)
+                GoRoute(
+                  path: 'store-tools',
+                  name: 'store-tools',
+                  builder: (context, state) => const StoreToolsTab(),
                 ),
                 // ====== نهاية الميزات الجديدة ======
                 GoRoute(
