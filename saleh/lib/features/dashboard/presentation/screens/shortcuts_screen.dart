@@ -141,14 +141,16 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
           ? FloatingActionButton.extended(
               onPressed: _showAddShortcutSheet,
               backgroundColor: AppTheme.primaryColor,
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: const Icon(Icons.add, color: Colors.white, size: 20),
               label: const Text(
                 'إضافة اختصار',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 13,
                 ),
               ),
+              extendedPadding: const EdgeInsets.symmetric(horizontal: 16),
             )
           : null,
     );
@@ -866,7 +868,7 @@ final List<ShortcutItemData> _availableShortcuts = [
   // الذكاء الاصطناعي
   const ShortcutItemData(
     key: 'ai_studio',
-    title: 'توليد AI',
+    title: 'استديو AI',
     route: '/dashboard/studio',
     icon: Icons.auto_awesome_outlined,
     color: Color(0xFFA855F7),

@@ -529,12 +529,12 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     );
   }
 
-  /// الهيدر العلوي الثابت - لون بني كاكاو
+  /// الهيدر العلوي الثابت - اللون الأساسي
   Widget _buildPersistentHeader(BuildContext context, String storeName) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    // لون بني كاكاو للهيدر
-    const Color headerColor = Color(0xFF372018);
+    // اللون الأساسي للهيدر (Teal Green)
+    const Color headerColor = AppTheme.primaryColor;
 
     return Container(
       width: double.infinity,

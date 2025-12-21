@@ -73,7 +73,7 @@ class _ShippingScreenState extends State<ShippingScreen>
             crossAxisCount: 2,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.2,
             children: [
               _buildStatCard(
                 'إجمالي الشحنات',

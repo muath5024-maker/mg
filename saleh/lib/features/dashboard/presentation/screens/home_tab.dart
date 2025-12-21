@@ -461,7 +461,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             Expanded(
               child: _buildFeatureCard(
                 icon: Icons.auto_awesome,
-                label: 'توليد AI',
+                label: 'استديو AI',
                 onTap: () => context.push('/dashboard/studio'),
                 showBadge: true,
               ),

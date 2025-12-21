@@ -5,7 +5,7 @@ import '../models/studio_tool.dart';
 import '../providers/studio_provider.dart';
 import '../services/studio_api_service.dart';
 
-/// تبويب تحرير الصور والفيديو
+/// استديو التحرير - تحرير الصور والفيديو
 class EditTab extends ConsumerStatefulWidget {
   const EditTab({super.key});
 
@@ -85,20 +85,119 @@ class _EditTabState extends ConsumerState<EditTab> {
   }
 
   Widget _buildUploadSection(ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
-          width: 2,
-          strokeAlign: BorderSide.strokeAlignCenter,
+    return Column(
+      children: [
+        // عرض حالة المعالجة
+        if (_isProcessing) ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(colorScheme.primary),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'جاري المعالجة...',
+                  style: TextStyle(color: colorScheme.primary),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // عرض رسالة الخطأ
+        if (_errorMessage != null) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.error.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: colorScheme.error, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: colorScheme.error, fontSize: 12),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, size: 16, color: colorScheme.error),
+                  onPressed: () => setState(() => _errorMessage = null),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // عرض نتيجة المعالجة
+        if (_resultUrl != null) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'تم المعالجة بنجاح!',
+                    style: TextStyle(color: Colors.green[700], fontSize: 12),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // TODO: فتح النتيجة
+                  },
+                  child: const Text('عرض'),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // منطقة الرفع
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: colorScheme.outline.withOpacity(0.2),
+              width: 2,
+              strokeAlign: BorderSide.strokeAlignCenter,
+            ),
+          ),
+          child: _selectedFile == null
+              ? _buildUploadPlaceholder(colorScheme)
+              : _buildSelectedFilePreview(colorScheme),
         ),
-      ),
-      child: _selectedFile == null
-          ? _buildUploadPlaceholder(colorScheme)
-          : _buildSelectedFilePreview(colorScheme),
+      ],
     );
   }
 
