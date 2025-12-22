@@ -10,8 +10,8 @@ final userPreferencesProvider = Provider<UserPreferencesService>((ref) {
 
 /// مزود حالة التفضيلات
 final preferencesStateProvider =
-    StateNotifierProvider<PreferencesNotifier, UserPreferences>(
-      (ref) => PreferencesNotifier(ref.watch(userPreferencesProvider)),
+    NotifierProvider<PreferencesNotifier, UserPreferences>(
+      PreferencesNotifier.new,
     );
 
 /// خدمة تفضيلات المستخدم الشاملة
@@ -412,11 +412,14 @@ class UserPreferences {
 }
 
 /// مدير حالة التفضيلات
-class PreferencesNotifier extends StateNotifier<UserPreferences> {
-  final UserPreferencesService _service;
+class PreferencesNotifier extends Notifier<UserPreferences> {
+  late UserPreferencesService _service;
 
-  PreferencesNotifier(this._service) : super(const UserPreferences()) {
+  @override
+  UserPreferences build() {
+    _service = ref.watch(userPreferencesProvider);
     _loadAllAsync();
+    return const UserPreferences();
   }
 
   /// تحميل جميع التفضيلات

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/constants/app_dimensions.dart';
 import 'app_icon.dart';
 
 /// زر قابل للوصول مع دعم كامل للـ Accessibility
@@ -151,7 +152,7 @@ class AccessibleButton extends StatelessWidget {
           minWidth: 64,
           horizontalPadding: 12,
           verticalPadding: 8,
-          fontSize: 12,
+          fontSize: AppDimensions.fontLabel,
           iconSize: 16,
           borderRadius: 8,
         );
@@ -161,7 +162,7 @@ class AccessibleButton extends StatelessWidget {
           minWidth: 88,
           horizontalPadding: 16,
           verticalPadding: 12,
-          fontSize: 14,
+          fontSize: AppDimensions.fontBody,
           iconSize: 20,
           borderRadius: 12,
         );
@@ -171,7 +172,7 @@ class AccessibleButton extends StatelessWidget {
           minWidth: 120,
           horizontalPadding: 24,
           verticalPadding: 16,
-          fontSize: 16,
+          fontSize: AppDimensions.fontTitle,
           iconSize: 24,
           borderRadius: 16,
         );
@@ -329,7 +330,7 @@ class AccessibleListTile extends StatelessWidget {
             ? Text(
                 subtitle!,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppDimensions.fontLabel,
                   color: isEnabled ? Colors.grey[600] : Colors.grey[400],
                 ),
               )

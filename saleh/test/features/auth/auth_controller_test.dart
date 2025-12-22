@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saleh/features/auth/data/auth_controller.dart';
 import 'package:saleh/features/auth/data/auth_repository.dart';
 import 'package:mockito/mockito.dart';
@@ -104,23 +107,37 @@ void main() {
 
   group('AuthController Integration Tests (Mocked)', () {
     late MockAuthRepository mockAuthRepository;
+    late ProviderContainer container;
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
+      when(mockAuthRepository.hasValidSession()).thenAnswer((_) async => false);
     });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    ProviderContainer createContainer() {
+      return ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(mockAuthRepository),
+        ],
+      );
+    }
 
     test('حالة المصادقة الأولية بدون جلسة', () async {
       // Arrange
       when(mockAuthRepository.hasValidSession()).thenAnswer((_) async => false);
 
-      // Act
-      final controller = AuthController(mockAuthRepository);
+      container = createContainer();
 
       // Wait for initial session check
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Assert
-      expect(controller.state.isAuthenticated, false);
+      final state = container.read(authControllerProvider);
+      expect(state.isAuthenticated, false);
     });
 
     test('حالة المصادقة مع جلسة موجودة', () async {
@@ -134,17 +151,27 @@ void main() {
         mockAuthRepository.getUserEmail(),
       ).thenAnswer((_) async => 'merchant@example.com');
 
-      // Act
-      final controller = AuthController(mockAuthRepository);
+      container = createContainer();
 
-      // Wait for initial session check
-      await Future.delayed(const Duration(milliseconds: 100));
+      // Use a Completer to wait for the authenticated state
+      final completer = Completer<AuthState>();
+      container.listen<AuthState>(authControllerProvider, (previous, next) {
+        if (next.isAuthenticated && !completer.isCompleted) {
+          completer.complete(next);
+        }
+      }, fireImmediately: false);
+
+      // Wait for state update with timeout
+      final state = await completer.future.timeout(
+        const Duration(seconds: 2),
+        onTimeout: () => container.read(authControllerProvider),
+      );
 
       // Assert
-      expect(controller.state.isAuthenticated, true);
-      expect(controller.state.userRole, 'merchant');
-      expect(controller.state.userId, 'user-123');
-      expect(controller.state.userEmail, 'merchant@example.com');
+      expect(state.isAuthenticated, true);
+      expect(state.userRole, 'merchant');
+      expect(state.userId, 'user-123');
+      expect(state.userEmail, 'merchant@example.com');
     });
 
     test('تسجيل الخروج يجب أن يمسح الحالة', () async {
@@ -152,30 +179,32 @@ void main() {
       when(mockAuthRepository.hasValidSession()).thenAnswer((_) async => false);
       when(mockAuthRepository.signOut()).thenAnswer((_) async {});
 
-      final controller = AuthController(mockAuthRepository);
+      container = createContainer();
       await Future.delayed(const Duration(milliseconds: 50));
 
       // Act
-      await controller.logout();
+      await container.read(authControllerProvider.notifier).logout();
 
       // Assert
-      expect(controller.state.isAuthenticated, false);
-      expect(controller.state.isLoading, false);
-      expect(controller.state.userRole, null);
+      final state = container.read(authControllerProvider);
+      expect(state.isAuthenticated, false);
+      expect(state.isLoading, false);
+      expect(state.userRole, null);
     });
 
     test('clearError يجب أن يمسح رسالة الخطأ', () async {
       // Arrange
       when(mockAuthRepository.hasValidSession()).thenAnswer((_) async => false);
 
-      final controller = AuthController(mockAuthRepository);
+      container = createContainer();
       await Future.delayed(const Duration(milliseconds: 50));
 
       // Act
-      controller.clearError();
+      container.read(authControllerProvider.notifier).clearError();
 
       // Assert
-      expect(controller.state.errorMessage, null);
+      final state = container.read(authControllerProvider);
+      expect(state.errorMessage, null);
     });
   });
 

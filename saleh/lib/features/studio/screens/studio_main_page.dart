@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import 'edit_studio_page.dart';
 import 'generation_studio_page.dart';
 import '../constants/studio_colors.dart';
@@ -65,8 +66,8 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                         ),
                       ],
                     ),
-                    style: const TextStyle(
-                      fontSize: 28,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontDisplay1,
                       fontWeight: FontWeight.bold,
                       height: 1.2,
                     ),
@@ -129,10 +130,10 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'المشاريع الأخيرة',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -204,10 +205,10 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'قوالب مقترحة',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -342,13 +343,13 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                       color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: color, size: 22),
+                    child: Icon(icon, color: color, size: AppDimensions.iconS),
                   ),
                   const Spacer(),
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontBody,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -356,7 +357,7 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: AppDimensions.fontCaption,
                       color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
@@ -406,9 +407,9 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                       ),
                       child: Text(
                         type,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
+                          fontSize: AppDimensions.fontCaption,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -421,14 +422,17 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: AppDimensions.fontBody,
+              fontWeight: FontWeight.bold,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
             time,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppDimensions.fontLabel,
               color: isDark ? Colors.grey[400] : Colors.grey[600],
             ),
           ),
@@ -458,7 +462,10 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.7),
+                    ],
                     stops: const [0.4, 1.0],
                   ),
                 ),
@@ -484,9 +491,9 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                       ),
                       child: Text(
                         badge,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
+                          fontSize: AppDimensions.fontCaption,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -495,16 +502,19 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                   ],
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   if (subtitle != null)
                     Text(
                       subtitle,
-                      style: TextStyle(color: Colors.grey[300], fontSize: 12),
+                      style: TextStyle(
+                        color: Colors.grey[300],
+                        fontSize: AppDimensions.fontLabel,
+                      ),
                     ),
                 ],
               ),
@@ -598,13 +608,17 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                           color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(icon, color: color, size: 24),
+                        child: Icon(
+                          icon,
+                          color: color,
+                          size: AppDimensions.iconM,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 20,
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontDisplay3,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -653,10 +667,10 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'ابدأ',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: AppDimensions.fontTitle,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../models/models.dart';
 
 /// حالة المشهد المحدد
@@ -8,9 +9,9 @@ final selectedSceneIndexProvider = StateProvider<int>((ref) => 0);
 
 /// Provider لمحرر Canvas
 final canvasEditorProvider =
-    StateNotifierProvider<CanvasEditorNotifier, CanvasEditorState>((ref) {
-      return CanvasEditorNotifier();
-    });
+    NotifierProvider<CanvasEditorNotifier, CanvasEditorState>(
+      CanvasEditorNotifier.new,
+    );
 
 class CanvasEditorState {
   final List<Layer> layers;
@@ -95,8 +96,9 @@ class CanvasAction {
   }) : timestamp = DateTime.now();
 }
 
-class CanvasEditorNotifier extends StateNotifier<CanvasEditorState> {
-  CanvasEditorNotifier() : super(const CanvasEditorState());
+class CanvasEditorNotifier extends Notifier<CanvasEditorState> {
+  @override
+  CanvasEditorState build() => const CanvasEditorState();
 
   /// تحميل طبقات المشهد
   void loadScene(Scene scene) {
@@ -445,9 +447,9 @@ enum VideoAspectRatio { portrait_9_16, landscape_16_9, square_1_1 }
 
 /// Provider لمعاينة الفيديو
 final videoPreviewProvider =
-    StateNotifierProvider<VideoPreviewNotifier, VideoPreviewState>((ref) {
-      return VideoPreviewNotifier();
-    });
+    NotifierProvider<VideoPreviewNotifier, VideoPreviewState>(
+      VideoPreviewNotifier.new,
+    );
 
 class VideoPreviewState {
   final bool isPlaying;
@@ -485,8 +487,9 @@ class VideoPreviewState {
       : 0;
 }
 
-class VideoPreviewNotifier extends StateNotifier<VideoPreviewState> {
-  VideoPreviewNotifier() : super(const VideoPreviewState());
+class VideoPreviewNotifier extends Notifier<VideoPreviewState> {
+  @override
+  VideoPreviewState build() => const VideoPreviewState();
 
   void play() {
     state = state.copyWith(isPlaying: true);

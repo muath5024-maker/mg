@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
@@ -620,14 +621,14 @@ class _ToolButton extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 20,
+                size: AppDimensions.iconS,
                 color: isActive ? colorScheme.primary : colorScheme.onSurface,
               ),
               const SizedBox(height: 2),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: AppDimensions.fontCaption,
                   color: isActive
                       ? colorScheme.primary
                       : colorScheme.onSurfaceVariant,

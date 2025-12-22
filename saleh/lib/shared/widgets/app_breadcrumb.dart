@@ -96,7 +96,7 @@ class _BreadcrumbChip extends StatelessWidget {
               Text(
                 item.label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppDimensions.fontLabel,
                   fontWeight: isLast ? FontWeight.w600 : FontWeight.normal,
                   color: isLast ? AppTheme.primaryColor : Colors.grey[600],
                 ),

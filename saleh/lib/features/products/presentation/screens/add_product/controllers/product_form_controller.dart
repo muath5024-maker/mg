@@ -10,28 +10,20 @@ import '../../../../data/categories_repository.dart';
 import '../../../../data/products_repository.dart';
 
 /// متحكم نموذج إضافة المنتج
-class ProductFormController extends StateNotifier<ProductFormState> {
+class ProductFormController extends Notifier<ProductFormState> {
   final ImagePicker _picker = ImagePicker();
-  final CategoriesRepository _categoriesRepo;
-  final ProductsRepository _productsRepo;
+  late CategoriesRepository _categoriesRepo;
+  late ProductsRepository _productsRepo;
 
   List<Category> categories = [];
   bool loadingCategories = false;
 
-  ProductFormController({
-    required CategoriesRepository categoriesRepo,
-    required ProductsRepository productsRepo,
-    ProductFormParams? params,
-  }) : _categoriesRepo = categoriesRepo,
-       _productsRepo = productsRepo,
-       super(
-         ProductFormState(
-           productType: params?.initialType ?? ProductType.physical,
-           name: params?.initialName ?? '',
-           price: params?.initialPrice,
-         ),
-       ) {
+  @override
+  ProductFormState build() {
+    _categoriesRepo = ref.watch(categoriesRepositoryProvider);
+    _productsRepo = ref.watch(productsRepositoryProvider);
     _loadCategories();
+    return const ProductFormState();
   }
 
   // ============================================
@@ -548,13 +540,9 @@ class ProductFormController extends StateNotifier<ProductFormState> {
 }
 
 /// Provider للمتحكم
-final productFormControllerProvider = StateNotifierProvider.autoDispose
-    .family<ProductFormController, ProductFormState, ProductFormParams>(
-      (ref, params) => ProductFormController(
-        categoriesRepo: ref.watch(categoriesRepositoryProvider),
-        productsRepo: ref.watch(productsRepositoryProvider),
-        params: params,
-      ),
+final productFormControllerProvider =
+    NotifierProvider.autoDispose<ProductFormController, ProductFormState>(
+      ProductFormController.new,
     );
 
 /// معاملات إنشاء المتحكم

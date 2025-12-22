@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/studio_tool.dart';
 import '../providers/studio_provider.dart';
 import '../services/studio_api_service.dart';
@@ -65,7 +66,7 @@ class _GenerateTabState extends ConsumerState<GenerateTab> {
                         'أنشئ محتوى احترافي بضغطة زر',
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 13,
+                          fontSize: AppDimensions.fontBody2,
                         ),
                       ),
                     ],
@@ -157,7 +158,7 @@ class _GenerateTabState extends ConsumerState<GenerateTab> {
               text,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontSize: 13,
+                fontSize: AppDimensions.fontBody2,
               ),
             ),
           ),
@@ -346,28 +347,28 @@ class _GenerateTabState extends ConsumerState<GenerateTab> {
                     children: [
                       Icon(
                         Icons.schedule,
-                        size: 12,
+                        size: AppDimensions.iconXS,
                         color: colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${template.durationSeconds ?? 30} ث',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: AppDimensions.fontCaption,
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const Spacer(),
                       Icon(
                         Icons.monetization_on,
-                        size: 12,
+                        size: AppDimensions.iconXS,
                         color: colorScheme.primary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${template.creditsCost ?? 10}',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: AppDimensions.fontCaption,
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold,
                         ),
@@ -550,7 +551,7 @@ class _GenerateTabState extends ConsumerState<GenerateTab> {
               'قد يستغرق هذا بضع دقائق',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontSize: 12,
+                fontSize: AppDimensions.fontLabel,
               ),
             ),
           ],
@@ -900,7 +901,7 @@ class _GenerateToolCard extends StatelessWidget {
             Text(
               tool.nameAr,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppDimensions.fontBody,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? colorScheme.primary : colorScheme.onSurface,
               ),
@@ -914,14 +915,14 @@ class _GenerateToolCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.monetization_on,
-                  size: 14,
+                  size: AppDimensions.iconXS,
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '${tool.creditsCost} رصيد',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1134,7 +1135,7 @@ class _GenerateToolSheetState extends State<_GenerateToolSheet> {
                     'الوقت المتوقع: ~30 ثانية',
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                     ),
                   ),
                 ],

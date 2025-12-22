@@ -850,7 +850,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         tag,
                         style: TextStyle(fontSize: AppDimensions.fontLabel),
                       ),
-                      deleteIcon: const Icon(Icons.close, size: 16),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: AppDimensions.iconXS,
+                      ),
                       onDeleted: () {
                         setState(() {
                           _keywordTags.remove(tag);
@@ -1027,7 +1030,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         borderRadius: BorderRadius.circular(4),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(icon, size: 20, color: AppTheme.textSecondaryColor),
+          child: Icon(
+            icon,
+            size: AppDimensions.iconS,
+            color: AppTheme.textSecondaryColor,
+          ),
         ),
       ),
     );
@@ -1110,7 +1117,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     _insertText(emoji);
                     Navigator.pop(context);
                   },
-                  child: Text(emoji, style: const TextStyle(fontSize: 28)),
+                  child: Text(
+                    emoji,
+                    style: const TextStyle(
+                      fontSize: AppDimensions.fontDisplay1,
+                    ),
+                  ),
                 ),
               )
               .toList(),
@@ -1135,11 +1147,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.visibility, color: AppTheme.primaryColor, size: 20),
+                Icon(
+                  Icons.visibility,
+                  color: AppTheme.primaryColor,
+                  size: AppDimensions.iconS,
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   'قنوات عرض المنتج',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppDimensions.fontTitle,
+                  ),
                 ),
               ],
             ),
@@ -1250,7 +1269,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         child: Icon(
           icon,
           color: value ? AppTheme.primaryColor : AppTheme.textSecondaryColor,
-          size: 20,
+          size: AppDimensions.iconS,
         ),
       ),
       contentPadding: EdgeInsets.zero,
@@ -1897,7 +1916,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         child: Icon(
                           Icons.shopping_bag,
                           color: AppTheme.textSecondaryColor,
-                          size: 24,
+                          size: AppDimensions.iconM,
                         ),
                       ),
                       border: OutlineInputBorder(
@@ -1946,7 +1965,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         child: Icon(
                           Icons.business_center,
                           color: AppTheme.textSecondaryColor,
-                          size: 24,
+                          size: AppDimensions.iconM,
                         ),
                       ),
                       border: OutlineInputBorder(
@@ -2082,7 +2101,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               const SizedBox(width: 8),
               const Text(
                 'الوسائط (صور وفيديو)',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
             ],
           ),
@@ -2131,7 +2153,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         const Text(
                           'اضغط لاختيار الصور',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: AppDimensions.fontBody,
                             fontWeight: FontWeight.w500,
                             color: AppTheme.textSecondaryColor,
                           ),
@@ -2180,7 +2202,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                           ),
                                           child: const Icon(
                                             Icons.close,
-                                            size: 16,
+                                            size: AppDimensions.iconXS,
                                             color: Colors.red,
                                           ),
                                         ),
@@ -2206,7 +2228,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                       child: const Center(
                                         child: Icon(
                                           Icons.videocam,
-                                          size: 40,
+                                          size: AppDimensions.iconXXL,
                                           color: AppTheme.accentColor,
                                         ),
                                       ),
@@ -2224,7 +2246,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                           ),
                                           child: const Icon(
                                             Icons.close,
-                                            size: 16,
+                                            size: AppDimensions.iconXS,
                                             color: Colors.red,
                                           ),
                                         ),
@@ -2261,7 +2283,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                                 return const Center(
                                                   child: Icon(
                                                     Icons.link,
-                                                    size: 32,
+                                                    size: AppDimensions.iconXL,
                                                     color:
                                                         AppTheme.textHintColor,
                                                   ),
@@ -2287,7 +2309,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                           ),
                                           child: const Icon(
                                             Icons.close,
-                                            size: 16,
+                                            size: AppDimensions.iconXS,
                                             color: Colors.red,
                                           ),
                                         ),
@@ -2316,14 +2338,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                     children: [
                                       Icon(
                                         Icons.add_photo_alternate,
-                                        size: 32,
+                                        size: AppDimensions.iconXL,
                                         color: AppTheme.textHintColor,
                                       ),
                                       SizedBox(height: 4),
                                       Text(
                                         'إضافة',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: AppDimensions.fontLabel,
                                           color: AppTheme.textHintColor,
                                         ),
                                       ),
@@ -2346,7 +2368,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _selectedImages.length < 4 ? _pickImages : null,
-                  icon: const Icon(Icons.photo_library, size: 18),
+                  icon: const Icon(
+                    Icons.photo_library,
+                    size: AppDimensions.iconS,
+                  ),
                   label: const Text('صورة'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.primaryColor,
@@ -2360,7 +2385,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _selectedVideo == null ? _pickVideo : null,
-                  icon: const Icon(Icons.videocam, size: 18),
+                  icon: const Icon(Icons.videocam, size: AppDimensions.iconS),
                   label: const Text('فيديو'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.accentColor,
@@ -2374,7 +2399,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _showAddUrlDialog,
-                  icon: const Icon(Icons.link, size: 18),
+                  icon: const Icon(Icons.link, size: AppDimensions.iconS),
                   label: const Text('رابط'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.blue,
@@ -2414,7 +2439,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             Text(
               'أدخل رابط صورة مباشر (PNG, JPG, WEBP)',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppDimensions.fontLabel,
                 color: AppTheme.textSecondaryColor,
               ),
             ),
@@ -2455,7 +2480,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: _generateWithAI,
-        icon: const Icon(Icons.auto_awesome, size: 20),
+        icon: const Icon(Icons.auto_awesome, size: AppDimensions.iconS),
         label: Text(
           'توليد الوصف والكلمات المفتاحية بالذكاء الاصطناعي',
           style: TextStyle(
@@ -2572,7 +2597,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               if (_hasUnsavedChanges)
                 const Text(
                   '• تغييرات غير محفوظة',
-                  style: TextStyle(fontSize: 10, color: Colors.orange),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontCaption,
+                    color: Colors.orange,
+                  ),
                 ),
             ],
           ),
@@ -2731,7 +2759,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               const SizedBox(width: 8),
               const Text(
                 'الأسعار',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
             ],
           ),
@@ -2930,7 +2961,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               const SizedBox(width: 8),
               const Text(
                 'المخزون',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
             ],
           ),
@@ -2999,11 +3033,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.qr_code, color: AppTheme.primaryColor, size: 20),
+              const Icon(
+                Icons.qr_code,
+                color: AppTheme.primaryColor,
+                size: AppDimensions.iconS,
+              ),
               const SizedBox(width: 8),
               const Text(
                 'رموز المنتج',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
             ],
           ),
@@ -3132,11 +3173,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.search, color: AppTheme.primaryColor, size: 20),
+              const Icon(
+                Icons.search,
+                color: AppTheme.primaryColor,
+                size: AppDimensions.iconS,
+              ),
               const SizedBox(width: 8),
               const Text(
                 'تحسين محركات البحث (SEO)',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
             ],
           ),
@@ -3171,7 +3219,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               children: [
                 const Text(
                   'معاينة نتيجة البحث في Google:',
-                  style: TextStyle(fontSize: 12, color: AppTheme.textHintColor),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontLabel,
+                    color: AppTheme.textHintColor,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -3179,7 +3230,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       ? 'اسم المنتج'
                       : _nameController.text,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: AppDimensions.fontHeadline,
                     color: Color(0xFF1a0dab),
                     decoration: TextDecoration.underline,
                   ),
@@ -3187,7 +3238,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 Text(
                   'store.mbuy.sa/p/${_slugController.text.isEmpty ? 'product-name' : _slugController.text}',
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: AppDimensions.fontBody2,
                     color: Color(0xFF006621),
                   ),
                 ),
@@ -3198,7 +3249,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       ? '${_descriptionController.text.substring(0, 160)}...'
                       : _descriptionController.text,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: AppDimensions.fontBody2,
                     color: Color(0xFF545454),
                   ),
                   maxLines: 2,
@@ -3241,7 +3292,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: _isSubmitting ? null : _saveAsDraft,
-                icon: const Icon(Icons.save_outlined, size: 18),
+                icon: const Icon(
+                  Icons.save_outlined,
+                  size: AppDimensions.fontHeadline,
+                ),
                 label: const Text('حفظ كمسودة'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -3266,7 +3320,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         // زر المعاينة
         TextButton.icon(
           onPressed: _showPreview,
-          icon: const Icon(Icons.visibility, size: 18),
+          icon: const Icon(Icons.visibility, size: AppDimensions.fontHeadline),
           label: const Text('معاينة المنتج'),
         ),
       ],
@@ -3306,7 +3360,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               const Center(
                 child: Text(
                   'معاينة المنتج',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontHeadline,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -3343,7 +3400,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     ? 'اسم المنتج'
                     : _nameController.text,
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: AppDimensions.fontDisplay3,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -3355,7 +3412,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   Text(
                     '${_priceController.text.isEmpty ? '0.00' : _priceController.text} ر.س',
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: AppDimensions.fontDisplay2,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.primaryColor,
                     ),
@@ -3365,7 +3422,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     Text(
                       '${_originalPriceController.text} ر.س',
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontTitle,
                         decoration: TextDecoration.lineThrough,
                         color: AppTheme.textHintColor,
                       ),
@@ -3385,7 +3442,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                           '-${_discountPercentage!.toStringAsFixed(0)}%',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: AppDimensions.fontLabel,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -3421,7 +3478,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         (tag) => Chip(
                           label: Text(
                             tag,
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontLabel,
+                            ),
                           ),
                           backgroundColor: AppTheme.slate100,
                         ),
@@ -3452,14 +3511,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(_currentTypeInfo.icon, color: _currentTypeInfo.color, size: 20),
+          Icon(
+            _currentTypeInfo.icon,
+            color: _currentTypeInfo.color,
+            size: AppDimensions.iconS,
+          ),
           const SizedBox(width: 8),
           Text(
             _currentTypeInfo.name,
             style: TextStyle(
               color: _currentTypeInfo.color,
               fontWeight: FontWeight.bold,
-              fontSize: 14,
+              fontSize: AppDimensions.fontBody,
             ),
           ),
           const SizedBox(width: 8),
@@ -3512,13 +3575,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   ),
                   const Text(
                     'تغيير نوع المنتج',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '⚠️ تغيير النوع قد يخفي بعض الحقول',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       color: Colors.orange.shade700,
                     ),
                   ),
@@ -3539,7 +3605,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                             color: info.color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(info.icon, color: info.color, size: 22),
+                          child: Icon(
+                            info.icon,
+                            color: info.color,
+                            size: AppDimensions.iconM,
+                          ),
                         ),
                         title: Text(
                           info.name,
@@ -3552,7 +3622,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         ),
                         subtitle: Text(
                           info.description,
-                          style: const TextStyle(fontSize: 11),
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontCaption,
+                          ),
                         ),
                         trailing: isSelected
                             ? Icon(Icons.check_circle, color: info.color)
@@ -3621,7 +3693,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'معلومات المنتج الرقمي',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
                 ],
               ),
@@ -3734,7 +3809,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'معلومات الخدمة',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
                 ],
               ),
@@ -3812,7 +3890,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       child: Text(
                         'حدد شروط الخدمة بوضوح في الوصف',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppDimensions.fontLabel,
                           color: Colors.blue.shade700,
                         ),
                       ),
@@ -3858,7 +3936,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'معلومات الطعام',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
                 ],
               ),
@@ -3975,7 +4056,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'معلومات الاشتراك',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
                 ],
               ),
@@ -4033,7 +4117,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   children: _subscriptionFeatures.map((feature) {
                     return Chip(
                       label: Text(feature),
-                      deleteIcon: const Icon(Icons.close, size: 16),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: AppDimensions.iconXS,
+                      ),
                       onDeleted: () {
                         setState(() => _subscriptionFeatures.remove(feature));
                       },
@@ -4114,7 +4201,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'معلومات الفعالية',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
                 ],
               ),
@@ -4256,7 +4346,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'خيارات التخصيص',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
                 ],
               ),

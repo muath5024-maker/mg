@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../constants/studio_colors.dart';
 
 /// صفحة استديو التحرير - تحرير الصور والفيديو
@@ -184,16 +185,16 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                   child: Icon(
                     Icons.undo,
                     color: Colors.white.withValues(alpha: 0.6),
-                    size: 20,
+                    size: AppDimensions.iconS,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'استديو التحرير',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: AppDimensions.fontTitle,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -203,7 +204,7 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                 icon: Icon(
                   Icons.redo,
                   color: Colors.white.withValues(alpha: 0.6),
-                  size: 20,
+                  size: AppDimensions.iconS,
                 ),
               ),
             ],
@@ -216,16 +217,20 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
               color: StudioColors.primaryColor,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.download, color: Colors.white, size: 16),
+                Icon(
+                  Icons.download,
+                  color: Colors.white,
+                  size: AppDimensions.iconXS,
+                ),
                 SizedBox(width: 4),
                 Text(
                   'تصدير',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -260,41 +265,50 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Image Placeholder
-                Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        StudioColors.primaryColor.withValues(alpha: 0.3),
-                        StudioColors.secondaryColor.withValues(alpha: 0.3),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: StudioColors.primaryColor.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_photo_alternate,
-                        size: 48,
-                        color: Colors.white.withValues(alpha: 0.5),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'اضغط لإضافة صورة',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 14,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final size = constraints.maxWidth < 300
+                        ? constraints.maxWidth * 0.7
+                        : 240.0;
+                    return Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            StudioColors.primaryColor.withValues(alpha: 0.3),
+                            StudioColors.secondaryColor.withValues(alpha: 0.3),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: StudioColors.primaryColor.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate,
+                            size: 40,
+                            color: Colors.white.withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'اضغط لإضافة صورة',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: AppDimensions.fontBody2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -313,7 +327,7 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                     'السطوع: ${_brightnessValue.toInt()}%',
                     style: TextStyle(
                       color: StudioColors.primaryColor,
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -360,7 +374,9 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
     return Container(
       decoration: BoxDecoration(
         color: StudioColors.surfaceDarkAlt,
-        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -375,9 +391,9 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                   children: [
                     Text(
                       _subTools[_selectedSubToolIndex].label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: AppDimensions.fontBody,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -385,9 +401,9 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                       _currentSliderValue >= 0
                           ? '+${_currentSliderValue.toInt()}'
                           : '${_currentSliderValue.toInt()}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: StudioColors.primaryColor,
-                        fontSize: 14,
+                        fontSize: AppDimensions.fontBody,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -399,7 +415,9 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                     activeTrackColor: StudioColors.primaryColor,
                     inactiveTrackColor: StudioColors.surfaceLighter,
                     thumbColor: Colors.white,
-                    overlayColor: StudioColors.primaryColor.withValues(alpha: 0.2),
+                    overlayColor: StudioColors.primaryColor.withValues(
+                      alpha: 0.2,
+                    ),
                     trackHeight: 4,
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 10,
@@ -443,7 +461,7 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                         children: [
                           Icon(
                             _subTools[index].icon,
-                            size: 18,
+                            size: AppDimensions.iconS,
                             color: isActive
                                 ? StudioColors.surfaceDarkAlt
                                 : Colors.grey[400],
@@ -452,7 +470,7 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                           Text(
                             _subTools[index].label,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: AppDimensions.fontBody,
                               fontWeight: isActive
                                   ? FontWeight.bold
                                   : FontWeight.w500,
@@ -493,7 +511,9 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: isActive
-                                ? StudioColors.primaryColor.withValues(alpha: 0.1)
+                                ? StudioColors.primaryColor.withValues(
+                                    alpha: 0.1,
+                                  )
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -501,7 +521,7 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                             isActive
                                 ? _navItems[index].activeIcon
                                 : _navItems[index].icon,
-                            size: 24,
+                            size: AppDimensions.iconM,
                             color: isActive
                                 ? StudioColors.primaryColor
                                 : Colors.grey[400],
@@ -511,7 +531,7 @@ class _EditStudioPageState extends ConsumerState<EditStudioPage>
                         Text(
                           _navItems[index].label,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: AppDimensions.fontCaption,
                             fontWeight: isActive
                                 ? FontWeight.bold
                                 : FontWeight.w500,

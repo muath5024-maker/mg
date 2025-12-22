@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../providers/studio_provider.dart';
 
 /// عرض رصيد المستخدم
@@ -24,7 +25,11 @@ class CreditBalanceWidget extends ConsumerWidget {
           ? const SizedBox(width: 60, child: LinearProgressIndicator())
           : const Center(child: CircularProgressIndicator()),
       error: (e, st) => compact
-          ? Icon(Icons.error_outline, color: colorScheme.error, size: 20)
+          ? Icon(
+              Icons.error_outline,
+              color: colorScheme.error,
+              size: AppDimensions.iconS,
+            )
           : Center(
               child: Text(
                 'خطأ في تحميل الرصيد',
@@ -56,14 +61,14 @@ class CreditBalanceWidget extends ConsumerWidget {
         children: [
           Icon(
             Icons.toll,
-            size: 16,
+            size: AppDimensions.iconXS,
             color: isLow ? colorScheme.error : colorScheme.primary,
           ),
           const SizedBox(width: 6),
           Text(
             _formatBalance(balance),
             style: TextStyle(
-              fontSize: 13,
+              fontSize: AppDimensions.fontBody2,
               fontWeight: FontWeight.bold,
               color: isLow
                   ? colorScheme.onErrorContainer
@@ -129,7 +134,7 @@ class CreditBalanceWidget extends ConsumerWidget {
                   Text(
                     'رصيدك الحالي',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       color: colorScheme.onPrimaryContainer.withValues(
                         alpha: 0.8,
                       ),
@@ -138,7 +143,7 @@ class CreditBalanceWidget extends ConsumerWidget {
                   Text(
                     _formatBalance(balance),
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: AppDimensions.fontDisplay1,
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onPrimaryContainer,
                     ),
@@ -159,12 +164,16 @@ class CreditBalanceWidget extends ConsumerWidget {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.warning_amber, size: 14, color: Colors.white),
+                      Icon(
+                        Icons.warning_amber,
+                        size: AppDimensions.fontBody,
+                        color: Colors.white,
+                      ),
                       SizedBox(width: 4),
                       Text(
                         'منخفض',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: AppDimensions.fontCaption,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -216,7 +225,7 @@ class CreditBalanceWidget extends ConsumerWidget {
           children: [
             Icon(
               icon,
-              size: 18,
+              size: AppDimensions.fontHeadline,
               color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
             ),
             const SizedBox(width: 8),
@@ -226,7 +235,7 @@ class CreditBalanceWidget extends ConsumerWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: AppDimensions.fontCaption,
                     color: colorScheme.onPrimaryContainer.withValues(
                       alpha: 0.7,
                     ),
@@ -235,7 +244,7 @@ class CreditBalanceWidget extends ConsumerWidget {
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppDimensions.fontBody,
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onPrimaryContainer,
                   ),
@@ -294,14 +303,14 @@ class CreditCostCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.toll,
-                size: 20,
+                size: AppDimensions.iconS,
                 color: hasEnough ? colorScheme.primary : colorScheme.error,
               ),
               const SizedBox(width: 8),
               Text(
                 '$cost نقطة',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                   color: hasEnough ? colorScheme.onSurface : colorScheme.error,
                 ),
@@ -311,7 +320,10 @@ class CreditCostCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             operation,
-            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+            style: TextStyle(
+              fontSize: AppDimensions.fontLabel,
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
           if (!hasEnough) ...[
             const SizedBox(height: 12),
@@ -324,12 +336,16 @@ class CreditCostCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.warning_amber, size: 16, color: colorScheme.error),
+                  Icon(
+                    Icons.warning_amber,
+                    size: AppDimensions.iconXS,
+                    color: colorScheme.error,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'رصيدك غير كافٍ (${currentBalance ?? 0})',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       color: colorScheme.onErrorContainer,
                     ),
                   ),
@@ -405,7 +421,11 @@ class CreditPricingList extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(item.$3, size: 18, color: colorScheme.primary),
+                    child: Icon(
+                      item.$3,
+                      size: AppDimensions.fontHeadline,
+                      color: colorScheme.primary,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
@@ -177,10 +178,7 @@ class _ScriptGeneratorScreenState extends ConsumerState<ScriptGeneratorScreen> {
                 CreditCostCard(
                   cost: 10,
                   operation: 'توليد سيناريو AI',
-                  currentBalance: ref
-                      .watch(userCreditsProvider)
-                      .valueOrNull
-                      ?.balance,
+                  currentBalance: ref.watch(userCreditsProvider).value?.balance,
                 ),
                 const SizedBox(height: 24),
 
@@ -266,7 +264,7 @@ class _ScriptGeneratorScreenState extends ConsumerState<ScriptGeneratorScreen> {
                 Text(
                   'القالب المختار',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -289,7 +287,11 @@ class _ScriptGeneratorScreenState extends ConsumerState<ScriptGeneratorScreen> {
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+        Icon(
+          icon,
+          size: AppDimensions.iconS,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(width: 8),
         Text(
           title,
@@ -427,7 +429,10 @@ class _ScriptGeneratorScreenState extends ConsumerState<ScriptGeneratorScreen> {
                     backgroundColor: colorScheme.primary,
                     child: Text(
                       '${entry.key + 1}',
-                      style: const TextStyle(fontSize: 12, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLabel,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),

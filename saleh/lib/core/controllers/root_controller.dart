@@ -54,8 +54,9 @@ class RootState {
 }
 
 /// متحكم الجذر - يقرر أي تطبيق يعمل
-class RootController extends StateNotifier<RootState> {
-  RootController() : super(const RootState());
+class RootController extends Notifier<RootState> {
+  @override
+  RootState build() => const RootState();
 
   /// تعيين نية تسجيل الدخول (مؤقت)
   void setLoginIntent(LoginIntent intent) {
@@ -90,8 +91,8 @@ class RootController extends StateNotifier<RootState> {
 }
 
 /// Provider للتحكم بالتطبيق الجذري
-final rootControllerProvider = StateNotifierProvider<RootController, RootState>(
-  (ref) => RootController(),
+final rootControllerProvider = NotifierProvider<RootController, RootState>(
+  RootController.new,
 );
 
 /// Provider للتطبيق الحالي

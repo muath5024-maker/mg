@@ -13,7 +13,7 @@ class AppSearchDelegate extends SearchDelegate<String?> {
     : super(
         searchFieldLabel: 'ابحث في التطبيق...',
         searchFieldStyle: const TextStyle(
-          fontSize: 16,
+          fontSize: AppDimensions.fontTitle,
           color: AppTheme.textPrimaryColor,
         ),
       );
@@ -331,12 +331,18 @@ class AppSearchDelegate extends SearchDelegate<String?> {
             const SizedBox(height: 16),
             Text(
               'لا توجد نتائج لـ "$query"',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                color: Colors.grey[600],
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'جرب كلمات بحث مختلفة',
-              style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+              style: TextStyle(
+                fontSize: AppDimensions.fontBody,
+                color: Colors.grey[400],
+              ),
             ),
           ],
         ),
@@ -364,7 +370,7 @@ class AppSearchDelegate extends SearchDelegate<String?> {
               child: Text(
                 category,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppDimensions.fontLabel,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[600],
                 ),
@@ -398,7 +404,7 @@ class AppSearchDelegate extends SearchDelegate<String?> {
               const Text(
                 'الأكثر استخداماً',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppDimensions.fontBody,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),
@@ -425,7 +431,7 @@ class AppSearchDelegate extends SearchDelegate<String?> {
               const Text(
                 'تصفح حسب الفئة',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppDimensions.fontBody,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),
@@ -451,7 +457,10 @@ class AppSearchDelegate extends SearchDelegate<String?> {
       return ExpansionTile(
         title: Text(
           category,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontSize: AppDimensions.fontBody,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         children: categoryItems
             .map((item) => _buildSearchResultItem(context, item))
@@ -463,7 +472,10 @@ class AppSearchDelegate extends SearchDelegate<String?> {
   Widget _buildQuickChip(BuildContext context, SearchItem item) {
     return ActionChip(
       avatar: AppIcon(item.icon, size: 16, color: AppTheme.primaryColor),
-      label: Text(item.title, style: const TextStyle(fontSize: 12)),
+      label: Text(
+        item.title,
+        style: const TextStyle(fontSize: AppDimensions.fontLabel),
+      ),
       backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
       onPressed: () {
         HapticFeedback.lightImpact();
@@ -488,11 +500,17 @@ class AppSearchDelegate extends SearchDelegate<String?> {
       ),
       title: Text(
         item.title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: AppDimensions.fontBody,
+        ),
       ),
       subtitle: Text(
         item.subtitle,
-        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        style: TextStyle(
+          fontSize: AppDimensions.fontLabel,
+          color: Colors.grey[600],
+        ),
       ),
       trailing: AppIcon(AppIcons.chevronLeft, size: 16, color: Colors.grey),
       onTap: () {

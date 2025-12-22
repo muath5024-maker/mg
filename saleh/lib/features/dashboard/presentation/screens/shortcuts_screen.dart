@@ -144,18 +144,18 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                 onPressed: _showAddShortcutSheet,
                 backgroundColor: AppTheme.primaryColor,
                 elevation: 4,
-                icon: const Icon(Icons.add, color: Colors.white, size: 24),
+                icon: const Icon(Icons.add, color: Colors.white, size: 20),
                 label: const Text(
                   'إضافة اختصار',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
                 extendedPadding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+                  horizontal: 20,
+                  vertical: 12,
                 ),
               ),
             )
@@ -253,15 +253,18 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
         unselectedLabelColor: AppTheme.textSecondaryColor,
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: AppDimensions.fontBody,
+        ),
         tabs: const [
           Tab(text: 'اختصاراتي'),
           Tab(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.auto_awesome, size: 18),
-                SizedBox(width: 4),
+                Icon(Icons.auto_awesome, size: AppDimensions.iconS),
+                SizedBox(width: AppDimensions.spacing4),
                 Text('أدوات AI'),
               ],
             ),
@@ -1573,11 +1576,11 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             'اختر الأداة:',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: AppDimensions.fontTitle,
               color: AppTheme.textPrimaryColor,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
 
           Wrap(
             spacing: 8,
@@ -1699,7 +1702,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                         SelectableText(
                           _generatedImageUrl!,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: AppDimensions.fontCaption,
                             color: Colors.grey[500],
                           ),
                         ),
@@ -1773,7 +1776,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                       'النتيجة:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontTitle,
                       ),
                     ),
                     const Spacer(),
@@ -1789,7 +1792,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 SelectableText(
                   _result.isEmpty ? 'اضغط على أي أداة للتجربة' : _result,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppDimensions.fontBody,
                     height: 1.6,
                     color: _result.contains('❌')
                         ? Colors.red[800]
@@ -1993,7 +1996,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             Text(
               'توليد صور بالذكاء الاصطناعي عبر OpenRouter',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppDimensions.fontLabel,
                 color: Colors.grey,
                 fontStyle: FontStyle.italic,
               ),

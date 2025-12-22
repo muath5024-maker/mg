@@ -365,13 +365,19 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   const Text(
                     '1) ماهو شوبينقنا؟',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   const Text(
                     'شوبينقنا هو نظام دروب شوبينق داخلي يربط تجار المنصة مع بعض.\n'
                     'تاجر يوفّر المنتج، وتاجر آخر يبيعه، والطلب يوصل للمورد مباشرة باسم الموزع ويتم شحنه للعميل، وكل العملية منظمة وواضحة داخل النظام.',
-                    style: TextStyle(fontSize: 16, height: 1.6),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontTitle,
+                      height: 1.6,
+                    ),
                   ),
                 ],
               ),
@@ -387,7 +393,10 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   const Text(
                     '2) كيف تتم العملية؟',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Padding(
@@ -397,15 +406,24 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '\t1. المورد يضيف المنتج ويحدد السعر والمخزون',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '\t2. الموزع يضيف المنتج لمتجره ويحدد سعر البيع',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '\t3. عند الشراء، يتم إرسال الطلب للمورد مع بيانات العميل ليتم الشحن مباشرة',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -424,7 +442,10 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   const Text(
                     '3) لماذا شوبينقنا؟',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Padding(
@@ -434,25 +455,37 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• بيع بدون الحاجة لمخزون',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• توسّع أسرع للمتاجر',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• تعاون فعلي بين التجار بدل المنافسة',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• عدة محطات بيع بدل نقطة بيع واحدة',
-                          style: TextStyle(fontSize: 16, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontTitle,
+                            height: 1.6,
+                          ),
                         ),
                         SizedBox(height: 8),
                         Text(
                           '(منتجك ما يعتمد على متجر واحد فقط، بل يُباع عبر متاجر متعددة)',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: AppDimensions.fontBody,
                             height: 1.6,
                             fontStyle: FontStyle.italic,
                             color: Colors.grey,
@@ -475,20 +508,27 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   const Text(
                     '4) توزيع المسؤوليات',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   // المورد
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.store, color: Colors.orange, size: 24),
+                      Icon(
+                        Icons.store,
+                        color: Colors.orange,
+                        size: AppDimensions.iconM,
+                      ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
                           'المورد:',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -502,15 +542,24 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• توفير المنتج وتحديث المخزون',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• تجهيز الطلبات وشحنها للعميل',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• الالتزام بجودة المنتج ووقت التنفيذ',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -520,13 +569,17 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.shopping_cart, color: Colors.green, size: 24),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: Colors.green,
+                        size: AppDimensions.iconM,
+                      ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
                           'الموزع:',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -540,15 +593,24 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• عرض المنتجات داخل متجره',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• التسويق والبيع للعملاء',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• إدارة تجربة ما قبل الشراء',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -561,14 +623,14 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       Icon(
                         Icons.business,
                         color: AppTheme.primaryColor,
-                        size: 24,
+                        size: AppDimensions.iconM,
                       ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
                           'المنصة:',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -582,19 +644,31 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• تنظيم عملية التعاون بين التجار',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• إدارة تدفق الطلبات وتوثيقها',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• تقليل النزاعات وضمان وضوح العمليات',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• خلق فرص بيع مشتركة بين التجار',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -613,20 +687,27 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   const Text(
                     '5) عمولة المنصة',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   // المورد
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.store, color: Colors.orange, size: 24),
+                      Icon(
+                        Icons.store,
+                        color: Colors.orange,
+                        size: AppDimensions.iconM,
+                      ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
                           'المورد (2.5٪):',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -640,11 +721,17 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• حصل على قنوات بيع إضافية بدون تسويق',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• زادت مبيعاته بدون تكلفة استحواذ عميل',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -654,13 +741,17 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.shopping_cart, color: Colors.green, size: 24),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: Colors.green,
+                        size: AppDimensions.iconM,
+                      ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
                           'الموزع (2.5٪):',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -674,11 +765,17 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• لا يتحمل مخزون ولا شحن',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• يركّز فقط على البيع والتسويق',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -691,14 +788,14 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       Icon(
                         Icons.business,
                         color: AppTheme.primaryColor,
-                        size: 24,
+                        size: AppDimensions.iconM,
                       ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
                           'المنصة (5٪):',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -712,19 +809,31 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: const [
                         Text(
                           '• تدير النظام',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• توثق الطلبات',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• تقلل النزاعات',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                         Text(
                           '• وتخلق فرص بيع للجميع',
-                          style: TextStyle(fontSize: 15, height: 1.6),
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSubtitle,
+                            height: 1.6,
+                          ),
                         ),
                       ],
                     ),
@@ -743,12 +852,18 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   const Text(
                     '6) عبارة ختامية',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   const Text(
                     'شوبينقنا يحوّل التعاون بين التجار إلى شبكة بيع حقيقية ترفع المبيعات للجميع بدون تعقيد.',
-                    style: TextStyle(fontSize: 16, height: 1.6),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontTitle,
+                      height: 1.6,
+                    ),
                   ),
                 ],
               ),
@@ -772,7 +887,11 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.category_outlined, size: 64, color: Colors.grey[400]),
+              Icon(
+                Icons.category_outlined,
+                size: AppDimensions.iconDisplay,
+                color: Colors.grey[400],
+              ),
               const SizedBox(height: 16),
               Text(
                 'لا توجد تصنيفات متاحة',
@@ -824,7 +943,7 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                         .firstWhere((c) => c.id == _selectedCategoryId)
                         .getLocalizedName('ar'),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: AppDimensions.fontHeadline,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -843,7 +962,7 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                       children: [
                         Icon(
                           Icons.shopping_bag_outlined,
-                          size: 64,
+                          size: AppDimensions.iconDisplay,
                           color: Colors.grey[400],
                         ),
                         const SizedBox(height: 16),
@@ -881,7 +1000,11 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.category, size: 48, color: AppTheme.primaryColor),
+              Icon(
+                Icons.category,
+                size: AppDimensions.iconHero,
+                color: AppTheme.primaryColor,
+              ),
               const SizedBox(height: 8),
               Text(
                 category.getLocalizedName('ar'),
@@ -1101,7 +1224,7 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 children: [
                   Icon(
                     Icons.inventory_2_outlined,
-                    size: 64,
+                    size: AppDimensions.iconDisplay,
                     color: Colors.grey[400],
                   ),
                   const SizedBox(height: 16),
@@ -1178,7 +1301,11 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.store_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(
+                    Icons.store_outlined,
+                    size: AppDimensions.iconDisplay,
+                    color: Colors.grey[400],
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'لا توجد منتجات كموزع',
@@ -1269,7 +1396,10 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                 padding: EdgeInsets.all(16),
                 child: Text(
                   'إضافة لمتجرك',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontHeadline,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               Padding(
@@ -1360,7 +1490,10 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
                   padding: EdgeInsets.all(16),
                   child: Text(
                     'تعديل القائمة',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Padding(

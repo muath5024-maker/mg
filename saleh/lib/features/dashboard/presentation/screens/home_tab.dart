@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
@@ -239,7 +240,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 Text(
                   'رابط المتجر',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: AppDimensions.fontCaption,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey.shade500,
                     letterSpacing: 0.5,
@@ -248,8 +249,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 const SizedBox(height: 2),
                 Text(
                   storeUrl,
-                  style: const TextStyle(
-                    fontSize: 13,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontBody2,
                     fontWeight: FontWeight.bold,
                     color: _HomeColors.primary,
                     fontFamily: 'monospace',
@@ -377,8 +378,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     children: [
                       Text(
                         value,
-                        style: const TextStyle(
-                          fontSize: 28,
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontDisplay1,
                           fontWeight: FontWeight.w800,
                           color: _HomeColors.primary,
                           letterSpacing: -0.5,
@@ -389,7 +390,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         Text(
                           suffix,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: AppDimensions.fontBody2,
                             fontWeight: FontWeight.bold,
                             color: Colors.grey.shade500,
                           ),
@@ -401,7 +402,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: AppDimensions.fontCaption,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey.shade500,
                       letterSpacing: 0.5,
@@ -567,8 +568,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   const SizedBox(height: 8),
                   Text(
                     label,
-                    style: const TextStyle(
-                      fontSize: 11,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontCaption,
                       fontWeight: FontWeight.bold,
                       color: _HomeColors.primary,
                       height: 1.3,

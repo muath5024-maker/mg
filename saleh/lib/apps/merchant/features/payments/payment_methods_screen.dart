@@ -96,7 +96,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
           // Payment Methods
           const Text(
             'طرق الدفع المتاحة',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: AppDimensions.fontHeadline,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: AppDimensions.spacing12),
           _buildPaymentMethodCard(
@@ -172,12 +175,12 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 32),
+            Icon(icon, color: color, size: AppDimensions.iconXL),
             SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: AppDimensions.fontDisplay2,
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
@@ -262,11 +265,18 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[400]),
+          Icon(
+            Icons.receipt_long_outlined,
+            size: AppDimensions.iconHero,
+            color: Colors.grey[400],
+          ),
           SizedBox(height: AppDimensions.spacing16),
           Text(
             'لا توجد معاملات',
-            style: TextStyle(color: Colors.grey[600], fontSize: 18),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: AppDimensions.fontHeadline,
+            ),
           ),
         ],
       ),
@@ -287,7 +297,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                 children: [
                   const Text(
                     'إعدادات العملة',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
@@ -334,7 +347,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                 children: [
                   const Text(
                     'إعدادات الخصم',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
@@ -365,7 +381,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                 children: [
                   const Text(
                     'الدفع الجزئي',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
@@ -396,7 +415,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                 children: [
                   const Text(
                     'الإشعارات',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
@@ -426,7 +448,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                 children: [
                   const Text(
                     'سياسة الاسترداد',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
@@ -463,7 +488,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                       const Text(
                         'الحسابات البنكية',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -485,7 +510,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
                         const Chip(
                           label: Text(
                             'الرئيسي',
-                            style: TextStyle(fontSize: 10),
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontCaption,
+                            ),
                           ),
                         ),
                         IconButton(
@@ -529,7 +556,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
               Text(
                 'إعدادات $name',
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: AppDimensions.fontDisplay3,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -48,7 +48,7 @@ class DialogHelper {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),
@@ -59,7 +59,7 @@ class DialogHelper {
         content: Text(
           message,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.fontBody,
             color: AppTheme.textSecondaryColor,
             height: 1.5,
           ),
@@ -119,7 +119,7 @@ class DialogHelper {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),
@@ -130,7 +130,7 @@ class DialogHelper {
         content: Text(
           message,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.fontBody,
             color: AppTheme.textSecondaryColor,
             height: 1.5,
           ),
@@ -182,7 +182,7 @@ class DialogHelper {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),
@@ -193,7 +193,7 @@ class DialogHelper {
         content: Text(
           message,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.fontBody,
             color: AppTheme.textSecondaryColor,
             height: 1.5,
           ),
@@ -250,7 +250,7 @@ class DialogHelper {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),
@@ -261,7 +261,7 @@ class DialogHelper {
         content: Text(
           message,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.fontBody,
             color: AppTheme.textSecondaryColor,
             height: 1.5,
           ),
@@ -314,7 +314,7 @@ class DialogHelper {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimaryColor,
                 ),

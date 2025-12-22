@@ -101,7 +101,10 @@ class _ShippingScreenState extends State<ShippingScreen>
           // Carriers Section
           const Text(
             'شركات الشحن المتاحة',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: AppDimensions.fontHeadline,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: AppDimensions.spacing12),
           _buildCarriersList(),
@@ -122,12 +125,12 @@ class _ShippingScreenState extends State<ShippingScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 32),
+            Icon(icon, color: color, size: AppDimensions.iconXL),
             SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: AppDimensions.fontDisplay2,
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
@@ -201,13 +204,16 @@ class _ShippingScreenState extends State<ShippingScreen>
         children: [
           Icon(
             Icons.local_shipping_outlined,
-            size: 64,
+            size: AppDimensions.iconHero,
             color: Colors.grey[400],
           ),
           SizedBox(height: AppDimensions.spacing16),
           Text(
             'لا توجد شحنات',
-            style: TextStyle(color: Colors.grey[600], fontSize: 18),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: AppDimensions.fontHeadline,
+            ),
           ),
           SizedBox(height: AppDimensions.spacing8),
           ElevatedButton.icon(
@@ -239,7 +245,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                       const Text(
                         'مناطق الشحن',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -284,7 +290,10 @@ class _ShippingScreenState extends State<ShippingScreen>
                 children: [
                   const Text(
                     'الإعدادات الافتراضية',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
@@ -331,7 +340,10 @@ class _ShippingScreenState extends State<ShippingScreen>
                 children: [
                   const Text(
                     'معلومات المرسل',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: AppDimensions.spacing16),
                   TextFormField(

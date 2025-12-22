@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/studio_package.dart';
 import '../providers/studio_provider.dart';
 import '../services/studio_api_service.dart';
@@ -66,19 +67,25 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
               backgroundColor: bgColor.withValues(alpha: 0.85),
               surfaceTintColor: Colors.transparent,
               leading: IconButton(
-                icon: const Icon(Icons.menu, size: 28),
+                icon: Icon(Icons.menu, size: AppDimensions.iconL),
                 onPressed: () => HapticFeedback.lightImpact(),
               ),
-              title: const Text(
+              title: Text(
                 'الخدمات والمميزات',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: AppDimensions.fontHeadline,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               centerTitle: true,
               actions: [
                 Stack(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.notifications_outlined, size: 28),
+                      icon: Icon(
+                        Icons.notifications_outlined,
+                        size: AppDimensions.iconL,
+                      ),
                       onPressed: () => HapticFeedback.lightImpact(),
                     ),
                     Positioned(
@@ -109,17 +116,17 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                     Text(
                       'جديد ومميز',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: AppDimensions.fontDisplay3,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => HapticFeedback.lightImpact(),
-                      child: const Text(
+                      child: Text(
                         'عرض الكل',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppDimensions.fontBody,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF3B82F6),
                         ),
@@ -178,7 +185,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                 child: Text(
                   'اكتشف الخدمات',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: AppDimensions.fontDisplay3,
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
@@ -402,7 +409,9 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                           decoration: BoxDecoration(
                             color: isFirst
                                 ? const Color(0xFF3B82F6).withValues(alpha: 0.9)
-                                : const Color(0xFF8B5CF6).withValues(alpha: 0.9),
+                                : const Color(
+                                    0xFF8B5CF6,
+                                  ).withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -412,15 +421,15 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                                 isFirst
                                     ? Icons.trending_up
                                     : Icons.auto_awesome,
-                                size: 14,
+                                size: AppDimensions.iconXS,
                                 color: Colors.white,
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 isFirst ? 'الأكثر طلباً' : 'جديد',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 12,
+                                  fontSize: AppDimensions.fontLabel,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -433,9 +442,9 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                           isFirst
                               ? 'حملات إعلانية متكاملة'
                               : 'محرر الذكاء الاصطناعي',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: AppDimensions.fontDisplay3,
                             fontWeight: FontWeight.bold,
                             height: 1.2,
                           ),
@@ -448,7 +457,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                               : 'حول أفكارك ونصوصك إلى فيديو احترافي في ثوانٍ معدودة.',
                           style: TextStyle(
                             color: Colors.grey[300],
-                            fontSize: 13,
+                            fontSize: AppDimensions.fontBody2,
                             height: 1.4,
                           ),
                           maxLines: 2,
@@ -529,14 +538,18 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                     color: bgColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Icon(icon, size: 32, color: iconColor),
+                  child: Icon(
+                    icon,
+                    size: AppDimensions.iconXL,
+                    color: iconColor,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // العنوان
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppDimensions.fontTitle,
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
@@ -546,7 +559,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     height: 1.4,
                   ),
@@ -632,9 +645,9 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.rocket_launch,
-                                size: 20,
+                                size: AppDimensions.iconS,
                                 color: Colors.white,
                               ),
                             ),
@@ -642,7 +655,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                             Text(
                               'الخدمة المميزة',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: AppDimensions.fontLabel,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.indigo[200],
                                 letterSpacing: 1,
@@ -652,10 +665,10 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                         ),
                         const SizedBox(height: 16),
                         // العنوان
-                        const Text(
+                        Text(
                           'حملة إعلانية كاملة',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: AppDimensions.fontDisplay3,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -665,7 +678,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                         Text(
                           'إدارة شاملة لحملتك من التخطيط إلى التنفيذ مع تقارير أداء دورية.',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: AppDimensions.fontBody,
                             color: Colors.indigo[100],
                             height: 1.5,
                           ),
@@ -683,10 +696,10 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                     ),
                     child: Transform.scale(
                       scaleX: -1,
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_forward,
                         color: Colors.white,
-                        size: 24,
+                        size: AppDimensions.iconM,
                       ),
                     ),
                   ),
@@ -714,10 +727,14 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.grey[50],
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.grey[200]!,
               width: 2,
               strokeAlign: BorderSide.strokeAlignInside,
             ),
@@ -729,7 +746,9 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.white,
                   shape: BoxShape.circle,
                   boxShadow: isDark
                       ? null
@@ -742,7 +761,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                 ),
                 child: Icon(
                   Icons.add,
-                  size: 28,
+                  size: AppDimensions.iconL,
                   color: isDark ? Colors.grey[400] : Colors.grey[500],
                 ),
               ),
@@ -750,7 +769,7 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
               Text(
                 'المزيد من الخدمات',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppDimensions.fontBody,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
                 ),
@@ -851,7 +870,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                           child: Icon(
                             _getIconData(package.icon),
                             color: const Color(0xFF3B82F6),
-                            size: 36,
+                            size: AppDimensions.iconXXL,
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -862,7 +881,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                               Text(
                                 package.nameAr,
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: AppDimensions.fontDisplay3,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Colors.white
@@ -886,16 +905,16 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.monetization_on,
-                                          size: 16,
+                                          size: AppDimensions.iconXS,
                                           color: Color(0xFF3B82F6),
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
                                           '${package.creditsCost} رصيد',
-                                          style: const TextStyle(
-                                            fontSize: 14,
+                                          style: TextStyle(
+                                            fontSize: AppDimensions.fontBody,
                                             fontWeight: FontWeight.bold,
                                             color: Color(0xFF3B82F6),
                                           ),
@@ -906,7 +925,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                   const SizedBox(width: 12),
                                   Icon(
                                     Icons.schedule,
-                                    size: 16,
+                                    size: AppDimensions.iconXS,
                                     color: isDark
                                         ? Colors.grey[400]
                                         : Colors.grey[600],
@@ -915,7 +934,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                   Text(
                                     '${package.estimatedTimeMinutes} دقيقة',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: AppDimensions.fontBody,
                                       color: isDark
                                           ? Colors.grey[400]
                                           : Colors.grey[600],
@@ -935,7 +954,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                     Text(
                       package.descriptionAr,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontTitle,
                         height: 1.6,
                         color: isDark ? Colors.grey[300] : Colors.grey[700],
                       ),
@@ -947,7 +966,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                     Text(
                       'ماذا ستحصل؟',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: AppDimensions.fontHeadline,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
@@ -971,12 +990,14 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                                color: const Color(
+                                  0xFF3B82F6,
+                                ).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
                                 _getDeliverableIcon(d.type),
-                                size: 24,
+                                size: AppDimensions.iconM,
                                 color: const Color(0xFF3B82F6),
                               ),
                             ),
@@ -988,7 +1009,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                   Text(
                                     d.descriptionAr,
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: AppDimensions.fontBody,
                                       fontWeight: FontWeight.w600,
                                       color: isDark
                                           ? Colors.white
@@ -999,7 +1020,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                   Text(
                                     '${d.quantity}x ${d.format.toUpperCase()}',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: AppDimensions.fontLabel,
                                       color: isDark
                                           ? Colors.grey[400]
                                           : Colors.grey[600],
@@ -1014,9 +1035,9 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                 color: Color(0xFF10B981),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.check,
-                                size: 14,
+                                size: AppDimensions.iconXS,
                                 color: Colors.white,
                               ),
                             ),
@@ -1031,7 +1052,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                     Text(
                       'المميزات',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: AppDimensions.fontHeadline,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
@@ -1059,16 +1080,16 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.check_circle,
-                                    size: 16,
+                                    size: AppDimensions.iconXS,
                                     color: Color(0xFF10B981),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     f,
                                     style: TextStyle(
-                                      fontSize: 13,
+                                      fontSize: AppDimensions.fontBody2,
                                       color: isDark
                                           ? Colors.grey[300]
                                           : Colors.grey[700],
@@ -1117,7 +1138,9 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                           ? null
                           : [
                               BoxShadow(
-                                color: const Color(0xFF3B82F6).withValues(alpha: 0.4),
+                                color: const Color(
+                                  0xFF3B82F6,
+                                ).withValues(alpha: 0.4),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),
@@ -1136,16 +1159,16 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                             ),
                           )
                         else ...[
-                          const Icon(
+                          Icon(
                             Icons.shopping_cart_outlined,
                             color: Colors.white,
-                            size: 22,
+                            size: AppDimensions.iconS,
                           ),
                           const SizedBox(width: 10),
-                          const Text(
+                          Text(
                             'طلب الحزمة',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: AppDimensions.fontHeadline,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -1303,10 +1326,10 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                           color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.inventory_2_outlined,
                           color: Color(0xFF3B82F6),
-                          size: 28,
+                          size: AppDimensions.iconL,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -1317,7 +1340,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                             Text(
                               'بيانات المنتج',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: AppDimensions.fontDisplay3,
                                 fontWeight: FontWeight.bold,
                                 color: isDark
                                     ? Colors.white
@@ -1328,7 +1351,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                             Text(
                               'أدخل معلومات منتجك لإنشاء المحتوى',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: AppDimensions.fontBody,
                                 color: isDark
                                     ? Colors.grey[400]
                                     : Colors.grey[600],
@@ -1346,7 +1369,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                   Text(
                     'اسم المنتج',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
@@ -1389,7 +1412,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                   Text(
                     'وصف المنتج',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
@@ -1455,7 +1478,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                               child: Text(
                                 'إلغاء',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: AppDimensions.fontTitle,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Colors.grey[400]
@@ -1519,18 +1542,19 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                                 ),
                               ],
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.check_circle_outline,
                                   color: Colors.white,
+                                  size: AppDimensions.iconM,
                                 ),
                                 SizedBox(width: 10),
                                 Text(
                                   'متابعة',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: AppDimensions.fontTitle,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -1587,10 +1611,10 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                 color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.error_outline,
                 color: Colors.red,
-                size: 48,
+                size: AppDimensions.iconXXL + 12,
               ),
             ),
             const SizedBox(height: 20),
@@ -1599,7 +1623,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
             Text(
               title,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: AppDimensions.fontDisplay3,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
@@ -1610,7 +1634,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
             Text(
               message,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.fontTitle,
                 color: isDark ? Colors.grey[400] : Colors.grey[600],
                 height: 1.5,
               ),
@@ -1637,7 +1661,7 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
                   child: Text(
                     'حسناً',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppDimensions.fontTitle,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),

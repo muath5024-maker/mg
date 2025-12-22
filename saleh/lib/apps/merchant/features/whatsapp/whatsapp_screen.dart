@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/app_dimensions.dart';
+
 class WhatsappScreen extends StatefulWidget {
   const WhatsappScreen({super.key});
 
@@ -59,7 +61,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
       children: [
         // Stats Row
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Row(
             children: [
               Expanded(
@@ -132,22 +134,25 @@ class _WhatsappScreenState extends State<WhatsappScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: AppDimensions.paddingS,
         child: Column(
           children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
+            Icon(icon, color: color, size: AppDimensions.iconM),
+            SizedBox(height: AppDimensions.spacing4),
             Text(
               value,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: AppDimensions.fontDisplay3,
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
             ),
             Text(
               title,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(
+                fontSize: AppDimensions.fontLabel,
+                color: Colors.grey,
+              ),
             ),
           ],
         ),
@@ -160,13 +165,20 @@ class _WhatsappScreenState extends State<WhatsappScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_outlined, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
+          Icon(
+            Icons.chat_outlined,
+            size: AppDimensions.iconHero,
+            color: Colors.grey[400],
+          ),
+          SizedBox(height: AppDimensions.spacing16),
           Text(
             'لا توجد محادثات',
-            style: TextStyle(color: Colors.grey[600], fontSize: 18),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: AppDimensions.fontHeadline,
+            ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: AppDimensions.spacing8),
           Text(
             'ستظهر محادثات واتساب هنا',
             style: TextStyle(color: Colors.grey[500]),
@@ -178,7 +190,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
 
   Widget _buildQuickRepliesTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           Row(
@@ -186,7 +198,10 @@ class _WhatsappScreenState extends State<WhatsappScreen>
             children: [
               const Text(
                 'الردود السريعة',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: AppDimensions.fontHeadline,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               ElevatedButton.icon(
                 onPressed: () => _showAddQuickReplyDialog(),
@@ -195,7 +210,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           _buildQuickReplyCard(
             '/مرحبا',
             'رسالة ترحيب',
@@ -223,9 +238,9 @@ class _WhatsappScreenState extends State<WhatsappScreen>
 
   Widget _buildQuickReplyCard(String shortcut, String title, String message) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: AppDimensions.spacing12),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -261,11 +276,14 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit, size: 20),
+                      icon: const Icon(Icons.edit, size: AppDimensions.iconS),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 20),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        size: AppDimensions.iconS,
+                      ),
                       onPressed: () {},
                     ),
                   ],
@@ -282,13 +300,13 @@ class _WhatsappScreenState extends State<WhatsappScreen>
 
   Widget _buildCampaignsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           // Templates Section
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -298,7 +316,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       const Text(
                         'قوالب الرسائل',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -309,7 +327,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   _buildTemplateItem(
                     'تأكيد الطلب',
                     'order_confirmation',
@@ -325,12 +343,12 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Broadcasts Section
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -340,7 +358,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       const Text(
                         'الحملات الجماعية',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -351,16 +369,16 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   Center(
                     child: Column(
                       children: [
                         Icon(
                           Icons.campaign_outlined,
-                          size: 48,
+                          size: AppDimensions.iconHero,
                           color: Colors.grey[400],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: AppDimensions.spacing8),
                         Text(
                           'لا توجد حملات',
                           style: TextStyle(color: Colors.grey[600]),
@@ -372,12 +390,12 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Auto Replies
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -387,7 +405,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       const Text(
                         'الردود الآلية',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -398,7 +416,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   SwitchListTile(
                     title: const Text('رد الترحيب'),
                     subtitle: const Text('عند أول رسالة من العميل'),
@@ -434,7 +452,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
           isApproved ? 'معتمد' : 'قيد المراجعة',
           style: TextStyle(
             color: isApproved ? Colors.green : Colors.orange,
-            fontSize: 12,
+            fontSize: AppDimensions.fontLabel,
           ),
         ),
         backgroundColor: isApproved
@@ -446,19 +464,23 @@ class _WhatsappScreenState extends State<WhatsappScreen>
 
   Widget _buildSettingsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           // Connection Status
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.circle, color: Colors.red, size: 12),
-                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.circle,
+                        color: Colors.red,
+                        size: AppDimensions.fontLabel,
+                      ),
+                      SizedBox(width: AppDimensions.spacing8),
                       const Text(
                         'غير متصل',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -481,20 +503,23 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Business Profile
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'الملف التجاري',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'رقم الواتساب',
@@ -502,14 +527,14 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                       prefixText: '+966 ',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'اسم النشاط',
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'وصف النشاط',
@@ -517,14 +542,14 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                     ),
                     maxLines: 2,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'البريد الإلكتروني',
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'رابط الموقع',
@@ -535,20 +560,23 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Working Hours
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'ساعات العمل',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   _buildWorkingHoursRow('السبت', '09:00', '22:00', true),
                   _buildWorkingHoursRow('الأحد', '09:00', '22:00', true),
                   _buildWorkingHoursRow('الاثنين', '09:00', '22:00', true),
@@ -560,20 +588,23 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Notifications
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'الإشعارات',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('إشعارات الطلبات الجديدة'),
                     value: true,
@@ -598,7 +629,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -618,7 +649,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
     bool isActive,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
       child: Row(
         children: [
           SizedBox(width: 80, child: Text(day)),
@@ -663,14 +694,14 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                   prefixText: '/',
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'العنوان',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'نص الرسالة',
@@ -710,7 +741,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'القالب',
@@ -726,7 +757,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                 ],
                 onChanged: (v) {},
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'الجمهور',
@@ -742,7 +773,7 @@ class _WhatsappScreenState extends State<WhatsappScreen>
                 ],
                 onChanged: (v) {},
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               ListTile(
                 leading: const Icon(Icons.schedule),
                 title: const Text('جدولة الإرسال'),

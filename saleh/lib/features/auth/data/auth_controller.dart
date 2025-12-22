@@ -39,22 +39,33 @@ class AuthState {
 }
 
 /// Auth Controller - يدير حالة المصادقة باستخدام Riverpod
-class AuthController extends StateNotifier<AuthState> {
-  final AuthRepository _authRepository;
+class AuthController extends Notifier<AuthState> {
+  late AuthRepository _authRepository;
 
-  AuthController(this._authRepository) : super(const AuthState()) {
+  @override
+  AuthState build() {
+    _authRepository = ref.watch(authRepositoryProvider);
     // التحقق من الجلسة عند بدء التطبيق
     _checkInitialSession();
+    return const AuthState();
   }
 
   /// التحقق من الجلسة الأولية
   Future<void> _checkInitialSession() async {
     try {
       final hasSession = await _authRepository.hasValidSession();
+      // التحقق من أن الـ provider لم يتم التخلص منه
+      if (!ref.mounted) return;
+
       if (hasSession) {
         final userRole = await _authRepository.getUserRole();
+        if (!ref.mounted) return;
+
         final userId = await _authRepository.getUserId();
+        if (!ref.mounted) return;
+
         final userEmail = await _authRepository.getUserEmail();
+        if (!ref.mounted) return;
 
         state = state.copyWith(
           isAuthenticated: true,
@@ -64,6 +75,8 @@ class AuthController extends StateNotifier<AuthState> {
         );
       }
     } catch (e) {
+      // التحقق من أن الـ provider لم يتم التخلص منه
+      if (!ref.mounted) return;
       // في حالة وجود خطأ، نعتبر المستخدم غير مسجل
       state = state.copyWith(isAuthenticated: false);
     }
@@ -91,6 +104,8 @@ class AuthController extends StateNotifier<AuthState> {
         role: role,
       );
 
+      if (!ref.mounted) return;
+
       final user = result['user'] as Map<String, dynamic>;
       final profile = result['profile'] as Map<String, dynamic>?;
 
@@ -106,6 +121,7 @@ class AuthController extends StateNotifier<AuthState> {
         userEmail: user['email'] as String?,
       );
     } on Exception catch (e) {
+      if (!ref.mounted) return;
       String errorMsg = e.toString().replaceFirst('Exception: ', '');
 
       state = state.copyWith(
@@ -114,6 +130,7 @@ class AuthController extends StateNotifier<AuthState> {
         errorMessage: errorMsg,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: false,
@@ -143,6 +160,8 @@ class AuthController extends StateNotifier<AuthState> {
         loginAs: loginAs,
       );
 
+      if (!ref.mounted) return;
+
       // استخراج معلومات المستخدم
       final user = result['user'] as Map<String, dynamic>;
 
@@ -165,6 +184,7 @@ class AuthController extends StateNotifier<AuthState> {
         userEmail: user['email'] as String?,
       );
     } on Exception catch (e) {
+      if (!ref.mounted) return;
       // فشل تسجيل الدخول
       String errorMsg = e.toString().replaceFirst('Exception: ', '');
 
@@ -174,6 +194,7 @@ class AuthController extends StateNotifier<AuthState> {
         errorMessage: errorMsg,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       // خطأ غير متوقع
       state = state.copyWith(
         isLoading: false,
@@ -187,10 +208,12 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> logout() async {
     try {
       await _authRepository.signOut();
+      if (!ref.mounted) return;
 
       // إعادة تعيين الحالة
       state = const AuthState(isLoading: false, isAuthenticated: false);
     } catch (e) {
+      if (!ref.mounted) return;
       // حتى لو فشل، نعتبر المستخدم خرج
       state = const AuthState(isLoading: false, isAuthenticated: false);
     }
@@ -205,11 +228,17 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> checkSession() async {
     try {
       final hasSession = await _authRepository.hasValidSession();
+      if (!ref.mounted) return;
 
       if (hasSession) {
         final userRole = await _authRepository.getUserRole();
+        if (!ref.mounted) return;
+
         final userId = await _authRepository.getUserId();
+        if (!ref.mounted) return;
+
         final userEmail = await _authRepository.getUserEmail();
+        if (!ref.mounted) return;
 
         state = state.copyWith(
           isAuthenticated: true,
@@ -221,6 +250,7 @@ class AuthController extends StateNotifier<AuthState> {
         state = state.copyWith(isAuthenticated: false);
       }
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isAuthenticated: false);
     }
   }
@@ -231,8 +261,8 @@ class AuthController extends StateNotifier<AuthState> {
 // ==========================================================================
 
 /// Provider لـ AuthController
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
-  (ref) => AuthController(ref.watch(authRepositoryProvider)),
+final authControllerProvider = NotifierProvider<AuthController, AuthState>(
+  AuthController.new,
 );
 
 /// Provider للتحقق السريع من حالة تسجيل الدخول

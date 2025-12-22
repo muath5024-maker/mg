@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../constants/studio_colors.dart';
 
 /// صفحة استديو التوليد - توليد الصور والفيديو بالذكاء الاصطناعي
@@ -152,10 +153,10 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                           Navigator.pop(context);
                         },
                       ),
-                      title: const Text(
+                      title: Text(
                         'استديو التوليد',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: AppDimensions.fontDisplay3,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -276,7 +277,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
             children: [
               Icon(
                 icon,
-                size: 18,
+                size: AppDimensions.fontHeadline,
                 color: isSelected
                     ? Colors.white
                     : (isDark ? Colors.grey[400] : Colors.grey[500]),
@@ -285,7 +286,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppDimensions.fontBody,
                   fontWeight: FontWeight.bold,
                   color: isSelected
                       ? Colors.white
@@ -326,7 +327,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                 Text(
                   'الوصف',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     fontWeight: FontWeight.bold,
                     color: StudioColors.primaryColor,
                     letterSpacing: 1,
@@ -341,14 +342,14 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                     children: [
                       Icon(
                         Icons.auto_fix_high,
-                        size: 16,
+                        size: AppDimensions.iconXS,
                         color: StudioColors.secondaryColor,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'تحسين تلقائي',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppDimensions.fontLabel,
                           fontWeight: FontWeight.w500,
                           color: StudioColors.secondaryColor,
                         ),
@@ -368,13 +369,13 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                     'صف خيالك هنا... مثل: مدينة مستقبلية في السحب، ساعة ذهبية، تفاصيل دقيقة...',
                 hintStyle: TextStyle(
                   color: isDark ? Colors.grey[500] : Colors.grey[400],
-                  fontSize: 14,
+                  fontSize: AppDimensions.fontBody,
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppDimensions.fontBody,
                 color: isDark ? Colors.white : Colors.grey[900],
                 height: 1.5,
               ),
@@ -412,16 +413,19 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'الأنماط الفنية',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             TextButton(
               onPressed: () => HapticFeedback.lightImpact(),
               child: Text(
                 'عرض الكل',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppDimensions.fontLabel,
                   color: StudioColors.primaryColor,
                   fontWeight: FontWeight.w500,
                 ),
@@ -487,7 +491,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                               Center(
                                 child: Icon(
                                   style.icon,
-                                  size: 32,
+                                  size: AppDimensions.iconXL,
                                   color: isDark
                                       ? Colors.grey[400]
                                       : Colors.grey[500],
@@ -522,7 +526,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                       Text(
                         style.name,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppDimensions.fontLabel,
                           fontWeight: isSelected
                               ? FontWeight.bold
                               : FontWeight.w500,
@@ -547,9 +551,12 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'الإعدادات',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: AppDimensions.fontHeadline,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 12),
 
@@ -566,7 +573,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
               Text(
                 'نسبة العرض إلى الارتفاع',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: AppDimensions.fontLabel,
                   color: isDark ? Colors.grey[400] : Colors.grey[500],
                 ),
               ),
@@ -605,7 +612,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                           children: [
                             Icon(
                               ratio.icon,
-                              size: 18,
+                              size: AppDimensions.fontHeadline,
                               color: isSelected
                                   ? StudioColors.primaryColor
                                   : (isDark
@@ -616,7 +623,7 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                             Text(
                               ratio.label,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: AppDimensions.fontBody,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.w500,
@@ -690,20 +697,24 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Icon(icon, size: 18, color: color),
+              child: Icon(icon, size: AppDimensions.fontHeadline, color: color),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: AppDimensions.fontBody,
                   fontWeight: FontWeight.w500,
                   color: isDark ? Colors.grey[200] : Colors.grey[700],
                 ),
               ),
             ),
-            Icon(Icons.chevron_left, size: 18, color: Colors.grey[400]),
+            Icon(
+              Icons.chevron_left,
+              size: AppDimensions.fontHeadline,
+              color: Colors.grey[400],
+            ),
           ],
         ),
       ),
@@ -759,13 +770,13 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                           Icon(
                             Icons.auto_awesome,
                             color: Colors.white,
-                            size: 24,
+                            size: AppDimensions.iconM,
                           ),
                           SizedBox(width: 8),
                           Text(
                             'توليد العمل الفني',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: AppDimensions.fontHeadline,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -788,10 +799,10 @@ class _GenerationStudioPageState extends ConsumerState<GenerationStudioPage>
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
+                      child: Text(
                         '2 ⚡',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppDimensions.fontLabel,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),

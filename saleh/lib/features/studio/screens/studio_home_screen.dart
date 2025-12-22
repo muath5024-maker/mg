@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
@@ -555,9 +556,12 @@ class _ProjectCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
+          Icon(icon, size: AppDimensions.fontLabel, color: color),
           const SizedBox(width: 4),
-          Text(text, style: TextStyle(fontSize: 10, color: color)),
+          Text(
+            text,
+            style: TextStyle(fontSize: AppDimensions.fontCaption, color: color),
+          ),
         ],
       ),
     );
@@ -637,7 +641,7 @@ class _CreateOptionTile extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              size: 16,
+              size: AppDimensions.iconXS,
               color: colorScheme.onSurfaceVariant,
             ),
           ],

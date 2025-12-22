@@ -64,7 +64,17 @@ import '../../features/settings/presentation/screens/support_screen.dart';
 import '../../features/settings/presentation/screens/about_screen.dart';
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/settings/presentation/screens/appearance_settings_screen.dart';
-import 'go_router_refresh_stream.dart';
+
+/// Helper class to refresh GoRouter when auth state changes
+class _AuthRefreshNotifier extends ChangeNotifier {
+  _AuthRefreshNotifier(WidgetRef ref) {
+    // Listen to auth state changes
+    // When authControllerProvider changes, notify listeners
+    ref.listenManual(authControllerProvider, (previous, next) {
+      notifyListeners();
+    });
+  }
+}
 
 /// App Router - Manages navigation throughout the application
 /// Uses go_router for declarative routing with authentication protection
@@ -112,9 +122,8 @@ class AppRouter {
       },
 
       // الاستماع لتغييرات حالة المصادقة
-      refreshListenable: GoRouterRefreshStream(
-        ref.read(authControllerProvider.notifier).stream,
-      ),
+      // Note: In Riverpod 3.x, we use a different approach for listening
+      refreshListenable: _AuthRefreshNotifier(ref),
 
       routes: [
         // ========================================================================

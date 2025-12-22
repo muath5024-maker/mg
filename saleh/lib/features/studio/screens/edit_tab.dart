@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/studio_tool.dart';
 import '../providers/studio_provider.dart';
 import '../services/studio_api_service.dart';
@@ -131,16 +132,27 @@ class _EditTabState extends ConsumerState<EditTab> {
             ),
             child: Row(
               children: [
-                Icon(Icons.error_outline, color: colorScheme.error, size: 20),
+                Icon(
+                  Icons.error_outline,
+                  color: colorScheme.error,
+                  size: AppDimensions.iconS,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     _errorMessage!,
-                    style: TextStyle(color: colorScheme.error, fontSize: 12),
+                    style: TextStyle(
+                      color: colorScheme.error,
+                      fontSize: AppDimensions.fontLabel,
+                    ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close, size: 16, color: colorScheme.error),
+                  icon: Icon(
+                    Icons.close,
+                    size: AppDimensions.iconXS,
+                    color: colorScheme.error,
+                  ),
                   onPressed: () => setState(() => _errorMessage = null),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -162,12 +174,19 @@ class _EditTabState extends ConsumerState<EditTab> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: AppDimensions.iconS,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'تم المعالجة بنجاح!',
-                    style: TextStyle(color: Colors.green[700], fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.green[700],
+                      fontSize: AppDimensions.fontLabel,
+                    ),
                   ),
                 ),
                 TextButton(
@@ -209,7 +228,7 @@ class _EditTabState extends ConsumerState<EditTab> {
         Text(
           'ارفع صورة أو فيديو',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: AppDimensions.fontTitle,
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
           ),
@@ -333,7 +352,7 @@ class _EditTabState extends ConsumerState<EditTab> {
                 Text(
                   tool.nameAr,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: AppDimensions.fontCaption,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
@@ -351,14 +370,14 @@ class _EditTabState extends ConsumerState<EditTab> {
                   children: [
                     Icon(
                       Icons.monetization_on,
-                      size: 12,
+                      size: AppDimensions.iconXS,
                       color: colorScheme.primary,
                     ),
                     const SizedBox(width: 2),
                     Text(
                       '${tool.creditsCost}',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: AppDimensions.fontCaption,
                         color: colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),

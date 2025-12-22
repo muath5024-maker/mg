@@ -53,6 +53,31 @@ class _WidgetCatalogScreenState extends ConsumerState<WidgetCatalogScreen> {
       icon: Icons.emoji_symbols,
       builder: (context) => const _IconsSection(),
     ),
+    _CatalogSection(
+      title: 'الأفاتار',
+      icon: Icons.account_circle,
+      builder: (context) => const _AvatarSection(),
+    ),
+    _CatalogSection(
+      title: 'الشرائح',
+      icon: Icons.label,
+      builder: (context) => const _ChipsSection(),
+    ),
+    _CatalogSection(
+      title: 'الحوارات',
+      icon: Icons.message,
+      builder: (context) => const _DialogsSection(),
+    ),
+    _CatalogSection(
+      title: 'التحميل',
+      icon: Icons.hourglass_empty,
+      builder: (context) => const _SkeletonSection(),
+    ),
+    _CatalogSection(
+      title: 'SVG أيقونات',
+      icon: Icons.image,
+      builder: (context) => const _SvgIconsSection(),
+    ),
   ];
 
   @override
@@ -718,6 +743,453 @@ class _DimensionRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// ============================================================================
+/// Avatar Section - قسم الأفاتار
+/// ============================================================================
+class _AvatarSection extends StatelessWidget {
+  const _AvatarSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('أفاتار المستخدم'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 24,
+          runSpacing: 16,
+          children: [
+            Column(
+              children: [
+                MbuyAvatar(name: 'أحمد محمد', size: MbuyAvatarSize.small),
+                const SizedBox(height: 8),
+                const Text('صغير'),
+              ],
+            ),
+            Column(
+              children: [
+                MbuyAvatar(name: 'سارة علي', size: MbuyAvatarSize.medium),
+                const SizedBox(height: 8),
+                const Text('متوسط'),
+              ],
+            ),
+            Column(
+              children: [
+                MbuyAvatar(name: 'محمد خالد', size: MbuyAvatarSize.large),
+                const SizedBox(height: 8),
+                const Text('كبير'),
+              ],
+            ),
+            Column(
+              children: [
+                MbuyAvatar(name: 'خالد أحمد', size: MbuyAvatarSize.xl),
+                const SizedBox(height: 8),
+                const Text('كبير جداً'),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('أفاتار مع صورة'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 24,
+          runSpacing: 16,
+          children: [
+            MbuyAvatar.image(
+              imageUrl: 'https://i.pravatar.cc/150?img=1',
+              size: MbuyAvatarSize.medium,
+            ),
+            MbuyAvatar.image(
+              imageUrl: 'https://i.pravatar.cc/150?img=2',
+              size: MbuyAvatarSize.medium,
+            ),
+            MbuyAvatar.image(
+              imageUrl: 'https://i.pravatar.cc/150?img=3',
+              size: MbuyAvatarSize.medium,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// ============================================================================
+/// Chips Section - قسم الشرائح
+/// ============================================================================
+class _ChipsSection extends StatelessWidget {
+  const _ChipsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('شرائح الفلتر'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            MbuyChip.filter(label: 'إلكترونيات', selected: true, onTap: () {}),
+            MbuyChip.filter(label: 'ملابس', selected: false, onTap: () {}),
+            MbuyChip(label: 'أجهزة منزلية', selected: false, onTap: () {}),
+            MbuyChip(label: 'رياضة', selected: true, onTap: () {}),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('شرائح مع أيقونة'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            MbuyChip(
+              label: 'مفضل',
+              icon: Icons.favorite,
+              selected: true,
+              onTap: () {},
+            ),
+            MbuyChip(
+              label: 'جديد',
+              icon: Icons.fiber_new,
+              selected: false,
+              onTap: () {},
+            ),
+            MbuyChip(
+              label: 'تخفيض',
+              icon: Icons.local_offer,
+              selected: false,
+              onTap: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('شرائح إدخال (قابلة للحذف)'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            MbuyChip.input(label: 'تقنية', onDeleted: () {}),
+            MbuyChip.input(label: 'موضة', onDeleted: () {}),
+            MbuyChip.input(label: 'صحة', onDeleted: () {}),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('الوسوم'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            MbuyTag.success('نجاح'),
+            MbuyTag.error('خطأ'),
+            MbuyTag.warning('تحذير'),
+            MbuyTag.info('معلومات'),
+            MbuyTag.primary('أساسي'),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// ============================================================================
+/// Dialogs Section - قسم الحوارات
+/// ============================================================================
+class _DialogsSection extends StatelessWidget {
+  const _DialogsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('الحوارات'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            MbuyButton(
+              text: 'حوار تأكيد',
+              type: MbuyButtonType.primary,
+              onPressed: () {
+                MbuyDialog.showConfirm(
+                  context,
+                  title: 'تأكيد الحذف',
+                  content: 'هل أنت متأكد من حذف هذا العنصر؟',
+                  confirmText: 'حذف',
+                  cancelText: 'إلغاء',
+                );
+              },
+            ),
+            MbuyButton(
+              text: 'حوار حذف',
+              type: MbuyButtonType.secondary,
+              onPressed: () {
+                MbuyDialog.showDelete(
+                  context,
+                  title: 'حذف العنصر',
+                  content: 'سيتم حذف هذا العنصر نهائياً',
+                );
+              },
+            ),
+            MbuyButton(
+              text: 'حوار عام',
+              type: MbuyButtonType.outline,
+              onPressed: () {
+                MbuyDialog.show(
+                  context,
+                  title: 'معلومات',
+                  content: 'تم حفظ التغييرات بنجاح!',
+                  icon: Icons.check_circle,
+                  iconColor: AppTheme.successColor,
+                  confirmText: 'حسناً',
+                );
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('النوافذ السفلية'),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            MbuyButton(
+              text: 'نافذة سفلية',
+              type: MbuyButtonType.primary,
+              onPressed: () {
+                MbuyBottomSheet.show(
+                  context,
+                  title: 'اختر خياراً',
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.camera_alt),
+                        title: const Text('التقاط صورة'),
+                        onTap: () => Navigator.pop(context),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.photo_library),
+                        title: const Text('اختيار من المعرض'),
+                        onTap: () => Navigator.pop(context),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.delete),
+                        title: const Text('حذف الصورة'),
+                        onTap: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// ============================================================================
+/// Skeleton Section - قسم التحميل الهيكلي
+/// ============================================================================
+class _SkeletonSection extends StatelessWidget {
+  const _SkeletonSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('التحميل الهيكلي'),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              SkeletonBox(width: 200, height: 20),
+              SizedBox(height: 12),
+              SkeletonBox(width: double.infinity, height: 16),
+              SizedBox(height: 8),
+              SkeletonBox(width: 150, height: 16),
+            ],
+          ),
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('بطاقة تحميل'),
+        const SizedBox(height: 16),
+        const SizedBox(width: 300, child: SkeletonCard()),
+        const SizedBox(height: 32),
+        _SectionTitle('قائمة تحميل'),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Column(
+            children: [
+              SkeletonListTile(),
+              SizedBox(height: 16),
+              SkeletonListTile(),
+              SizedBox(height: 16),
+              SkeletonListTile(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// ============================================================================
+/// SVG Icons Section - قسم أيقونات SVG
+/// ============================================================================
+class _SvgIconsSection extends StatelessWidget {
+  const _SvgIconsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = [
+      ('home', AppIcons.home),
+      ('store', AppIcons.store),
+      ('cart', AppIcons.cart),
+      ('orders', AppIcons.orders),
+      ('product', AppIcons.product),
+      ('wallet', AppIcons.wallet),
+      ('notifications', AppIcons.notifications),
+      ('settings', AppIcons.settings),
+      ('search', AppIcons.search),
+      ('add', AppIcons.add),
+      ('edit', AppIcons.edit),
+      ('delete', AppIcons.delete),
+      ('share', AppIcons.share),
+      ('download', AppIcons.download),
+      ('upload', AppIcons.upload),
+      ('check', AppIcons.check),
+      ('close', AppIcons.close),
+      ('error', AppIcons.error),
+      ('warning', AppIcons.warning),
+      ('info', AppIcons.info),
+      ('star', AppIcons.star),
+      ('heart', AppIcons.heart),
+      ('chat', AppIcons.chat),
+      ('shipping', AppIcons.shipping),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('أيقونات SVG (AppIcons)'),
+        const SizedBox(height: 8),
+        Text(
+          'استخدم: AppIcon(AppIcons.home)',
+          style: TextStyle(
+            color: AppTheme.textSecondaryColor,
+            fontFamily: 'monospace',
+          ),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: icons.map((icon) {
+            return Container(
+              width: 80,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.borderColor),
+              ),
+              child: Column(
+                children: [
+                  AppIcon(icon.$2, size: 28),
+                  const SizedBox(height: 8),
+                  Text(
+                    icon.$1,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('أحجام الأيقونات'),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Column(
+              children: [
+                AppIcon(AppIcons.home, size: 16),
+                const SizedBox(height: 4),
+                const Text('16px'),
+              ],
+            ),
+            const SizedBox(width: 24),
+            Column(
+              children: [
+                AppIcon(AppIcons.home, size: 24),
+                const SizedBox(height: 4),
+                const Text('24px'),
+              ],
+            ),
+            const SizedBox(width: 24),
+            Column(
+              children: [
+                AppIcon(AppIcons.home, size: 32),
+                const SizedBox(height: 4),
+                const Text('32px'),
+              ],
+            ),
+            const SizedBox(width: 24),
+            Column(
+              children: [
+                AppIcon(AppIcons.home, size: 48),
+                const SizedBox(height: 4),
+                const Text('48px'),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _SectionTitle('أيقونات ملونة'),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            AppIcon(AppIcons.heart, size: 32, color: AppTheme.errorColor),
+            const SizedBox(width: 16),
+            AppIcon(AppIcons.check, size: 32, color: AppTheme.successColor),
+            const SizedBox(width: 16),
+            AppIcon(AppIcons.warning, size: 32, color: AppTheme.warningColor),
+            const SizedBox(width: 16),
+            AppIcon(AppIcons.info, size: 32, color: AppTheme.infoColor),
+          ],
+        ),
+      ],
     );
   }
 }

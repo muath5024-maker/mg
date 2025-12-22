@@ -21,8 +21,9 @@ class AppModeState {
 }
 
 /// متحكم وضع التطبيق
-class AppModeController extends StateNotifier<AppModeState> {
-  AppModeController() : super(const AppModeState());
+class AppModeController extends Notifier<AppModeState> {
+  @override
+  AppModeState build() => const AppModeState();
 
   /// التبديل إلى وضع التاجر
   void switchToMerchant() {
@@ -50,8 +51,8 @@ class AppModeController extends StateNotifier<AppModeState> {
 }
 
 /// Provider لوضع التطبيق
-final appModeProvider = StateNotifierProvider<AppModeController, AppModeState>(
-  (ref) => AppModeController(),
+final appModeProvider = NotifierProvider<AppModeController, AppModeState>(
+  AppModeController.new,
 );
 
 /// Provider مختصر للوضع الحالي

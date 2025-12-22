@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../../../shared/widgets/app_search_delegate.dart';
@@ -115,7 +116,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                   const Text(
                     'إضافة منتج جديد',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: AppDimensions.fontDisplay3,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textPrimaryColor,
                     ),
@@ -124,7 +125,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                   Text(
                     'اختر نوع المنتج الذي تريد إضافته',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       color: AppTheme.textSecondaryColor,
                     ),
                   ),
@@ -143,7 +144,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                         child: Text(
                           'أو اختر نوع المنتج',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: AppDimensions.fontLabel,
                             color: AppTheme.textHintColor,
                           ),
                         ),
@@ -269,7 +270,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: AppDimensions.fontTitle,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -277,7 +278,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                     'أضف منتج بسرعة (اسم + سعر + صورة)',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                     ),
                   ),
                 ],
@@ -316,11 +317,17 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         ),
         title: Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: AppDimensions.fontSubtitle,
+          ),
         ),
         subtitle: Text(
           description,
-          style: TextStyle(fontSize: 12, color: AppTheme.textSecondaryColor),
+          style: TextStyle(
+            fontSize: AppDimensions.fontLabel,
+            color: AppTheme.textSecondaryColor,
+          ),
         ),
         trailing: Icon(Icons.chevron_left, color: AppTheme.textHintColor),
         shape: RoundedRectangleBorder(
@@ -453,7 +460,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                                 'إضافة صورة (اختياري)',
                                 style: TextStyle(
                                   color: AppTheme.textHintColor,
-                                  fontSize: 12,
+                                  fontSize: AppDimensions.fontLabel,
                                 ),
                               ),
                             ],
@@ -579,7 +586,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                   Text(
                     storeName,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: AppDimensions.fontHeadline,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       letterSpacing: 0.5,
@@ -593,7 +600,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                         Text(
                           'عرض متجري',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: AppDimensions.fontCaption,
                             color: Colors.white.withValues(alpha: 0.8),
                             fontWeight: FontWeight.w500,
                           ),
@@ -728,7 +735,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: AppDimensions.fontCaption,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? AppTheme.primaryColor : Colors.grey[600],
               ),

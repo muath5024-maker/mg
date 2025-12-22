@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../payments/data/payment_repository.dart';
@@ -145,8 +146,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           children: [
             SvgPicture.asset(
               reward.iconPath,
-              width: 48,
-              height: 48,
+              width: AppDimensions.iconHero,
+              height: AppDimensions.iconHero,
               colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
             ),
             const SizedBox(height: 16),
@@ -212,8 +213,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             AppIcons.arrowBack,
-            width: 24,
-            height: 24,
+            width: AppDimensions.iconM,
+            height: AppDimensions.iconM,
             colorFilter: const ColorFilter.mode(
               AppTheme.primaryColor,
               BlendMode.srcIn,
@@ -221,11 +222,11 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
+        title: Text(
           'نقاطي',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: AppDimensions.fontHeadline,
             color: AppTheme.textPrimaryColor,
           ),
         ),
@@ -234,8 +235,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           IconButton(
             icon: SvgPicture.asset(
               AppIcons.help,
-              width: 24,
-              height: 24,
+              width: AppDimensions.iconM,
+              height: AppDimensions.iconM,
               colorFilter: const ColorFilter.mode(
                 AppTheme.textPrimaryColor,
                 BlendMode.srcIn,
@@ -298,9 +299,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'رصيد النقاط',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -316,8 +320,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                   children: [
                     SvgPicture.asset(
                       AppIcons.star,
-                      width: 16,
-                      height: 16,
+                      width: AppDimensions.iconXS,
+                      height: AppDimensions.iconXS,
                       colorFilter: const ColorFilter.mode(
                         Colors.white,
                         BlendMode.srcIn,
@@ -343,17 +347,20 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             children: [
               Text(
                 '$_currentPoints',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 48,
+                  fontSize: AppDimensions.fontDisplay1 + 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 8),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
                   ' نقطة',
-                  style: TextStyle(color: Colors.white70, fontSize: 18),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: AppDimensions.fontHeadline,
+                  ),
                 ),
               ),
             ],
@@ -374,16 +381,19 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               ),
               icon: SvgPicture.asset(
                 AppIcons.addCircle,
-                width: 20,
-                height: 20,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
                 colorFilter: const ColorFilter.mode(
                   Colors.orange,
                   BlendMode.srcIn,
                 ),
               ),
-              label: const Text(
+              label: Text(
                 'شراء نقاط',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
             ),
           ),
@@ -394,13 +404,19 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'المستوى الذهبي',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: AppDimensions.fontLabel,
+                    ),
                   ),
                   Text(
                     '${((_currentPoints / 2000) * 100).toInt()}%',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: AppDimensions.fontLabel,
+                    ),
                   ),
                 ],
               ),
@@ -414,7 +430,10 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               const SizedBox(height: 4),
               Text(
                 '${2000 - _currentPoints} نقطة للمستوى التالي',
-                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: AppDimensions.fontCaption,
+                ),
               ),
             ],
           ),
@@ -445,8 +464,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           children: [
             SvgPicture.asset(
               AppIcons.creditCard,
-              width: 24,
-              height: 24,
+              width: AppDimensions.iconM,
+              height: AppDimensions.iconM,
               colorFilter: const ColorFilter.mode(
                 AppTheme.primaryColor,
                 BlendMode.srcIn,
@@ -470,8 +489,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 children: [
                   SvgPicture.asset(
                     AppIcons.star,
-                    width: 32,
-                    height: 32,
+                    width: AppDimensions.iconXL,
+                    height: AppDimensions.iconXL,
                     colorFilter: const ColorFilter.mode(
                       Colors.orange,
                       BlendMode.srcIn,
@@ -483,17 +502,17 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                     children: [
                       Text(
                         '${package.points} نقطة',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: AppDimensions.fontHeadline,
                         ),
                       ),
                       if (package.bonus > 0)
                         Text(
                           '+ ${package.bonus} نقطة هدية',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.green,
-                            fontSize: 12,
+                            fontSize: AppDimensions.fontLabel,
                           ),
                         ),
                     ],
@@ -501,9 +520,9 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                   const Spacer(),
                   Text(
                     '${package.price} ر.س',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontSize: AppDimensions.fontDisplay3,
                       color: AppTheme.primaryColor,
                     ),
                   ),
@@ -511,9 +530,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'سيتم إضافة النقاط فوراً إلى حسابك بعد إتمام الدفع.',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+              style: TextStyle(
+                fontSize: AppDimensions.fontBody2,
+                color: Colors.grey,
+              ),
             ),
           ],
         ),
@@ -586,8 +608,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ),
             child: SvgPicture.asset(
               iconPath,
-              width: 20,
-              height: 20,
+              width: AppDimensions.iconS,
+              height: AppDimensions.iconS,
               colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
             ),
           ),
@@ -597,14 +619,17 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             children: [
               Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 18,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 label,
-                style: TextStyle(fontSize: 11, color: AppTheme.slate600),
+                style: TextStyle(
+                  fontSize: AppDimensions.fontCaption,
+                  color: AppTheme.slate600,
+                ),
               ),
             ],
           ),
@@ -620,9 +645,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'المكافآت المتاحة',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -689,15 +717,18 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               ),
               child: SvgPicture.asset(
                 reward.iconPath,
-                width: 32,
-                height: 32,
+                width: AppDimensions.iconXL,
+                height: AppDimensions.iconXL,
                 colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
               ),
             ),
             const SizedBox(height: 12),
             Text(
               reward.title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: AppDimensions.fontBody,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -705,7 +736,10 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             const SizedBox(height: 4),
             Text(
               reward.description,
-              style: TextStyle(fontSize: 11, color: AppTheme.slate600),
+              style: TextStyle(
+                fontSize: AppDimensions.fontCaption,
+                color: AppTheme.slate600,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -716,8 +750,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               children: [
                 SvgPicture.asset(
                   AppIcons.star,
-                  width: 16,
-                  height: 16,
+                  width: AppDimensions.iconXS,
+                  height: AppDimensions.iconXS,
                   colorFilter: const ColorFilter.mode(
                     Colors.orange,
                     BlendMode.srcIn,
@@ -728,7 +762,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                   '${reward.pointsCost}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: AppDimensions.fontSubtitle,
                     color: canRedeem ? Colors.orange : AppTheme.slate600,
                   ),
                 ),
@@ -749,7 +783,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: canRedeem ? Colors.white : AppTheme.slate600,
-                  fontSize: 12,
+                  fontSize: AppDimensions.fontLabel,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -764,9 +798,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'سجل المعاملات',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: AppDimensions.fontHeadline,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 12),
         Container(
@@ -819,25 +856,28 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         ),
         child: SvgPicture.asset(
           iconPath,
-          width: 20,
-          height: 20,
+          width: AppDimensions.iconS,
+          height: AppDimensions.iconS,
           colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         ),
       ),
       title: Text(
         transaction.description,
-        style: const TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: AppDimensions.fontBody),
       ),
       subtitle: Text(
         _formatDate(transaction.date),
-        style: TextStyle(fontSize: 12, color: AppTheme.slate600),
+        style: TextStyle(
+          fontSize: AppDimensions.fontLabel,
+          color: AppTheme.slate600,
+        ),
       ),
       trailing: Text(
         '${isPositive ? '+' : '-'}${transaction.amount}',
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: color,
-          fontSize: 16,
+          fontSize: AppDimensions.fontTitle,
         ),
       ),
     );
@@ -1047,8 +1087,8 @@ class _HelpItem extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             iconPath,
-            width: 20,
-            height: 20,
+            width: AppDimensions.iconS,
+            height: AppDimensions.iconS,
             colorFilter: const ColorFilter.mode(
               AppTheme.primaryColor,
               BlendMode.srcIn,
@@ -1063,7 +1103,10 @@ class _HelpItem extends StatelessWidget {
               Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
               Text(
                 description,
-                style: TextStyle(fontSize: 12, color: AppTheme.slate600),
+                style: TextStyle(
+                  fontSize: AppDimensions.fontLabel,
+                  color: AppTheme.slate600,
+                ),
               ),
             ],
           ),
@@ -1187,8 +1230,8 @@ class _BuyPointsSheet extends StatelessWidget {
                   ),
                   child: SvgPicture.asset(
                     AppIcons.star,
-                    width: 28,
-                    height: 28,
+                    width: AppDimensions.iconL,
+                    height: AppDimensions.iconL,
                     colorFilter: const ColorFilter.mode(
                       Colors.orange,
                       BlendMode.srcIn,
@@ -1196,19 +1239,22 @@ class _BuyPointsSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'شراء نقاط',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: AppDimensions.fontDisplay3,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       'اختر الباقة المناسبة لك',
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontBody2,
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -1236,8 +1282,8 @@ class _BuyPointsSheet extends StatelessWidget {
               children: [
                 SvgPicture.asset(
                   AppIcons.shield,
-                  width: 16,
-                  height: 16,
+                  width: AppDimensions.iconXS,
+                  height: AppDimensions.iconXS,
                   colorFilter: ColorFilter.mode(
                     Colors.grey[600]!,
                     BlendMode.srcIn,
@@ -1246,7 +1292,10 @@ class _BuyPointsSheet extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   'دفع آمن ومشفر',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontLabel,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -1289,14 +1338,17 @@ class _BuyPointsSheet extends StatelessWidget {
                         children: [
                           Text(
                             '${package.points}',
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontDisplay2,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const Text(
+                          Text(
                             ' نقطة',
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontBody,
+                              color: Colors.grey,
+                            ),
                           ),
                           if (package.isPopular) ...[
                             const SizedBox(width: 8),
@@ -1309,11 +1361,11 @@ class _BuyPointsSheet extends StatelessWidget {
                                 color: Colors.orange,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'الأكثر مبيعاً',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 10,
+                                  fontSize: AppDimensions.fontCaption,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -1326,8 +1378,8 @@ class _BuyPointsSheet extends StatelessWidget {
                           children: [
                             SvgPicture.asset(
                               AppIcons.gift,
-                              width: 14,
-                              height: 14,
+                              width: AppDimensions.fontBody,
+                              height: AppDimensions.fontBody,
                               colorFilter: const ColorFilter.mode(
                                 Colors.green,
                                 BlendMode.srcIn,
@@ -1336,9 +1388,9 @@ class _BuyPointsSheet extends StatelessWidget {
                             const SizedBox(width: 4),
                             Text(
                               '+${package.bonus} نقطة هدية',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.green,
-                                fontSize: 12,
+                                fontSize: AppDimensions.fontLabel,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -1355,7 +1407,7 @@ class _BuyPointsSheet extends StatelessWidget {
                     Text(
                       '${package.price.toInt()} ر.س',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: AppDimensions.fontHeadline,
                         fontWeight: FontWeight.bold,
                         color: package.isPopular
                             ? Colors.orange
@@ -1364,7 +1416,10 @@ class _BuyPointsSheet extends StatelessWidget {
                     ),
                     Text(
                       '${package.pricePerPoint.toStringAsFixed(2)} ر.س/نقطة',
-                      style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontCaption,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),

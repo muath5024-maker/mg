@@ -49,27 +49,27 @@ class _MerchantServicesScreenState
                     children: [
                       Icon(
                         Icons.store_outlined,
-                        size: 64,
+                        size: AppDimensions.iconDisplay,
                         color: AppTheme.textHintColor,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
                       const Text(
                         'لا يوجد متجر',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: AppDimensions.fontDisplay3,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textPrimaryColor,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacing8),
                       const Text(
                         'يرجى إنشاء متجر أولاً',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppDimensions.fontBody,
                           color: AppTheme.textSecondaryColor,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacing24),
                       ElevatedButton(
                         onPressed: () =>
                             context.push('/dashboard/store/create-store'),
@@ -139,14 +139,15 @@ class _MerchantServicesScreenState
             context.pop();
           },
           child: Container(
-            padding: const EdgeInsets.all(10),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.arrow_back_ios_rounded,
-              size: 20,
+              size: AppDimensions.iconS,
               color: AppTheme.primaryColor,
             ),
           ),
@@ -157,7 +158,7 @@ class _MerchantServicesScreenState
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 20,
+              fontSize: AppDimensions.fontDisplay3,
               color: AppTheme.textPrimaryColor,
             ),
           ),
@@ -168,14 +169,15 @@ class _MerchantServicesScreenState
             _showSettingsSheet(context);
           },
           child: Container(
-            padding: const EdgeInsets.all(10),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.more_vert,
-              size: 20,
+              size: AppDimensions.iconS,
               color: AppTheme.primaryColor,
             ),
           ),
@@ -208,9 +210,13 @@ class _MerchantServicesScreenState
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.store, color: Colors.white, size: 32),
+                child: const Icon(
+                  Icons.store,
+                  color: Colors.white,
+                  size: AppDimensions.iconXL,
+                ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacing16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,7 +225,7 @@ class _MerchantServicesScreenState
                       store?.name ?? 'متجري',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: AppDimensions.fontDisplay3,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -243,7 +249,7 @@ class _MerchantServicesScreenState
                               color: store?.isActive == true
                                   ? Colors.greenAccent
                                   : Colors.redAccent,
-                              fontSize: 12,
+                              fontSize: AppDimensions.fontLabel,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -265,14 +271,14 @@ class _MerchantServicesScreenState
                                 Icon(
                                   Icons.verified,
                                   color: Colors.lightBlueAccent,
-                                  size: 14,
+                                  size: AppDimensions.iconXS,
                                 ),
-                                SizedBox(width: 4),
+                                SizedBox(width: AppDimensions.spacing4),
                                 Text(
                                   'موثق',
                                   style: TextStyle(
                                     color: Colors.lightBlueAccent,
-                                    fontSize: 12,
+                                    fontSize: AppDimensions.fontLabel,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -299,13 +305,16 @@ class _MerchantServicesScreenState
                 const Icon(
                   Icons.location_on_outlined,
                   color: Colors.white70,
-                  size: 18,
+                  size: AppDimensions.iconS,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 Expanded(
                   child: Text(
                     store?.city ?? 'لم يتم تحديد المدينة',
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: AppDimensions.fontBody,
+                    ),
                   ),
                 ),
                 GestureDetector(
@@ -314,7 +323,7 @@ class _MerchantServicesScreenState
                     'تعديل',
                     style: TextStyle(
                       color: AppTheme.accentColor,
-                      fontSize: 13,
+                      fontSize: AppDimensions.fontBody2,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -375,18 +384,24 @@ class _MerchantServicesScreenState
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: AppDimensions.iconM),
+          const SizedBox(height: AppDimensions.spacing8),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: AppDimensions.fontHeadline,
               fontWeight: FontWeight.bold,
               color: Colors.grey[800],
             ),
           ),
-          const SizedBox(height: 2),
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          const SizedBox(height: AppDimensions.spacing2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: AppDimensions.fontLabel,
+              color: Colors.grey[600],
+            ),
+          ),
         ],
       ),
     );
@@ -492,9 +507,13 @@ class _MerchantServicesScreenState
                   color: AppTheme.primaryColor.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: AppTheme.primaryColor, size: 22),
+                child: Icon(
+                  icon,
+                  color: AppTheme.primaryColor,
+                  size: AppDimensions.iconS,
+                ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: AppDimensions.spacing14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,15 +521,18 @@ class _MerchantServicesScreenState
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: AppDimensions.fontSubtitle,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey[800],
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppDimensions.spacing2),
                     Text(
                       subtitle,
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontBody2,
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
@@ -592,14 +614,14 @@ class _MerchantServicesScreenState
                   child: Icon(
                     service['icon'] as IconData,
                     color: service['color'] as Color,
-                    size: 24,
+                    size: AppDimensions.iconM,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacing8),
                 Text(
                   service['title'] as String,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     fontWeight: FontWeight.w500,
                     color: Colors.grey[700],
                   ),
@@ -640,10 +662,10 @@ class _MerchantServicesScreenState
                 child: const Icon(
                   Icons.logout_outlined,
                   color: Colors.orange,
-                  size: 24,
+                  size: AppDimensions.iconM,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacing16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -651,15 +673,18 @@ class _MerchantServicesScreenState
                     const Text(
                       'تسجيل الخروج',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontTitle,
                         fontWeight: FontWeight.w600,
                         color: Colors.orange,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppDimensions.spacing2),
                     Text(
                       'الخروج من الحساب الحالي',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontBody2,
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
@@ -700,10 +725,10 @@ class _MerchantServicesScreenState
                 child: const Icon(
                   Icons.delete_forever_outlined,
                   color: Colors.red,
-                  size: 24,
+                  size: AppDimensions.iconM,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacing16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -711,15 +736,18 @@ class _MerchantServicesScreenState
                     const Text(
                       'حذف المتجر',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontTitle,
                         fontWeight: FontWeight.w600,
                         color: Colors.red,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppDimensions.spacing2),
                     Text(
                       'حذف المتجر وجميع البيانات نهائياً',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontBody2,
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),

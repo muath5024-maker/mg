@@ -16,21 +16,21 @@ final studioApiServiceProvider = Provider<StudioApiService>((ref) {
 
 /// حالة رصيد المستخدم
 final userCreditsProvider =
-    StateNotifierProvider<UserCreditsNotifier, AsyncValue<UserCredits>>((ref) {
-      return UserCreditsNotifier(ref);
-    });
+    NotifierProvider<UserCreditsNotifier, AsyncValue<UserCredits>>(
+      UserCreditsNotifier.new,
+    );
 
-class UserCreditsNotifier extends StateNotifier<AsyncValue<UserCredits>> {
-  final Ref _ref;
-
-  UserCreditsNotifier(this._ref) : super(const AsyncValue.loading()) {
+class UserCreditsNotifier extends Notifier<AsyncValue<UserCredits>> {
+  @override
+  AsyncValue<UserCredits> build() {
     loadCredits();
+    return const AsyncValue.loading();
   }
 
   Future<void> loadCredits() async {
     state = const AsyncValue.loading();
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final credits = await api.getCredits();
       state = AsyncValue.data(credits);
     } catch (e, st) {
@@ -58,24 +58,21 @@ class UserCreditsNotifier extends StateNotifier<AsyncValue<UserCredits>> {
 
 /// حالة القوالب
 final templatesProvider =
-    StateNotifierProvider<TemplatesNotifier, AsyncValue<List<StudioTemplate>>>((
-      ref,
-    ) {
-      return TemplatesNotifier(ref);
-    });
+    NotifierProvider<TemplatesNotifier, AsyncValue<List<StudioTemplate>>>(
+      TemplatesNotifier.new,
+    );
 
-class TemplatesNotifier
-    extends StateNotifier<AsyncValue<List<StudioTemplate>>> {
-  final Ref _ref;
-
-  TemplatesNotifier(this._ref) : super(const AsyncValue.loading()) {
+class TemplatesNotifier extends Notifier<AsyncValue<List<StudioTemplate>>> {
+  @override
+  AsyncValue<List<StudioTemplate>> build() {
     loadTemplates();
+    return const AsyncValue.loading();
   }
 
   Future<void> loadTemplates({String? category}) async {
     state = const AsyncValue.loading();
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final templates = await api.getTemplates(category: category);
       state = AsyncValue.data(templates);
     } catch (_) {
@@ -87,23 +84,21 @@ class TemplatesNotifier
 
 /// حالة المشاريع
 final projectsProvider =
-    StateNotifierProvider<ProjectsNotifier, AsyncValue<List<StudioProject>>>((
-      ref,
-    ) {
-      return ProjectsNotifier(ref);
-    });
+    NotifierProvider<ProjectsNotifier, AsyncValue<List<StudioProject>>>(
+      ProjectsNotifier.new,
+    );
 
-class ProjectsNotifier extends StateNotifier<AsyncValue<List<StudioProject>>> {
-  final Ref _ref;
-
-  ProjectsNotifier(this._ref) : super(const AsyncValue.loading()) {
+class ProjectsNotifier extends Notifier<AsyncValue<List<StudioProject>>> {
+  @override
+  AsyncValue<List<StudioProject>> build() {
     loadProjects();
+    return const AsyncValue.loading();
   }
 
   Future<void> loadProjects({String? status}) async {
     state = const AsyncValue.loading();
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final projects = await api.getProjects(status: status);
       state = AsyncValue.data(projects);
     } catch (e, st) {
@@ -117,7 +112,7 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<StudioProject>>> {
     String? productId,
     ProductData? productData,
   }) async {
-    final api = _ref.read(studioApiServiceProvider);
+    final api = ref.read(studioApiServiceProvider);
     final project = await api.createProject(
       name: name,
       templateId: templateId,
@@ -134,7 +129,7 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<StudioProject>>> {
   }
 
   Future<void> deleteProject(String id) async {
-    final api = _ref.read(studioApiServiceProvider);
+    final api = ref.read(studioApiServiceProvider);
     await api.deleteProject(id);
 
     // إزالة من القائمة
@@ -157,32 +152,29 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<StudioProject>>> {
 
 /// حالة المشروع الحالي
 final currentProjectProvider =
-    StateNotifierProvider<CurrentProjectNotifier, AsyncValue<StudioProject?>>((
-      ref,
-    ) {
-      return CurrentProjectNotifier(ref);
-    });
+    NotifierProvider<CurrentProjectNotifier, AsyncValue<StudioProject?>>(
+      CurrentProjectNotifier.new,
+    );
 
 /// مشاهد المشروع الحالي
 final currentScenesProvider =
-    StateNotifierProvider<CurrentScenesNotifier, List<Scene>>((ref) {
-      return CurrentScenesNotifier(ref);
-    });
+    NotifierProvider<CurrentScenesNotifier, List<Scene>>(
+      CurrentScenesNotifier.new,
+    );
 
-class CurrentProjectNotifier extends StateNotifier<AsyncValue<StudioProject?>> {
-  final Ref _ref;
-
-  CurrentProjectNotifier(this._ref) : super(const AsyncValue.data(null));
+class CurrentProjectNotifier extends Notifier<AsyncValue<StudioProject?>> {
+  @override
+  AsyncValue<StudioProject?> build() => const AsyncValue.data(null);
 
   Future<void> loadProject(String id) async {
     state = const AsyncValue.loading();
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final result = await api.getProject(id);
       state = AsyncValue.data(result.project);
 
       // تحديث المشاهد
-      _ref.read(currentScenesProvider.notifier).setScenes(result.scenes);
+      ref.read(currentScenesProvider.notifier).setScenes(result.scenes);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -193,11 +185,11 @@ class CurrentProjectNotifier extends StateNotifier<AsyncValue<StudioProject?>> {
   }
 
   Future<void> updateProject(Map<String, dynamic> updates) async {
-    final currentProject = state.valueOrNull;
+    final currentProject = state.value;
     if (currentProject == null) return;
 
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final updated = await api.updateProject(
         currentProject.id,
         name: updates['name'],
@@ -207,7 +199,7 @@ class CurrentProjectNotifier extends StateNotifier<AsyncValue<StudioProject?>> {
       state = AsyncValue.data(updated);
 
       // تحديث في قائمة المشاريع
-      _ref.read(projectsProvider.notifier).updateProject(updated);
+      ref.read(projectsProvider.notifier).updateProject(updated);
     } catch (e) {
       rethrow;
     }
@@ -236,8 +228,9 @@ class CurrentProjectNotifier extends StateNotifier<AsyncValue<StudioProject?>> {
   }
 }
 
-class CurrentScenesNotifier extends StateNotifier<List<Scene>> {
-  CurrentScenesNotifier(Ref ref) : super([]);
+class CurrentScenesNotifier extends Notifier<List<Scene>> {
+  @override
+  List<Scene> build() => [];
 
   void setScenes(List<Scene> scenes) {
     state = scenes;
@@ -282,9 +275,9 @@ class CurrentScenesNotifier extends StateNotifier<List<Scene>> {
 
 /// Provider لتوليد AI
 final aiGenerationProvider =
-    StateNotifierProvider<AIGenerationNotifier, AIGenerationState>((ref) {
-      return AIGenerationNotifier(ref);
-    });
+    NotifierProvider<AIGenerationNotifier, AIGenerationState>(
+      AIGenerationNotifier.new,
+    );
 
 class AIGenerationState {
   final bool isGenerating;
@@ -314,10 +307,9 @@ class AIGenerationState {
   }
 }
 
-class AIGenerationNotifier extends StateNotifier<AIGenerationState> {
-  final Ref _ref;
-
-  AIGenerationNotifier(this._ref) : super(const AIGenerationState());
+class AIGenerationNotifier extends Notifier<AIGenerationState> {
+  @override
+  AIGenerationState build() => const AIGenerationState();
 
   Future<ScriptData> generateScript({
     required ProductData productData,
@@ -333,7 +325,7 @@ class AIGenerationNotifier extends StateNotifier<AIGenerationState> {
     );
 
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final result = await api.generateScript(
         productData: productData,
         templateId: templateId,
@@ -343,7 +335,7 @@ class AIGenerationNotifier extends StateNotifier<AIGenerationState> {
       );
 
       // خصم الرصيد
-      _ref.read(userCreditsProvider.notifier).deductCredits(result.creditsUsed);
+      ref.read(userCreditsProvider.notifier).deductCredits(result.creditsUsed);
 
       state = state.copyWith(isGenerating: false, progress: 1);
 
@@ -365,14 +357,14 @@ class AIGenerationNotifier extends StateNotifier<AIGenerationState> {
     );
 
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final result = await api.generateImage(
         prompt: prompt,
         style: style,
         projectId: projectId,
       );
 
-      _ref.read(userCreditsProvider.notifier).deductCredits(result.creditsUsed);
+      ref.read(userCreditsProvider.notifier).deductCredits(result.creditsUsed);
 
       state = state.copyWith(isGenerating: false);
       return result.imageUrl;
@@ -393,14 +385,14 @@ class AIGenerationNotifier extends StateNotifier<AIGenerationState> {
     );
 
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final result = await api.generateVoice(
         text: text,
         voiceId: voiceId,
         projectId: projectId,
       );
 
-      _ref.read(userCreditsProvider.notifier).deductCredits(result.creditsUsed);
+      ref.read(userCreditsProvider.notifier).deductCredits(result.creditsUsed);
 
       state = state.copyWith(isGenerating: false);
       return result.audioUrl;

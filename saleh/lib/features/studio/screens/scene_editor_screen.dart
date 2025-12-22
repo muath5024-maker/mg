@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
@@ -188,9 +189,9 @@ class _SceneEditorScreenState extends ConsumerState<SceneEditorScreen> {
                 ),
                 child: Text(
                   scene.textOverlay!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: AppDimensions.fontDisplay2,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -214,11 +215,18 @@ class _SceneEditorScreenState extends ConsumerState<SceneEditorScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.timer, size: 14, color: Colors.white),
+                  Icon(
+                    Icons.timer,
+                    size: AppDimensions.fontBody,
+                    color: Colors.white,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     '${scene.duration}s',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: AppDimensions.fontLabel,
+                    ),
                   ),
                 ],
               ),
@@ -236,9 +244,9 @@ class _SceneEditorScreenState extends ConsumerState<SceneEditorScreen> {
                   color: Colors.green.withValues(alpha: 0.9),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.volume_up,
-                  size: 16,
+                  size: AppDimensions.iconXS,
                   color: Colors.white,
                 ),
               ),
@@ -320,13 +328,13 @@ class _SceneEditorScreenState extends ConsumerState<SceneEditorScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.white),
+          Icon(icon, size: AppDimensions.fontBody, color: Colors.white),
           const SizedBox(width: 4),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: AppDimensions.fontLabel,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -429,7 +437,11 @@ class _SceneEditorScreenState extends ConsumerState<SceneEditorScreen> {
       children: [
         Row(
           children: [
-            Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+            Icon(
+              icon,
+              size: AppDimensions.fontHeadline,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 8),
             Text(title, style: Theme.of(context).textTheme.labelLarge),
           ],
@@ -699,7 +711,7 @@ class _ActionButton extends StatelessWidget {
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 18, color: color),
+                Icon(icon, size: AppDimensions.fontHeadline, color: color),
                 const SizedBox(width: 6),
                 Text(label, style: TextStyle(color: color)),
                 if (cost != null) ...[
@@ -716,7 +728,7 @@ class _ActionButton extends StatelessWidget {
                     child: Text(
                       '$cost',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: AppDimensions.fontCaption,
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),

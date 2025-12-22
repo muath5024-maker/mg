@@ -4,11 +4,9 @@ import '../models/models.dart';
 import 'studio_provider.dart';
 
 /// Provider لتصدير الفيديو
-final renderProvider = StateNotifierProvider<RenderNotifier, RenderState>((
-  ref,
-) {
-  return RenderNotifier(ref);
-});
+final renderProvider = NotifierProvider<RenderNotifier, RenderState>(
+  RenderNotifier.new,
+);
 
 class RenderState {
   final bool isRendering;
@@ -50,11 +48,11 @@ class RenderState {
   }
 }
 
-class RenderNotifier extends StateNotifier<RenderState> {
-  final Ref _ref;
+class RenderNotifier extends Notifier<RenderState> {
   Timer? _statusTimer;
 
-  RenderNotifier(this._ref) : super(const RenderState());
+  @override
+  RenderState build() => const RenderState();
 
   /// بدء عملية التصدير
   Future<void> startRender({
@@ -72,7 +70,7 @@ class RenderNotifier extends StateNotifier<RenderState> {
     );
 
     try {
-      final api = _ref.read(studioApiServiceProvider);
+      final api = ref.read(studioApiServiceProvider);
       final result = await api.startRender(
         projectId: projectId,
         quality: quality.name, // تحويل enum إلى string
@@ -124,11 +122,7 @@ class RenderNotifier extends StateNotifier<RenderState> {
     state = const RenderState();
   }
 
-  @override
-  void dispose() {
-    _statusTimer?.cancel();
-    super.dispose();
-  }
+  // Note: dispose is handled by the framework in Notifier
 }
 
 /// Provider لتاريخ عمليات التصدير
@@ -142,25 +136,23 @@ final renderHistoryProvider = FutureProvider.family<List<RenderJob>, String>((
 
 /// Provider لإعدادات التصدير
 final renderSettingsProvider =
-    StateNotifierProvider<RenderSettingsNotifier, RenderSettings>((ref) {
-      return RenderSettingsNotifier();
-    });
+    NotifierProvider<RenderSettingsNotifier, RenderSettings>(
+      RenderSettingsNotifier.new,
+    );
 
-class RenderSettingsNotifier extends StateNotifier<RenderSettings> {
-  RenderSettingsNotifier()
-    : super(
-        const RenderSettings(
-          width: 1080,
-          height: 1920,
-          quality: 'medium',
-          format: 'mp4',
-          resolution: '1080x1920',
-          fps: 30,
-          videoBitrate: '8M',
-          audioBitrate: '192k',
-          audioSampleRate: 44100,
-        ),
-      );
+class RenderSettingsNotifier extends Notifier<RenderSettings> {
+  @override
+  RenderSettings build() => const RenderSettings(
+    width: 1080,
+    height: 1920,
+    quality: 'medium',
+    format: 'mp4',
+    resolution: '1080x1920',
+    fps: 30,
+    videoBitrate: '8M',
+    audioBitrate: '192k',
+    audioSampleRate: 44100,
+  );
 
   void setQuality(RenderQuality quality) {
     switch (quality) {
@@ -248,9 +240,9 @@ final estimatedCreditsProvider = Provider<int>((ref) {
 
 /// Provider لمعالجة FFmpeg المحلية
 final localProcessingProvider =
-    StateNotifierProvider<LocalProcessingNotifier, LocalProcessingState>((ref) {
-      return LocalProcessingNotifier();
-    });
+    NotifierProvider<LocalProcessingNotifier, LocalProcessingState>(
+      LocalProcessingNotifier.new,
+    );
 
 class LocalProcessingState {
   final bool isProcessing;
@@ -284,8 +276,9 @@ class LocalProcessingState {
   }
 }
 
-class LocalProcessingNotifier extends StateNotifier<LocalProcessingState> {
-  LocalProcessingNotifier() : super(const LocalProcessingState());
+class LocalProcessingNotifier extends Notifier<LocalProcessingState> {
+  @override
+  LocalProcessingState build() => const LocalProcessingState();
 
   /// ضغط فيديو
   Future<String?> compressVideo({

@@ -28,12 +28,15 @@ class MerchantStoreState {
 }
 
 /// Merchant Store Controller
-/// يدير حالة المتجر باستخدام StateNotifier
-class MerchantStoreController extends StateNotifier<MerchantStoreState> {
-  final MerchantRepository _repository;
+/// يدير حالة المتجر باستخدام Notifier
+class MerchantStoreController extends Notifier<MerchantStoreState> {
+  late MerchantRepository _repository;
 
-  MerchantStoreController(this._repository)
-    : super(MerchantStoreState(isLoading: false));
+  @override
+  MerchantStoreState build() {
+    _repository = ref.watch(merchantRepositoryProvider);
+    return MerchantStoreState(isLoading: false);
+  }
 
   /// جلب متجر التاجر
   Future<void> loadMerchantStore() async {
@@ -130,8 +133,8 @@ class MerchantStoreController extends StateNotifier<MerchantStoreState> {
 
 /// Provider للـ MerchantStoreController
 final merchantStoreControllerProvider =
-    StateNotifierProvider<MerchantStoreController, MerchantStoreState>(
-      (ref) => MerchantStoreController(ref.watch(merchantRepositoryProvider)),
+    NotifierProvider<MerchantStoreController, MerchantStoreState>(
+      MerchantStoreController.new,
     );
 
 /// Provider لحالة المتجر فقط

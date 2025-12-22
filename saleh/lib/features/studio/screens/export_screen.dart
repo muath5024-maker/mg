@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
@@ -125,7 +126,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           CreditCostCard(
             cost: estimatedCredits,
             operation: 'تصدير فيديو (${_getQualityLabel(settings.quality)})',
-            currentBalance: ref.watch(userCreditsProvider).valueOrNull?.balance,
+            currentBalance: ref.watch(userCreditsProvider).value?.balance,
           ),
           const SizedBox(height: 24),
 
@@ -302,7 +303,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
               Text(
                 q.$3,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: AppDimensions.fontCaption,
                   color: isSelected
                       ? Theme.of(context).colorScheme.onPrimary
                       : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -321,7 +322,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             child: Text(
               '${q.$4}',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: AppDimensions.fontCaption,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? Colors.white : null,
               ),
@@ -360,7 +361,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         children: [
           Icon(
             icon,
-            size: 20,
+            size: AppDimensions.iconS,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 12),
