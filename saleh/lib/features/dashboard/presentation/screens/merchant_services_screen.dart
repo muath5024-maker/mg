@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/exports.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
+import '../../../auth/data/auth_controller.dart';
 
 class MerchantServicesScreen extends ConsumerStatefulWidget {
   const MerchantServicesScreen({super.key});
@@ -422,6 +423,20 @@ class _MerchantServicesScreenState
         'onTap': () => context.push('/dashboard/notifications'),
         'enabled': true,
       },
+      {
+        'icon': Icons.settings_outlined,
+        'title': 'إعدادات التطبيق',
+        'subtitle': 'اللغة والمظهر والخصوصية',
+        'onTap': () => context.push('/dashboard/settings'),
+        'enabled': true,
+      },
+      {
+        'icon': Icons.person_outline,
+        'title': 'إعدادات الحساب',
+        'subtitle': 'البريد الإلكتروني وكلمة المرور',
+        'onTap': () => context.push('/dashboard/account-settings'),
+        'enabled': true,
+      },
     ];
 
     return ListView.separated(
@@ -754,10 +769,109 @@ class _MerchantServicesScreenState
                   _showComingSoon('إيقاف المتجر');
                 },
               ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(
+                  Icons.logout_outlined,
+                  color: Colors.orange,
+                ),
+                title: const Text(
+                  'تسجيل الخروج',
+                  style: TextStyle(color: Colors.orange),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showLogoutDialog();
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.delete_forever_outlined,
+                  color: Colors.red,
+                ),
+                title: const Text(
+                  'حذف المتجر',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteStoreDialog();
+                },
+              ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تسجيل الخروج'),
+        content: const Text('هل أنت متأكد من تسجيل الخروج؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await ref.read(authControllerProvider.notifier).logout();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('تسجيل الخروج'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteStoreDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+            SizedBox(width: 8),
+            Text('حذف المتجر'),
+          ],
+        ),
+        content: const Text(
+          'هل أنت متأكد من حذف المتجر؟\n\nهذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع البيانات.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              // TODO: تنفيذ حذف المتجر
+              MbuySnackBar.show(
+                context,
+                message: 'سيتم تفعيل هذه الميزة قريباً',
+                type: MbuySnackBarType.info,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('حذف نهائياً'),
+          ),
+        ],
+      ),
     );
   }
 
