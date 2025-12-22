@@ -8,4 +8,4 @@
 /// ```
 library;
 
-export 'base_screen.dart';
+export '../widgets/base_screen.dart';
