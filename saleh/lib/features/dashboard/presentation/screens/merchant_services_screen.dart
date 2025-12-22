@@ -116,6 +116,12 @@ class _MerchantServicesScreenState
                       const MbuySectionTitle(title: 'خدمات إضافية'),
                       const SizedBox(height: 12),
                       _buildServicesGrid(),
+                      const SizedBox(height: 24),
+                      const MbuySectionTitle(title: 'الحساب'),
+                      const SizedBox(height: 12),
+                      _buildLogoutCard(),
+                      const SizedBox(height: 12),
+                      _buildDeleteStoreCard(),
                     ],
                   ),
                 ),
@@ -418,23 +424,23 @@ class _MerchantServicesScreenState
       },
       {
         'icon': Icons.notifications_outlined,
-        'title': 'الإشعارات',
+        'title': 'إعدادات الإشعارات',
         'subtitle': 'تنبيهات الطلبات والرسائل',
-        'onTap': () => context.push('/dashboard/notifications'),
+        'onTap': () => context.push('/notification-settings'),
         'enabled': true,
       },
       {
-        'icon': Icons.settings_outlined,
-        'title': 'إعدادات التطبيق',
-        'subtitle': 'اللغة والمظهر والخصوصية',
-        'onTap': () => context.push('/dashboard/settings'),
+        'icon': Icons.palette_outlined,
+        'title': 'إعدادات المظهر',
+        'subtitle': 'اللغة والثيم والألوان',
+        'onTap': () => context.push('/appearance-settings'),
         'enabled': true,
       },
       {
         'icon': Icons.person_outline,
         'title': 'إعدادات الحساب',
         'subtitle': 'البريد الإلكتروني وكلمة المرور',
-        'onTap': () => context.push('/dashboard/account-settings'),
+        'onTap': () => context.push('/settings'),
         'enabled': true,
       },
     ];
@@ -603,6 +609,126 @@ class _MerchantServicesScreenState
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLogoutCard() {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          _showLogoutDialog();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.logout_outlined,
+                  color: Colors.orange,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'تسجيل الخروج',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'الخروج من الحساب الحالي',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_left, color: Colors.orange),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteStoreCard() {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          _showDeleteStoreDialog();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.delete_forever_outlined,
+                  color: Colors.red,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'حذف المتجر',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'حذف المتجر وجميع البيانات نهائياً',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_left, color: Colors.red),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

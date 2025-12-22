@@ -138,22 +138,25 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
         ),
       ),
       floatingActionButton: _tabController.index == 0 && _isEditing
-          ? FloatingActionButton.extended(
-              onPressed: _showAddShortcutSheet,
-              backgroundColor: AppTheme.primaryColor,
-              elevation: 4,
-              icon: const Icon(Icons.add, color: Colors.white, size: 22),
-              label: const Text(
-                'إضافة اختصار',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+          ? Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              child: FloatingActionButton.extended(
+                onPressed: _showAddShortcutSheet,
+                backgroundColor: AppTheme.primaryColor,
+                elevation: 4,
+                icon: const Icon(Icons.add, color: Colors.white, size: 24),
+                label: const Text(
+                  'إضافة اختصار',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
-              ),
-              extendedPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
+                extendedPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
               ),
             )
           : null,

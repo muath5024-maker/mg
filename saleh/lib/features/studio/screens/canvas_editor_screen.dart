@@ -240,7 +240,7 @@ class _CanvasEditorScreenState extends ConsumerState<CanvasEditorScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -248,51 +248,65 @@ class _CanvasEditorScreenState extends ConsumerState<CanvasEditorScreen> {
           BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 12),
         ],
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _ToolButton(
-            icon: Icons.text_fields,
-            label: 'نص',
-            onPressed: _addTextLayer,
-          ),
-          _ToolButton(
-            icon: Icons.image,
-            label: 'صورة',
-            onPressed: _addImageLayer,
-          ),
-          _ToolButton(
-            icon: Icons.crop_square,
-            label: 'شكل',
-            onPressed: _addShapeLayer,
-          ),
-          _ToolButton(
-            icon: Icons.emoji_emotions,
-            label: 'ملصق',
-            onPressed: _addStickerLayer,
-          ),
-          const VerticalDivider(width: 24),
-          _ToolButton(
-            icon: Icons.auto_awesome,
-            label: 'AI صورة',
-            onPressed: _generateAIImage,
-          ),
-          const VerticalDivider(width: 24),
-          _ToolButton(
-            icon: Icons.layers,
-            label: 'طبقات',
-            isActive: _showLayerPanel,
-            onPressed: () => setState(() => _showLayerPanel = !_showLayerPanel),
-          ),
-          _ToolButton(
-            icon: Icons.tune,
-            label: 'خصائص',
-            isActive: _showPropertiesPanel,
-            onPressed: () =>
-                setState(() => _showPropertiesPanel = !_showPropertiesPanel),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _ToolButton(
+              icon: Icons.text_fields,
+              label: 'نص',
+              onPressed: _addTextLayer,
+            ),
+            _ToolButton(
+              icon: Icons.image,
+              label: 'صورة',
+              onPressed: _addImageLayer,
+            ),
+            _ToolButton(
+              icon: Icons.crop_square,
+              label: 'شكل',
+              onPressed: _addShapeLayer,
+            ),
+            _ToolButton(
+              icon: Icons.emoji_emotions,
+              label: 'ملصق',
+              onPressed: _addStickerLayer,
+            ),
+            Container(
+              height: 32,
+              width: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              color: colorScheme.outline.withOpacity(0.2),
+            ),
+            _ToolButton(
+              icon: Icons.auto_awesome,
+              label: 'AI',
+              onPressed: _generateAIImage,
+            ),
+            Container(
+              height: 32,
+              width: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              color: colorScheme.outline.withOpacity(0.2),
+            ),
+            _ToolButton(
+              icon: Icons.layers,
+              label: 'طبقات',
+              isActive: _showLayerPanel,
+              onPressed: () =>
+                  setState(() => _showLayerPanel = !_showLayerPanel),
+            ),
+            _ToolButton(
+              icon: Icons.tune,
+              label: 'خصائص',
+              isActive: _showPropertiesPanel,
+              onPressed: () =>
+                  setState(() => _showPropertiesPanel = !_showPropertiesPanel),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -589,36 +603,35 @@ class _ToolButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 48, maxWidth: 64),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            decoration: BoxDecoration(
-              color: isActive ? colorScheme.primaryContainer : null,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: 18,
-                  color: isActive ? colorScheme.primary : colorScheme.onSurface,
+        child: Container(
+          width: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          decoration: BoxDecoration(
+            color: isActive ? colorScheme.primaryContainer : null,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isActive ? colorScheme.primary : colorScheme.onSurface,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: isActive
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: isActive
-                        ? colorScheme.primary
-                        : colorScheme.onSurfaceVariant,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
-            ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),
