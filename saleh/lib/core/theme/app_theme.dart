@@ -1068,4 +1068,20 @@ class AppTheme {
   /// Get shadow color for cards
   static Color shadow(bool isDark) =>
       isDark ? shadowDark : Colors.black.withValues(alpha: 0.05);
+
+  // ============================================================================
+  // Active/Inactive Colors - Unified across all components
+  // ============================================================================
+  
+  /// Active/Selected color - unified for all navigation and interactive elements
+  static Color activeColor(bool isDark) =>
+      isDark ? const Color(0xFF4ADE80) : primaryColor;
+
+  /// Inactive/Unselected color with improved contrast for dark mode
+  static Color inactiveColor(bool isDark) =>
+      isDark ? const Color(0xFF8BA899) : Color(0xFF757575); // محسّن للتباين
+
+  /// Icon inactive color with better visibility
+  static Color iconInactive(bool isDark) =>
+      isDark ? const Color(0xFF9DB5A8) : Color(0xFF9E9E9E);
 }

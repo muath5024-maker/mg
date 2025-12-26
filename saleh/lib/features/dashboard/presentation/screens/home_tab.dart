@@ -113,13 +113,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           Row(
             children: [
               // زر المشاركة
-              GestureDetector(
+              InkWell(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   SharePlus.instance.share(
                     ShareParams(text: 'تسوق من متجري: https://$storeUrl'),
                   );
                 },
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
                   width: 36,
                   height: 36,
@@ -136,7 +137,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               ),
               const SizedBox(width: 8),
               // زر النسخ
-              GestureDetector(
+              InkWell(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   Clipboard.setData(ClipboardData(text: storeUrl));
@@ -151,6 +152,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     ),
                   );
                 },
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
                   width: 36,
                   height: 36,

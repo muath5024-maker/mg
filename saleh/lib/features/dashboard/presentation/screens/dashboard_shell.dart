@@ -43,8 +43,64 @@ class DashboardShell extends ConsumerStatefulWidget {
   ConsumerState<DashboardShell> createState() => _DashboardShellState();
 }
 
+/// Adaptive Breakpoints
+enum ScreenSize {
+  mobile, // < 600
+  tablet, // 600-900
+  desktop, // 900-1200
+  large, // > 1200
+}
+
 class _DashboardShellState extends ConsumerState<DashboardShell> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  /// تحديد حجم الشاشة الحالي
+  ScreenSize _getScreenSize(double width) {
+    if (width < 600) return ScreenSize.mobile;
+    if (width < 900) return ScreenSize.tablet;
+    if (width < 1200) return ScreenSize.desktop;
+    return ScreenSize.large;
+  }
+
+  /// Adaptive Density - المسافات حسب حجم الشاشة
+  double _getPadding(ScreenSize size) {
+    switch (size) {
+      case ScreenSize.mobile:
+        return 12.0;
+      case ScreenSize.tablet:
+        return 16.0;
+      case ScreenSize.desktop:
+        return 20.0;
+      case ScreenSize.large:
+        return 24.0;
+    }
+  }
+
+  /// Adaptive Icon Size
+  double _getIconSize(ScreenSize size) {
+    switch (size) {
+      case ScreenSize.mobile:
+        return 22.0;
+      case ScreenSize.tablet:
+        return 24.0;
+      case ScreenSize.desktop:
+      case ScreenSize.large:
+        return 26.0;
+    }
+  }
+
+  /// Adaptive Font Size
+  double _getFontSize(ScreenSize size) {
+    switch (size) {
+      case ScreenSize.mobile:
+        return 12.0;
+      case ScreenSize.tablet:
+        return 13.0;
+      case ScreenSize.desktop:
+      case ScreenSize.large:
+        return 14.0;
+    }
+  }
 
   void _openAllMenu() {
     HapticFeedback.lightImpact();
@@ -536,19 +592,40 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     );
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth >= 900;
+    final screenSize = _getScreenSize(screenWidth);
+    final isDesktop =
+        screenSize == ScreenSize.desktop || screenSize == ScreenSize.large;
+    final useSideNav = screenSize != ScreenSize.mobile;
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         key: _scaffoldKey,
-        body: Column(
+        body: Row(
+          textDirection: TextDirection.rtl,
           children: [
-            _buildPersistentHeader(context, store?.name ?? 'mbuy', isDesktop),
-            Expanded(child: widget.child),
+            // NavigationRail للديسكتوب والتابلت
+            if (useSideNav)
+              _buildNavigationRail(context, currentIndex, screenSize),
+            // المحتوى الرئيسي
+            Expanded(
+              child: Column(
+                children: [
+                  _buildPersistentHeader(
+                    context,
+                    store?.name ?? 'mbuy',
+                    screenSize,
+                  ),
+                  Expanded(child: widget.child),
+                ],
+              ),
+            ),
           ],
         ),
-        bottomNavigationBar: _buildCustomBottomNav(context, currentIndex),
+        // BottomNavigationBar للموبايل فقط
+        bottomNavigationBar: !useSideNav
+            ? _buildCustomBottomNav(context, currentIndex, screenSize)
+            : null,
       ),
     );
   }
@@ -557,9 +634,12 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
   Widget _buildPersistentHeader(
     BuildContext context,
     String storeName,
-    bool isDesktop,
+    ScreenSize screenSize,
   ) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final padding = _getPadding(screenSize);
+    final iconSize = _getIconSize(screenSize);
+    final isDesktop = screenSize != ScreenSize.mobile;
 
     // اللون الأساسي للهيدر (Teal Green)
     const Color headerColor = AppTheme.primaryColor;
@@ -567,10 +647,10 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(
-        top: topPadding + 8,
-        bottom: 12,
-        left: 12,
-        right: 12,
+        top: topPadding + padding * 0.7,
+        bottom: padding,
+        left: padding,
+        right: padding,
       ),
       decoration: const BoxDecoration(color: headerColor),
       child: Row(
@@ -579,22 +659,30 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
           // الجانب الأيسر - أزرار الإجراءات
           Row(
             children: [
-              _buildHeaderButton(Icons.search, () => _openSearch(context)),
+              _buildHeaderButton(
+                Icons.search,
+                () => _openSearch(context),
+                iconSize,
+              ),
               _buildHeaderButton(
                 Icons.smart_toy_outlined,
                 () => context.push('/dashboard/ai-assistant'),
+                iconSize,
               ),
               _buildHeaderButton(
                 Icons.notifications_outlined,
                 () => context.push('/dashboard/notifications'),
+                iconSize,
               ),
               _buildHeaderButton(
                 Icons.bolt,
                 () => context.push('/dashboard/shortcuts'),
+                iconSize,
               ),
               _buildHeaderButton(
                 Icons.add,
                 () => _showProductTypeSelection(context),
+                iconSize,
               ),
             ],
           ),
@@ -666,25 +754,36 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     );
   }
 
-  Widget _buildHeaderButton(IconData icon, VoidCallback onTap) {
+  Widget _buildHeaderButton(
+    IconData icon,
+    VoidCallback onTap,
+    double iconSize,
+  ) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
         onTap();
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: Icon(icon, color: Colors.white, size: 22),
+        padding: EdgeInsets.symmetric(horizontal: iconSize * 0.27),
+        child: Icon(icon, color: Colors.white, size: iconSize),
       ),
     );
   }
 
-  Widget _buildCustomBottomNav(BuildContext context, int currentIndex) {
+  Widget _buildCustomBottomNav(
+    BuildContext context,
+    int currentIndex,
+    ScreenSize screenSize,
+  ) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconSize = _getIconSize(screenSize);
+    final fontSize = _getFontSize(screenSize);
+    final navHeight = screenSize == ScreenSize.mobile ? 65.0 : 70.0;
 
     return Container(
-      height: 70 + bottomPadding, // ارتفاع نحيف + SafeArea
+      height: navHeight + bottomPadding,
       decoration: BoxDecoration(
         color: isDark ? AppTheme.backgroundColorDark : Colors.white,
         boxShadow: [
@@ -708,6 +807,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               isSelected: currentIndex == 0,
               onTap: () => _onItemTapped(0, context),
               isDark: isDark,
+              iconSize: iconSize,
+              fontSize: fontSize,
             ),
             _buildNavItem(
               icon: AppIcons.orders,
@@ -715,6 +816,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               isSelected: currentIndex == 1,
               onTap: () => _onItemTapped(1, context),
               isDark: isDark,
+              iconSize: iconSize,
+              fontSize: fontSize,
             ),
             _buildNavItem(
               icon: AppIcons.product,
@@ -722,6 +825,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               isSelected: currentIndex == 2,
               onTap: () => _onItemTapped(2, context),
               isDark: isDark,
+              iconSize: iconSize,
+              fontSize: fontSize,
             ),
             _buildNavItem(
               icon: AppIcons.studio,
@@ -729,6 +834,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               isSelected: currentIndex == 3,
               onTap: () => _onItemTapped(3, context),
               isDark: isDark,
+              iconSize: iconSize,
+              fontSize: fontSize,
             ),
           ],
         ),
@@ -742,16 +849,19 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     required bool isSelected,
     required VoidCallback onTap,
     required bool isDark,
+    required double iconSize,
+    required double fontSize,
   }) {
-    // ألوان مخصصة للـ Dark Mode
-    final selectedColor = isDark
-        ? const Color(0xFF4ADE80)
-        : AppTheme.primaryColor;
-    final unselectedColor = isDark ? const Color(0xFF6B8F7A) : Colors.grey[600];
+    // استخدام الألوان الموحدة من AppTheme
+    final selectedColor = AppTheme.activeColor(isDark);
+    final unselectedColor = AppTheme.inactiveColor(isDark);
 
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+    return InkWell(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(12),
       child: SizedBox(
         width: 70,
         child: Column(
@@ -759,14 +869,14 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
           children: [
             AppIcon(
               icon,
-              size: 24,
+              size: iconSize,
               color: isSelected ? selectedColor : unselectedColor,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: fontSize * 0.3),
             Text(
               label,
               style: TextStyle(
-                fontSize: AppDimensions.fontCaption,
+                fontSize: fontSize * 0.92,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? selectedColor : unselectedColor,
               ),
@@ -775,6 +885,108 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// NavigationRail للديسكتوب والتابلت - Adaptive Navigation
+  Widget _buildNavigationRail(
+    BuildContext context,
+    int currentIndex,
+    ScreenSize screenSize,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final padding = _getPadding(screenSize);
+    final iconSize = _getIconSize(screenSize);
+    final fontSize = _getFontSize(screenSize);
+    final isExtended = screenSize == ScreenSize.large;
+    
+    // استخدام الألوان الموحدة
+    final selectedColor = AppTheme.activeColor(isDark);
+    final unselectedColor = AppTheme.inactiveColor(isDark);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.backgroundColorDark : Colors.white,
+        border: Border(
+          left: BorderSide(
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+      ),
+      child: NavigationRail(
+        selectedIndex: currentIndex,
+        onDestinationSelected: (index) => _onItemTapped(index, context),
+        extended: isExtended,
+        labelType: isExtended
+            ? NavigationRailLabelType.none
+            : NavigationRailLabelType.all,
+        backgroundColor: Colors.transparent,
+        selectedIconTheme: IconThemeData(
+          color: selectedColor,
+          size: iconSize,
+        ),
+        unselectedIconTheme: IconThemeData(
+          color: unselectedColor,
+          size: iconSize,
+        ),
+        selectedLabelTextStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w600,
+          color: selectedColor,
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          fontSize: fontSize * 0.92,
+          fontWeight: FontWeight.w500,
+          color: unselectedColor,
+        ),
+        minWidth: screenSize == ScreenSize.tablet ? 72 : 80,
+        minExtendedWidth: 200,
+        destinations: [
+          NavigationRailDestination(
+            icon: AppIcon(AppIcons.home, size: iconSize),
+            selectedIcon: AppIcon(
+              AppIcons.home,
+              size: iconSize,
+              color: selectedColor,
+            ),
+            label: const Text('الرئيسية'),
+            padding: EdgeInsets.symmetric(vertical: padding * 0.8),
+          ),
+          NavigationRailDestination(
+            icon: AppIcon(AppIcons.orders, size: iconSize),
+            selectedIcon: AppIcon(
+              AppIcons.orders,
+              size: iconSize,
+              color: selectedColor,
+            ),
+            label: const Text('الطلبات'),
+            padding: EdgeInsets.symmetric(vertical: padding * 0.8),
+          ),
+          NavigationRailDestination(
+            icon: AppIcon(AppIcons.product, size: iconSize),
+            selectedIcon: AppIcon(
+              AppIcons.product,
+              size: iconSize,
+              color: selectedColor,
+            ),
+            label: const Text('المنتجات'),
+            padding: EdgeInsets.symmetric(vertical: padding * 0.8),
+          ),
+          NavigationRailDestination(
+            icon: AppIcon(AppIcons.studio, size: iconSize),
+            selectedIcon: AppIcon(
+              AppIcons.studio,
+              size: iconSize,
+              color: selectedColor,
+            ),
+            label: const Text('استديو AI'),
+            padding: EdgeInsets.symmetric(vertical: padding * 0.8),
+          ),
+        ],
       ),
     );
   }
