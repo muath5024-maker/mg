@@ -6,9 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../shared/widgets/app_icon.dart';
-import '../../../../shared/widgets/app_search_delegate.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
-import 'all_menu_drawer.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
@@ -46,6 +44,13 @@ class DashboardShell extends ConsumerStatefulWidget {
 }
 
 class _DashboardShellState extends ConsumerState<DashboardShell> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void _openAllMenu() {
+    HapticFeedback.lightImpact();
+    context.push('/dashboard/all-menu');
+  }
+
   /// الحصول على الـ index الحالي بناءً على المسار
   /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، استديو AI(3)
   /// المحادثات: لا تظهر في البار السفلي (الوصول عبر الإشعارات)
@@ -85,11 +90,17 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
 
   void _openSearch(BuildContext context) {
     HapticFeedback.lightImpact();
-    showSearch(context: context, delegate: AppSearchDelegate());
+    context.push('/dashboard/search');
   }
 
-  /// عرض قائمة اختيار نوع المنتج
+  /// عرض صفحة إضافة منتج
   void _showProductTypeSelection(BuildContext context) {
+    HapticFeedback.lightImpact();
+    context.push('/dashboard/add-product');
+  }
+
+  /// عرض قائمة اختيار نوع المنتج (DEPRECATED - استبدلت بصفحة كاملة)
+  void _showProductTypeSelectionOld(BuildContext context) {
     HapticFeedback.lightImpact();
     showModalBottomSheet(
       context: context,
@@ -524,15 +535,16 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
       ),
     );
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 900;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        drawer: const AllMenuDrawer(),
+        key: _scaffoldKey,
         body: Column(
           children: [
-            // الهيدر العلوي الثابت
-            _buildPersistentHeader(context, store?.name ?? 'mbuy'),
-            // المحتوى
+            _buildPersistentHeader(context, store?.name ?? 'mbuy', isDesktop),
             Expanded(child: widget.child),
           ],
         ),
@@ -542,7 +554,11 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
   }
 
   /// الهيدر العلوي الثابت - اللون الأساسي
-  Widget _buildPersistentHeader(BuildContext context, String storeName) {
+  Widget _buildPersistentHeader(
+    BuildContext context,
+    String storeName,
+    bool isDesktop,
+  ) {
     final topPadding = MediaQuery.of(context).padding.top;
 
     // اللون الأساسي للهيدر (Teal Green)
@@ -570,7 +586,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               ),
               _buildHeaderButton(
                 Icons.notifications_outlined,
-                () => context.push('/dashboard/inbox'),
+                () => context.push('/dashboard/notifications'),
               ),
               _buildHeaderButton(
                 Icons.bolt,
@@ -622,13 +638,12 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                 ],
               ),
               const SizedBox(width: 8),
-              // أيقونة المتجر - تفتح قائمة "الكل"
-              Builder(
-                builder: (scaffoldContext) => GestureDetector(
+              // أيقونة المتجر - تفتح القائمة في الموبايل
+              if (!isDesktop)
+                GestureDetector(
                   onTap: () {
-                    debugPrint('🔵 STORE_ICON_TAPPED');
                     HapticFeedback.lightImpact();
-                    Scaffold.of(scaffoldContext).openDrawer();
+                    _openAllMenu();
                   },
                   child: Container(
                     width: 36,
@@ -644,7 +659,6 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ],

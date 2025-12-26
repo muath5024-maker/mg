@@ -18,6 +18,12 @@ import '../../features/dashboard/presentation/screens/audit_logs_screen.dart';
 import '../../features/dashboard/presentation/screens/inbox_screen.dart';
 import '../../features/dashboard/presentation/screens/customers_screen.dart';
 import '../../features/dashboard/presentation/screens/reports_screen.dart';
+import '../../features/dashboard/presentation/screens/all_menu_panel.dart';
+import '../../features/dashboard/presentation/screens/search_panel.dart';
+import '../../features/dashboard/presentation/screens/ai_assistant_panel.dart';
+import '../../features/dashboard/presentation/screens/notifications_panel.dart';
+import '../../features/dashboard/presentation/screens/shortcuts_panel.dart';
+import '../../features/dashboard/presentation/screens/add_product_panel.dart';
 // Finance
 import '../../features/finance/presentation/screens/wallet_screen.dart';
 import '../../features/finance/presentation/screens/points_screen.dart';
@@ -295,6 +301,36 @@ class AppRouter {
                   },
                 ),
                 // الشاشات الجديدة v2.0
+                GoRoute(
+                  path: 'all-menu',
+                  name: 'all-menu',
+                  builder: (context, state) => const AllMenuPanel(),
+                ),
+                GoRoute(
+                  path: 'search',
+                  name: 'search',
+                  builder: (context, state) => const SearchPanel(),
+                ),
+                GoRoute(
+                  path: 'ai-assistant',
+                  name: 'ai-assistant-panel',
+                  builder: (context, state) => const AIAssistantPanel(),
+                ),
+                GoRoute(
+                  path: 'notifications',
+                  name: 'notifications',
+                  builder: (context, state) => const NotificationsPanel(),
+                ),
+                GoRoute(
+                  path: 'shortcuts',
+                  name: 'shortcuts-panel',
+                  builder: (context, state) => const ShortcutsPanel(),
+                ),
+                GoRoute(
+                  path: 'add-product',
+                  name: 'add-product-panel',
+                  builder: (context, state) => const AddProductPanel(),
+                ),
                 GoRoute(
                   path: 'shortcuts',
                   name: 'shortcuts',
