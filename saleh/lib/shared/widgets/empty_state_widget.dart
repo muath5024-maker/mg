@@ -36,11 +36,7 @@ class EmptyStateWidget extends StatelessWidget {
           children: [
             // الرسم التوضيحي أو الأيقونة
             if (illustration != null)
-              SizedBox(
-                width: 200,
-                height: 200,
-                child: illustration,
-              )
+              SizedBox(width: 200, height: 200, child: illustration)
             else
               Container(
                 width: 120,
@@ -112,11 +108,7 @@ class CompactEmptyStateWidget extends StatelessWidget {
   final String? message;
   final IconData? icon;
 
-  const CompactEmptyStateWidget({
-    super.key,
-    this.message,
-    this.icon,
-  });
+  const CompactEmptyStateWidget({super.key, this.message, this.icon});
 
   @override
   Widget build(BuildContext context) {

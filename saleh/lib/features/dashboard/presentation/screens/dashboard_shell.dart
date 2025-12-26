@@ -155,262 +155,6 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     context.push('/dashboard/add-product');
   }
 
-  /// عرض قائمة اختيار نوع المنتج (DEPRECATED - استبدلت بصفحة كاملة)
-  void _showProductTypeSelectionOld(BuildContext context) {
-    HapticFeedback.lightImpact();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // مقبض السحب
-                  Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const Text(
-                    'إضافة منتج جديد',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontDisplay3,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'اختر نوع المنتج الذي تريد إضافته',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontBody,
-                      color: AppTheme.textSecondaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // === خيار الإدراج السريع ===
-                  _buildQuickAddOption(context),
-                  const SizedBox(height: 16),
-
-                  // فاصل مع عنوان
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: Colors.grey[300])),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'أو اختر نوع المنتج',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontLabel,
-                            color: AppTheme.textHintColor,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: Colors.grey[300])),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // === أنواع المنتجات ===
-                  _buildProductTypeOption(
-                    context,
-                    type: 'physical',
-                    title: 'منتج مادي',
-                    description: 'منتج يتم شحنه للعميل',
-                    icon: Icons.inventory_2,
-                    color: const Color(0xFF2196F3),
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    type: 'digital',
-                    title: 'منتج رقمي',
-                    description: 'ملفات، برامج، كتب إلكترونية',
-                    icon: Icons.cloud_download,
-                    color: const Color(0xFF9C27B0),
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    type: 'service',
-                    title: 'خدمة حسب الطلب',
-                    description: 'تصميم، برمجة، استشارات',
-                    icon: Icons.handyman,
-                    color: const Color(0xFF4CAF50),
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    type: 'foodAndBeverage',
-                    title: 'أكل ومشروبات',
-                    description: 'وجبات، حلويات، مشروبات',
-                    icon: Icons.restaurant,
-                    color: const Color(0xFFFF9800),
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    type: 'subscription',
-                    title: 'اشتراك',
-                    description: 'اشتراكات شهرية أو سنوية',
-                    icon: Icons.autorenew,
-                    color: const Color(0xFF00BCD4),
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    type: 'ticket',
-                    title: 'تذكرة / حجز',
-                    description: 'فعاليات، حجوزات، مواعيد',
-                    icon: Icons.confirmation_number,
-                    color: const Color(0xFFE91E63),
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    type: 'customizable',
-                    title: 'منتج قابل للتخصيص',
-                    description: 'منتجات يمكن للعميل تخصيصها',
-                    icon: Icons.tune,
-                    color: const Color(0xFF795548),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  /// خيار الإدراج السريع
-  Widget _buildQuickAddOption(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.pop(context);
-        _showQuickAddDialog(context);
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppTheme.accentColor,
-              AppTheme.accentColor.withValues(alpha: 0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.accentColor.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.flash_on, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'إدراج سريع ⚡',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppDimensions.fontTitle,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'أضف منتج بسرعة (اسم + سعر + صورة)',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: AppDimensions.fontLabel,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white.withValues(alpha: 0.8),
-              size: 18,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProductTypeOption(
-    BuildContext context, {
-    required String type,
-    required String title,
-    required String description,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color, size: 24),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: AppDimensions.fontSubtitle,
-          ),
-        ),
-        subtitle: Text(
-          description,
-          style: TextStyle(
-            fontSize: AppDimensions.fontLabel,
-            color: AppTheme.textSecondaryColor,
-          ),
-        ),
-        trailing: Icon(Icons.chevron_left, color: AppTheme.textHintColor),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey.shade200),
-        ),
-        onTap: () {
-          Navigator.pop(context);
-          context.push('/dashboard/products/add', extra: {'productType': type});
-        },
-      ),
-    );
-  }
-
   /// نافذة الإدراج السريع
   void _showQuickAddDialog(BuildContext context) {
     final nameController = TextEditingController();
@@ -593,8 +337,6 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenSize = _getScreenSize(screenWidth);
-    final isDesktop =
-        screenSize == ScreenSize.desktop || screenSize == ScreenSize.large;
     final useSideNav = screenSize != ScreenSize.mobile;
 
     return Directionality(
@@ -900,7 +642,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     final iconSize = _getIconSize(screenSize);
     final fontSize = _getFontSize(screenSize);
     final isExtended = screenSize == ScreenSize.large;
-    
+
     // استخدام الألوان الموحدة
     final selectedColor = AppTheme.activeColor(isDark);
     final unselectedColor = AppTheme.inactiveColor(isDark);
@@ -911,8 +653,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         border: Border(
           left: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.2),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.grey.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -925,10 +667,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             ? NavigationRailLabelType.none
             : NavigationRailLabelType.all,
         backgroundColor: Colors.transparent,
-        selectedIconTheme: IconThemeData(
-          color: selectedColor,
-          size: iconSize,
-        ),
+        selectedIconTheme: IconThemeData(color: selectedColor, size: iconSize),
         unselectedIconTheme: IconThemeData(
           color: unselectedColor,
           size: iconSize,

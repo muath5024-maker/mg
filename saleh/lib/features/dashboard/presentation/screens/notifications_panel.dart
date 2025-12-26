@@ -120,7 +120,10 @@ class _NotificationsPanelState extends State<NotificationsPanel>
               ? Colors.white
               : AppTheme.primaryColor.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+          border: Border.all(
+            color: Colors.grey.withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
         child: Row(
           textDirection: TextDirection.rtl,
@@ -167,7 +170,7 @@ class _NotificationsPanelState extends State<NotificationsPanel>
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: notification.color.withOpacity(0.1),
+                color: notification.color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(

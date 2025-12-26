@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// صفحة البحث - صفحة كاملة مع زر إغلاق
@@ -75,7 +74,11 @@ class _SearchPanelState extends State<SearchPanel> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search, size: 80, color: Colors.grey.withOpacity(0.3)),
+          Icon(
+            Icons.search,
+            size: 80,
+            color: Colors.grey.withValues(alpha: 0.3),
+          ),
           const SizedBox(height: 16),
           Text(
             'ابحث عن أي شيء',
@@ -149,7 +152,10 @@ class _SearchPanelState extends State<SearchPanel> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+          border: Border.all(
+            color: Colors.grey.withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
         child: Row(
           textDirection: TextDirection.rtl,

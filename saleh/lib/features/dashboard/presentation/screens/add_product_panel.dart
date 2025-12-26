@@ -95,7 +95,7 @@ class _AddProductPanelState extends State<AddProductPanel> {
           gradient: LinearGradient(
             colors: [
               AppTheme.accentColor,
-              AppTheme.accentColor.withOpacity(0.8),
+              AppTheme.accentColor.withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -103,7 +103,7 @@ class _AddProductPanelState extends State<AddProductPanel> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.accentColor.withOpacity(0.3),
+              color: AppTheme.accentColor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -128,7 +128,7 @@ class _AddProductPanelState extends State<AddProductPanel> {
                   Text(
                     'أضف منتج بسرعة (اسم + سعر + صورة)',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 14,
                     ),
                   ),
@@ -140,7 +140,7 @@ class _AddProductPanelState extends State<AddProductPanel> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.flash_on, color: Colors.white, size: 28),
@@ -184,7 +184,10 @@ class _AddProductPanelState extends State<AddProductPanel> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+            border: Border.all(
+              color: Colors.grey.withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
           child: Row(
             textDirection: TextDirection.rtl,
@@ -216,7 +219,7 @@ class _AddProductPanelState extends State<AddProductPanel> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),

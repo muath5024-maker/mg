@@ -298,11 +298,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                size: 22,
-                color: AppTheme.primaryColor,
-              ),
+              child: Icon(icon, size: 22, color: AppTheme.primaryColor),
             ),
             const SizedBox(width: 12),
             // القيمة والنص
@@ -477,11 +473,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       color: AppTheme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
-                      icon,
-                      size: 22,
-                      color: AppTheme.primaryColor,
-                    ),
+                    child: Icon(icon, size: 22, color: AppTheme.primaryColor),
                   ),
                   const SizedBox(height: 8),
                   Text(

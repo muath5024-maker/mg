@@ -101,11 +101,7 @@ class CompactErrorStateWidget extends StatelessWidget {
   final String? message;
   final VoidCallback? onRetry;
 
-  const CompactErrorStateWidget({
-    super.key,
-    this.message,
-    this.onRetry,
-  });
+  const CompactErrorStateWidget({super.key, this.message, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -136,9 +132,7 @@ class CompactErrorStateWidget extends StatelessWidget {
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('إعادة المحاولة'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppTheme.errorColor,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
             ),
           ],
         ],

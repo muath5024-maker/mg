@@ -50,7 +50,7 @@ class _AllMenuPanelState extends ConsumerState<AllMenuPanel> {
           // التبويبات على اليمين (البداية في RTL)
           SizedBox(width: 180, child: _buildTabsSection()),
           // خط فاصل
-          Container(width: 1, color: Colors.grey.withOpacity(0.2)),
+          Container(width: 1, color: Colors.grey.withValues(alpha: 0.2)),
           // الخيارات على اليسار (النهاية في RTL)
           Expanded(child: _buildOptionsSection()),
         ],

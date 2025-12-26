@@ -159,7 +159,9 @@ class AppTheme {
   // App Store Theme Colors (Dark Green Theme)
   // ============================================================================
   static const Color appStorePrimary = Color(0xFF13EC80); // Neon Green
-  static const Color appStoreBackground = Color(0xFF102219); // Dark Green Background
+  static const Color appStoreBackground = Color(
+    0xFF102219,
+  ); // Dark Green Background
   static const Color appStoreSurface = Color(0xFF193326); // Surface Dark
   static const Color appStoreCard = Color(0xFF1C3228); // Card Dark
   static const Color appStoreTextPrimary = Color(0xFFFFFFFF); // White
@@ -1072,7 +1074,7 @@ class AppTheme {
   // ============================================================================
   // Active/Inactive Colors - Unified across all components
   // ============================================================================
-  
+
   /// Active/Selected color - unified for all navigation and interactive elements
   static Color activeColor(bool isDark) =>
       isDark ? const Color(0xFF4ADE80) : primaryColor;
