@@ -334,66 +334,10 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // الجانب الأيسر - أزرار الإجراءات
+          // الجانب الأيمن (في RTL يكون أول عنصر) - القائمة + متجري
           Row(
             children: [
-              _buildHeaderButton(Icons.search, _openSearch, iconSize),
-              _buildHeaderButton(Icons.smart_toy_outlined, _openAI, iconSize),
-              _buildHeaderButton(
-                Icons.notifications_outlined,
-                _openNotifications,
-                iconSize,
-              ),
-              _buildHeaderButton(Icons.bolt, _openShortcuts, iconSize),
-              _buildHeaderButton(Icons.add, _openAddProduct, iconSize),
-            ],
-          ),
-          // الجانب الأيمن - اسم المتجر والشعار
-          Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    storeName,
-                    style: const TextStyle(
-                      fontSize: AppDimensions.fontHeadline,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
-                          .read(overlay.overlayProvider.notifier)
-                          .openViewStore();
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'عرض متجري',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontCaption,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.visibility,
-                          size: 12,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
-              // أيقونة المتجر - تفتح القائمة في الموبايل
+              // أيقونة القائمة الرئيسية
               if (!isDesktop)
                 GestureDetector(
                   onTap: () {
@@ -408,12 +352,73 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
-                      Icons.storefront,
+                      Icons.menu,
                       color: Colors.white,
-                      size: 20,
+                      size: 22,
                     ),
                   ),
                 ),
+              const SizedBox(width: 8),
+              // زر عرض متجري
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(overlay.overlayProvider.notifier).openViewStore();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.visibility,
+                        size: 14,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'متجري',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontCaption,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // الجانب الأيسر (في RTL يكون آخر عنصر) - اسم المتجر + الأزرار
+          Row(
+            children: [
+              _buildHeaderButton(Icons.add, _openAddProduct, iconSize),
+              _buildHeaderButton(Icons.bolt, _openShortcuts, iconSize),
+              _buildHeaderButton(
+                Icons.notifications_outlined,
+                _openNotifications,
+                iconSize,
+              ),
+              _buildHeaderButton(Icons.smart_toy_outlined, _openAI, iconSize),
+              _buildHeaderButton(Icons.search, _openSearch, iconSize),
+              const SizedBox(width: 8),
+              Text(
+                storeName,
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontHeadline,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ],
           ),
         ],

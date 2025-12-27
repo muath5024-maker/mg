@@ -73,8 +73,13 @@ class _AllMenuPanelState extends ConsumerState<AllMenuPanel> {
           // زر الإغلاق على اليسار
           GestureDetector(
             onTap: () {
-              widget.onClose?.call();
-              Navigator.of(context).pop();
+              // استخدام onClose فقط لإغلاق الـ overlay
+              // لا نستخدم Navigator.pop() لأن القائمة overlay وليست route
+              if (widget.onClose != null) {
+                widget.onClose!();
+              } else {
+                Navigator.of(context).pop();
+              }
             },
             child: const Icon(
               Icons.close,
