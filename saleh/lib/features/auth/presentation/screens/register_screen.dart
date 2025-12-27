@@ -11,8 +11,8 @@ import '../../data/auth_controller.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/auth_text_form_field.dart';
 
-/// شاشة Ø§Ù„ØªØ³Ø¬ÙŠÙ„
-/// ØªØ³Ù…Ø­ Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ† Ø§Ù„Ø¬Ø¯Ø¯ Ø¨إنشاء حساب ØªØ§Ø¬Ø±
+/// شاشة التسجيل
+/// تسمح للمستخدمين الجدد بإنشاء حساب تاجر
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -73,7 +73,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ø§Ù„Ø§Ø³ØªÙ…Ø§Ø¹ Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØµØ§Ø¯Ù‚Ø© Ù„Ø¹Ø±Ø¶ Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ Ø£Ùˆ Ø§Ù„ØªÙˆØ¬ÙŠÙ‡
+    // الاستماع لحالة المصادقة لعرض الأخطاء أو التوجيه
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,10 +83,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-        // Ù…Ø³Ø­ Ø§Ù„Ø®Ø·Ø£ Ø¨Ø¹Ø¯ Ø¹Ø±Ø¶Ù‡
+        // مسح الخطأ بعد عرضه
         ref.read(authControllerProvider.notifier).clearError();
       } else if (next.isAuthenticated) {
-        // Ù†Ø¬Ø­ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ - ØªÙˆØ¬ÙŠÙ‡ Ù„Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù…ØªØ¬Ø±
+        // نجح التسجيل - توجيه لإنشاء المتجر
         context.go('/dashboard/store/create-store');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -111,7 +111,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               children: [
                 const SizedBox(height: 20),
 
-                // Ø²Ø± Ø§Ù„Ø¹ÙˆØ¯Ø©
+                // زر العودة
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
@@ -125,7 +125,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 20),
 
-                // Ø§Ù„Ø´Ø¹Ø§Ø±
+                // الشعار
                 Center(
                   child: Container(
                     width: 80,
@@ -153,9 +153,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 24),
 
-                // Ø§Ù„Ø¹Ù†ÙˆØ§Ù†
+                // العنوان
                 const Text(
-                  'إنشاء حساب Ø¬Ø¯ÙŠØ¯',
+                  'إنشاء حساب جديد',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -167,27 +167,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: 8),
 
                 Text(
-                  'Ø§Ù†Ø¶Ù… Ø¥Ù„Ù‰ Mbuy ÙˆØ§Ø¨Ø¯Ø£ Ø±Ø­Ù„ØªÙƒ Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ©',
+                  'انضم إلى Mbuy وابدأ رحلتك التجارية',
                   style: TextStyle(fontSize: 14, color: AppTheme.mutedSlate),
                   textAlign: TextAlign.center,
                 ),
 
                 const SizedBox(height: 32),
 
-                // Ø­Ù‚Ù„ Ø§Ù„Ø§Ø³Ù…
+                // حقل الاسم
                 AuthTextFormField(
                   controller: _nameController,
                   labelText: 'الاسم الكامل',
-                  hintText: 'Ø£Ø¯Ø®Ù„ Ø§Ø³Ù…Ùƒ',
+                  hintText: 'أدخل اسمك',
                   prefixIcon: AppIcons.person,
                   keyboardType: TextInputType.name,
                   textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø§Ø³Ù…';
+                      return 'الرجاء إدخال الاسم';
                     }
                     if (value.trim().length < 2) {
-                      return 'Ø§Ù„Ø§Ø³Ù… Ù‚ØµÙŠØ± Ø¬Ø¯Ø§Ù‹';
+                      return 'الاسم قصير جداً';
                     }
                     return null;
                   },
@@ -195,7 +195,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 16),
 
-                // Ø­Ù‚Ù„ Ø§Ù„Ø¥ÙŠÙ…ÙŠÙ„
+                // حقل الإيميل
                 AuthTextFormField(
                   controller: _emailController,
                   labelText: 'البريد الإلكتروني',
@@ -205,11 +205,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ البريد الإلكتروني';
+                      return 'الرجاء إدخال البريد الإلكتروني';
                     }
                     final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
                     if (!emailRegex.hasMatch(value)) {
-                      return 'البريد الإلكتروني ØºÙŠØ± ØµØ­ÙŠØ­';
+                      return 'البريد الإلكتروني غير صحيح';
                     }
                     return null;
                   },
@@ -217,11 +217,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 16),
 
-                // Ø­Ù‚Ù„ كلمة المرور
+                // حقل كلمة المرور
                 AuthTextFormField(
                   controller: _passwordController,
                   labelText: 'كلمة المرور',
-                  hintText: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                  hintText: '••••••••',
                   prefixIcon: AppIcons.lock,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
@@ -238,10 +238,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ كلمة المرور';
+                      return 'الرجاء إدخال كلمة المرور';
                     }
                     if (value.length < 6) {
-                      return 'كلمة المرور ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„';
+                      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
                     }
                     return null;
                   },
@@ -253,7 +253,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 AuthTextFormField(
                   controller: _confirmPasswordController,
                   labelText: 'تأكيد كلمة المرور',
-                  hintText: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                  hintText: '••••••••',
                   prefixIcon: AppIcons.lock,
                   obscureText: _obscureConfirmPassword,
                   textInputAction: TextInputAction.done,
@@ -272,10 +272,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ تأكيد كلمة المرور';
+                      return 'الرجاء تأكيد كلمة المرور';
                     }
                     if (value != _passwordController.text) {
-                      return 'كلمة المرور ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©';
+                      return 'كلمة المرور غير متطابقة';
                     }
                     return null;
                   },
@@ -283,7 +283,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 16),
 
-                // Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙˆØ·
+                // الموافقة على الشروط
                 Row(
                   children: [
                     Checkbox(
@@ -307,9 +307,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: AppTheme.mutedSlate,
                             ),
                             children: [
-                              const TextSpan(text: 'Ø£ÙˆØ§ÙÙ‚ Ø¹Ù„Ù‰ '),
+                              const TextSpan(text: 'أوافق على '),
                               TextSpan(
-                                text: 'Ø´Ø±ÙˆØ· Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…',
+                                text: 'شروط الاستخدام',
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     context.push('/terms');
@@ -320,7 +320,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
-                              const TextSpan(text: ' Ùˆ '),
+                              const TextSpan(text: ' و '),
                               TextSpan(
                                 text: 'سياسة الخصوصية',
                                 recognizer: TapGestureRecognizer()
@@ -343,7 +343,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 24),
 
-                // Ø²Ø± Ø§Ù„ØªØ³Ø¬ÙŠÙ„
+                // زر التسجيل
                 PrimaryButton(
                   text: 'إنشاء حساب',
                   onPressed: _handleRegister,
@@ -352,12 +352,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 const SizedBox(height: 24),
 
-                // Ø±Ø§Ø¨Ø· تسجيل الدخول
+                // رابط تسجيل الدخول
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ Ø¨Ø§Ù„ÙØ¹Ù„ØŸ',
+                      'لديك حساب بالفعل؟',
                       style: TextStyle(
                         color: AppTheme.mutedSlate,
                         fontSize: 14,

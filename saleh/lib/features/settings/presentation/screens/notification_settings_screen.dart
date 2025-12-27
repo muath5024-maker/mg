@@ -7,8 +7,8 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/services/user_preferences_service.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// شاشة Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الØ¥Ø´Ø¹Ø§Ø±Ø§Øª
-/// ØªØªÙŠØ­ Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… الØªØ­ÙƒÙ… الÙƒØ§Ù…Ù„ ÙÙŠ Ø¥Ø´Ø¹Ø§Ø±Ø§ØªÙ‡
+/// شاشة إعدادات الإشعارات
+/// تتيح للمستخدم التحكم الكامل في إشعاراته
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
   const NotificationSettingsScreen({super.key});
 
@@ -120,7 +120,7 @@ class _NotificationSettingsScreenState
           ),
           const Expanded(
             child: Text(
-              'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الØ¥Ø´Ø¹Ø§Ø±Ø§Øª',
+              'إعدادات الإشعارات',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -129,7 +129,7 @@ class _NotificationSettingsScreenState
               ),
             ),
           ),
-          const SizedBox(width: 40), // Ù„Ù„ØªÙˆØ§Ø²Ù†
+          const SizedBox(width: 40), // للتوازن
         ],
       ),
     );
@@ -141,26 +141,26 @@ class _NotificationSettingsScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // الØªÙØ¹ÙŠÙ„ الØ¹Ø§Ù…
+          // التفعيل العام
           _buildMasterSwitch(),
           const SizedBox(height: 24),
 
-          // Ø¥Ø´Ø¹Ø§Ø±Ø§Øª الطلبØ§Øª
+          // إشعارات الطلبات
           _buildSection(
-            title: 'الطلبØ§Øª',
+            title: 'الطلبات',
             icon: AppIcons.shoppingBagOutlined,
             color: AppTheme.primaryColor,
             children: [
               _buildSwitchTile(
-                'الطلبØ§Øª الØ¬Ø¯ÙŠØ¯Ø©',
-                'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ù†Ø¯ Ø§Ø³ØªلاÙ… طلب Ø¬Ø¯ÙŠØ¯',
-                AppIcons.add, // Ø£Ùˆ Ø£ÙŠÙ‚ÙˆÙ†Ø© منØ§Ø³Ø¨Ø© Ø£Ø®Ø±Ù‰
+                'الطلبات الجديدة',
+                'إشعار عند استلام طلب جديد',
+                AppIcons.add, // أو أيقونة مناسبة أخرى
                 _settings.newOrders,
                 (v) => _updateSetting(_settings.copyWith(newOrders: v)),
               ),
               _buildSwitchTile(
-                'Ø­الØ© الطلبØ§Øª',
-                'تحديثØ§Øª Ø­الØ© الطلبØ§Øª',
+                'حالة الطلبات',
+                'تحديثات حالة الطلبات',
                 AppIcons.shipping,
                 _settings.orderStatus,
                 (v) => _updateSetting(_settings.copyWith(orderStatus: v)),
@@ -169,29 +169,29 @@ class _NotificationSettingsScreenState
           ),
           const SizedBox(height: 16),
 
-          // Ø¥Ø´Ø¹Ø§Ø±Ø§Øª الÙ…Ø®Ø²ÙˆÙ† ÙˆالØ¹Ù…لاØ¡
+          // إشعارات المخزون والعملاء
           _buildSection(
-            title: 'الÙ…Ø®Ø²ÙˆÙ† ÙˆالØ¹Ù…لاØ¡',
+            title: 'المخزون والعملاء',
             icon: AppIcons.inventory2,
             color: AppTheme.accentColor,
             children: [
               _buildSwitchTile(
-                'الÙ…Ø®Ø²ÙˆÙ† المنØ®ÙØ¶',
-                'ØªÙ†Ø¨ÙŠÙ‡ Ø¹Ù†Ø¯ Ø§Ù†Ø®ÙØ§Ø¶ ÙƒÙ…ÙŠØ© منØªØ¬',
+                'المخزون المنخفض',
+                'تنبيه عند انخفاض كمية منتج',
                 AppIcons.warning,
                 _settings.lowStock,
                 (v) => _updateSetting(_settings.copyWith(lowStock: v)),
               ),
               _buildSwitchTile(
-                'Ø±Ø³Ø§Ø¦Ù„ الØ¹Ù…لاØ¡',
-                'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ù†Ø¯ Ø§Ø³ØªلاÙ… Ø±Ø³الØ© Ø¬Ø¯ÙŠØ¯Ø©',
+                'رسائل العملاء',
+                'إشعار عند استلام رسالة جديدة',
                 AppIcons.chat,
                 _settings.customerMessages,
                 (v) => _updateSetting(_settings.copyWith(customerMessages: v)),
               ),
               _buildSwitchTile(
-                'الØªÙ‚ÙŠÙŠÙ…Ø§Øª',
-                'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ù†Ø¯ Ø§Ø³ØªلاÙ… ØªÙ‚ÙŠÙŠÙ… Ø¬Ø¯ÙŠØ¯',
+                'التقييمات',
+                'إشعار عند استلام تقييم جديد',
                 AppIcons.star,
                 _settings.reviews,
                 (v) => _updateSetting(_settings.copyWith(reviews: v)),
@@ -200,29 +200,29 @@ class _NotificationSettingsScreenState
           ),
           const SizedBox(height: 16),
 
-          // Ø¥Ø´Ø¹Ø§Ø±Ø§Øª الØªØ³ÙˆÙŠÙ‚ ÙˆالÙ†Ø¸Ø§Ù…
+          // إشعارات التسويق والنظام
           _buildSection(
-            title: 'الØªØ³ÙˆÙŠÙ‚ ÙˆالÙ†Ø¸Ø§Ù…',
+            title: 'التسويق والنظام',
             icon: AppIcons.campaign,
             color: AppTheme.purpleColor,
             children: [
               _buildSwitchTile(
-                'الØ¹Ø±ÙˆØ¶ ÙˆالØªØ±ÙˆÙŠØ¬',
-                'نصØ§Ø¦Ø­ ÙˆØ¹Ø±ÙˆØ¶ Ù„ØªØ·ÙˆÙŠØ± Ù…ØªØ¬Ø±Ùƒ',
+                'العروض والترويج',
+                'نصائح وعروض لتطوير متجرك',
                 AppIcons.localOffer,
                 _settings.promotions,
                 (v) => _updateSetting(_settings.copyWith(promotions: v)),
               ),
               _buildSwitchTile(
-                'تحديثØ§Øª الÙ†Ø¸Ø§Ù…',
-                'Ù…ÙŠØ²Ø§Øª Ø¬Ø¯ÙŠØ¯Ø© ÙˆØªØ­Ø³ÙŠÙ†Ø§Øª',
+                'تحديثات النظام',
+                'ميزات جديدة وتحسينات',
                 AppIcons.sync,
                 _settings.systemUpdates,
                 (v) => _updateSetting(_settings.copyWith(systemUpdates: v)),
               ),
               _buildSwitchTile(
-                'الØªÙ‚Ø§Ø±ÙŠØ± الØ¯ÙˆØ±ÙŠØ©',
-                'Ù…Ù„Ø®Øµ Ø£Ø¯Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
+                'التقارير الدورية',
+                'ملخص أداء متجرك',
                 AppIcons.analytics,
                 _settings.reports,
                 (v) => _updateSetting(_settings.copyWith(reports: v)),
@@ -231,23 +231,23 @@ class _NotificationSettingsScreenState
           ),
           const SizedBox(height: 16),
 
-          // Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الØµÙˆØª ÙˆالØ§Ù‡ØªØ²Ø§Ø²
+          // إعدادات الصوت والاهتزاز
           _buildSection(
-            title: 'الØµÙˆØª ÙˆالØ§Ù‡ØªØ²Ø§Ø²',
-            icon: AppIcons.notifications, // Ø£Ùˆ Ø£ÙŠÙ‚ÙˆÙ†Ø© منØ§Ø³Ø¨Ø©
+            title: 'الصوت والاهتزاز',
+            icon: AppIcons.notifications, // أو أيقونة مناسبة
             color: AppTheme.secondaryColor,
             children: [
               _buildSwitchTile(
-                'الØµÙˆØª',
-                'ØªØ´ØºÙŠÙ„ ØµÙˆØª Ø¹Ù†Ø¯ الØ¥Ø´Ø¹Ø§Ø±',
+                'الصوت',
+                'تشغيل صوت عند الإشعار',
                 AppIcons.notifications,
                 _settings.sound,
                 (v) => _updateSetting(_settings.copyWith(sound: v)),
               ),
               _buildSwitchTile(
-                'الØ§Ù‡ØªØ²Ø§Ø²',
-                'Ø§Ù‡ØªØ²Ø§Ø² الØ¬Ù‡Ø§Ø² Ø¹Ù†Ø¯ الØ¥Ø´Ø¹Ø§Ø±',
-                AppIcons.activity, // Ø£Ùˆ Ø£ÙŠÙ‚ÙˆÙ†Ø© منØ§Ø³Ø¨Ø©
+                'الاهتزاز',
+                'اهتزاز الجهاز عند الإشعار',
+                AppIcons.activity, // أو أيقونة مناسبة
                 _settings.vibration,
                 (v) => _updateSetting(_settings.copyWith(vibration: v)),
               ),
@@ -255,7 +255,7 @@ class _NotificationSettingsScreenState
           ),
           const SizedBox(height: 16),
 
-          // ÙˆÙ‚Øª الÙ‡Ø¯ÙˆØ¡
+          // وقت الهدوء
           _buildQuietModeSection(),
 
           const SizedBox(height: 100),
@@ -308,7 +308,7 @@ class _NotificationSettingsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'الØ¥Ø´Ø¹Ø§Ø±Ø§Øª',
+                  'الإشعارات',
                   style: TextStyle(
                     color: AppTheme.surfaceColor,
                     fontSize: 20,
@@ -316,7 +316,7 @@ class _NotificationSettingsScreenState
                   ),
                 ),
                 Text(
-                  _settings.enabled ? 'Ù…ÙØ¹Ù‘Ù„Ø©' : 'Ù…ØªÙˆÙ‚ÙØ©',
+                  _settings.enabled ? 'مفعّلة' : 'متوقفة',
                   style: TextStyle(
                     color: AppTheme.surfaceColor.withValues(alpha: 0.8),
                     fontSize: 14,
@@ -506,7 +506,7 @@ class _NotificationSettingsScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ÙˆÙ‚Øª الÙ‡Ø¯ÙˆØ¡',
+                          'وقت الهدوء',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -514,7 +514,7 @@ class _NotificationSettingsScreenState
                           ),
                         ),
                         Text(
-                          'Ø¥ÙŠÙ‚Ø§Ù الØ¥Ø´Ø¹Ø§Ø±Ø§Øª Ù…Ø¤Ù‚ØªØ§Ù‹',
+                          'إيقاف الإشعارات مؤقتاً',
                           style: TextStyle(
                             fontSize: 12,
                             color: AppTheme.textSecondaryColor,
@@ -557,7 +557,7 @@ class _NotificationSettingsScreenState
                         AppIcons.arrowForward,
                         color: AppTheme.textHintColor,
                       ),
-                    ), // ÙŠÙ…ÙƒÙ† Ø§Ø³ØªØ¨Ø¯الÙ‡Ø§ Ø¨Ù€ AppIcon Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ø¶من أيقونات SVG
+                    ), // يمكن استبدالها بـ AppIcon إذا كانت ضمن أيقونات SVG
                     Expanded(
                       child: _buildTimePicker(
                         'إلى',
@@ -656,7 +656,7 @@ class _NotificationSettingsScreenState
               AppIcon(AppIcons.check, color: AppTheme.surfaceColor),
               SizedBox(width: 8),
               Text(
-                'Ø­ÙØ¸ الØªØºÙŠÙŠØ±Ø§Øª',
+                'حفظ التغييرات',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],

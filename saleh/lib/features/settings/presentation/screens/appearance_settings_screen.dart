@@ -19,7 +19,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header Ø«Ø§Ø¨Øª ÙÙŠ Ø§Ù„Ø£Ø¹Ù„Ù‰
+            // Header ثابت في الأعلى
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _buildHeader(context),
@@ -31,13 +31,13 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 children: [
                   Text(
-                    'Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¸Ù‡Ø± Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ Ù„Ùƒ',
+                    'اختر المظهر المناسب لك',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 16),
                   _ThemeOptionCard(
-                    title: 'ÙØ§ØªØ­',
-                    subtitle: 'ØªØ¬Ø±Ø¨Ø© ÙƒÙ„Ø§Ø³ÙŠÙƒÙŠØ© ÙˆÙˆØ§Ø¶Ø­Ø©.',
+                    title: 'فاتح',
+                    subtitle: 'تجربة كلاسيكية وواضحة.',
                     icon: AppIcons.sun,
                     isSelected: currentThemeMode == ThemeMode.light,
                     onTap: () {
@@ -48,8 +48,8 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _ThemeOptionCard(
-                    title: 'Ø¯Ø§ÙƒÙ†',
-                    subtitle: 'Ù…Ø±ÙŠØ­ Ù„Ù„Ø¹ÙŠÙ† ÙÙŠ Ø§Ù„Ø¥Ø¶Ø§Ø¡Ø© Ø§Ù„Ù…Ù†Ø®ÙØ¶Ø©.',
+                    title: 'داكن',
+                    subtitle: 'مريح للعين في الإضاءة المنخفضة.',
                     icon: AppIcons.moon,
                     isSelected: currentThemeMode == ThemeMode.dark,
                     onTap: () {
@@ -60,8 +60,8 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _ThemeOptionCard(
-                    title: 'Ø§ÙØªØ±Ø§Ø¶ÙŠ Ø§Ù„Ù†Ø¸Ø§Ù…',
-                    subtitle: 'ÙŠØªÙƒÙŠÙ Ù…Ø¹ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø¬Ù‡Ø§Ø²Ùƒ.',
+                    title: 'افتراضي النظام',
+                    subtitle: 'يتكيف مع إعدادات جهازك.',
                     icon: AppIcons.monitor,
                     isSelected: currentThemeMode == ThemeMode.system,
                     onTap: () {
@@ -180,7 +180,7 @@ Widget _buildHeader(BuildContext context) {
       ),
       Expanded(
         child: Text(
-          'Ø§Ù„Ù…Ø¸Ù‡Ø±',
+          'المظهر',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.bold,

@@ -9,7 +9,7 @@ import '../../../../shared/widgets/app_icon.dart';
 import '../../data/auth_repository.dart';
 
 /// شاشة نسيت كلمة المرور
-/// ØªØ±Ø³Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† كلمة المرور Ù„Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
+/// ترسل رابط إعادة تعيين كلمة المرور للبريد الإلكتروني
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -86,7 +86,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         children: [
           const SizedBox(height: AppDimensions.spacing20),
 
-          // Ø²Ø± Ø§Ù„Ø¹ÙˆØ¯Ø©
+          // زر العودة
           Align(
             alignment: Alignment.centerRight,
             child: IconButton(
@@ -100,7 +100,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           const SizedBox(height: AppDimensions.spacing40),
 
-          // Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø©
+          // الأيقونة
           Center(
             child: Container(
               width: AppDimensions.avatarProfile,
@@ -121,9 +121,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           const SizedBox(height: AppDimensions.spacing32),
 
-          // Ø§Ù„Ø¹Ù†ÙˆØ§Ù†
+          // العنوان
           const Text(
-            'نسيت كلمة المرورØŸ',
+            'نسيت كلمة المرور؟',
             style: TextStyle(
               fontSize: AppDimensions.fontDisplay1,
               fontWeight: FontWeight.bold,
@@ -135,7 +135,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           const SizedBox(height: AppDimensions.spacing12),
 
           Text(
-            'Ø£Ø¯Ø®Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ÙˆØ³Ù†Ø±Ø³Ù„ Ù„Ùƒ Ø±Ø§Ø¨Ø· Ù„Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† كلمة المرور',
+            'أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور',
             style: TextStyle(
               fontSize: AppDimensions.fontBody,
               color: AppTheme.mutedSlate,
@@ -146,7 +146,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           const SizedBox(height: AppDimensions.spacing40),
 
-          // Ø­Ù‚Ù„ Ø§Ù„Ø¥ÙŠÙ…ÙŠÙ„
+          // حقل الإيميل
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
@@ -182,11 +182,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ البريد الإلكتروني';
+                return 'الرجاء إدخال البريد الإلكتروني';
               }
               final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
               if (!emailRegex.hasMatch(value)) {
-                return 'البريد الإلكتروني ØºÙŠØ± ØµØ­ÙŠØ­';
+                return 'البريد الإلكتروني غير صحيح';
               }
               return null;
             },
@@ -194,7 +194,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           const SizedBox(height: AppDimensions.spacing32),
 
-          // Ø²Ø± Ø§Ù„Ø¥Ø±Ø³Ø§Ù„
+          // زر الإرسال
           SizedBox(
             height: AppDimensions.buttonHeightXL,
             child: ElevatedButton(
@@ -220,7 +220,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Ø¥Ø±Ø³Ø§Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„ØªØ¹ÙŠÙŠÙ†',
+                          'إرسال رابط إعادة التعيين',
                           style: TextStyle(
                             fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
@@ -239,11 +239,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           const SizedBox(height: AppDimensions.spacing24),
 
-          // Ø±Ø§Ø¨Ø· Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„تسجيل الدخول
+          // رابط العودة لتسجيل الدخول
           TextButton(
             onPressed: () => context.pop(),
             child: Text(
-              'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„تسجيل الدخول',
+              'العودة لتسجيل الدخول',
               style: TextStyle(
                 color: AppTheme.primaryColor,
                 fontWeight: FontWeight.w600,
@@ -262,7 +262,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       children: [
         SizedBox(height: AppDimensions.spacing64 + AppDimensions.spacing16),
 
-        // Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø§Ù„Ù†Ø¬Ø§Ø­
+        // أيقونة النجاح
         Center(
           child: Container(
             width: 120,
@@ -283,9 +283,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
         const SizedBox(height: AppDimensions.spacing32),
 
-        // Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ù†Ø¬Ø§Ø­
+        // رسالة النجاح
         Text(
-          'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø§Ø¨Ø·!',
+          'تم إرسال الرابط!',
           style: TextStyle(
             fontSize: AppDimensions.fontDisplay1,
             fontWeight: FontWeight.bold,
@@ -297,7 +297,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: AppDimensions.spacing16),
 
         Text(
-          'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† كلمة المرور Ø¥Ù„Ù‰\n${_emailController.text}',
+          'تم إرسال رابط إعادة تعيين كلمة المرور إلى\n${_emailController.text}',
           style: TextStyle(
             fontSize: AppDimensions.fontBody,
             color: AppTheme.mutedSlate,
@@ -308,7 +308,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
         const SizedBox(height: AppDimensions.spacing16),
 
-        // ØªØ¹Ù„ÙŠÙ…Ø§Øª
+        // تعليمات
         Container(
           padding: AppDimensions.paddingM,
           decoration: BoxDecoration(
@@ -329,7 +329,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   ),
                   const SizedBox(width: AppDimensions.spacing8),
                   const Text(
-                    'ØªØ¹Ù„ÙŠÙ…Ø§Øª:',
+                    'تعليمات:',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppTheme.infoColor,
@@ -339,9 +339,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               ),
               const SizedBox(height: AppDimensions.spacing8),
               Text(
-                'â€¢ ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„ÙˆØ§Ø±Ø¯ ÙÙŠ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ\n'
-                'â€¢ Ù‚Ø¯ ÙŠØµÙ„ Ø§Ù„Ø±Ø§Ø¨Ø· Ø¥Ù„Ù‰ Ù…Ø¬Ù„Ø¯ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ ØºÙŠØ± Ø§Ù„Ù…Ø±ØºÙˆØ¨ ÙÙŠÙ‡Ø§\n'
-                'â€¢ Ø§Ù„Ø±Ø§Ø¨Ø· ØµØ§Ù„Ø­ Ù„Ù…Ø¯Ø© 24 ساعة',
+                '• تحقق من صندوق الوارد في بريدك الإلكتروني\n'
+                '• قد يصل الرابط إلى مجلد الرسائل غير المرغوب فيها\n'
+                '• الرابط صالح لمدة 24 ساعة',
                 style: TextStyle(
                   fontSize: AppDimensions.fontBody2,
                   color: AppTheme.infoColor.withValues(alpha: 0.9),
@@ -354,7 +354,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
         const SizedBox(height: AppDimensions.spacing32),
 
-        // Ø²Ø± Ø§Ù„Ø¹ÙˆØ¯Ø©
+        // زر العودة
         SizedBox(
           height: AppDimensions.buttonHeightXL,
           child: ElevatedButton(
@@ -368,7 +368,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               elevation: 0,
             ),
             child: Text(
-              'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„تسجيل الدخول',
+              'العودة لتسجيل الدخول',
               style: TextStyle(
                 fontSize: AppDimensions.fontTitle,
                 fontWeight: FontWeight.bold,
@@ -379,13 +379,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
         const SizedBox(height: AppDimensions.spacing16),
 
-        // Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„
+        // إعادة الإرسال
         TextButton(
           onPressed: () {
             setState(() => _emailSent = false);
           },
           child: Text(
-            'Ù„Ù… ØªØ³ØªÙ„Ù… Ø§Ù„Ø±Ø§Ø¨Ø·ØŸ Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„',
+            'لم تستلم الرابط؟ إعادة الإرسال',
             style: TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.w600,

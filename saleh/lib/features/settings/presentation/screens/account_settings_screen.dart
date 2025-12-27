@@ -8,7 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../../auth/data/auth_controller.dart';
 
-/// شاشة إعدادات الحساب Ø§Ù„Ø´Ø®ØµÙŠ
+/// شاشة إعدادات الحساب الشخصي
 class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
 
@@ -31,7 +31,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header Ø«Ø§Ø¨Øª ÙÙŠ Ø§Ù„Ø£Ø¹Ù„Ù‰
+            // Header ثابت في الأعلى
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _buildHeader(context),
@@ -42,52 +42,52 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               child: ListView(
                 padding: AppDimensions.paddingM,
                 children: [
-                  // Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨
-                  _buildSectionTitle('Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨'),
+                  // معلومات الحساب
+                  _buildSectionTitle('معلومات الحساب'),
                   _buildSettingsCard([
                     _buildInfoTile(
                       icon: AppIcons.email,
                       title: 'البريد الإلكتروني',
-                      subtitle: authState.userEmail ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯',
+                      subtitle: authState.userEmail ?? 'غير محدد',
                     ),
                     const Divider(height: 1),
                     _buildInfoTile(
                       icon: AppIcons.person,
-                      title: 'Ù†ÙˆØ¹ Ø§Ù„Ø­Ø³Ø§Ø¨',
+                      title: 'نوع الحساب',
                       subtitle: authState.userRole == 'merchant'
-                          ? 'ØªØ§Ø¬Ø±'
-                          : 'Ø¹Ù…ÙŠÙ„',
+                          ? 'تاجر'
+                          : 'عميل',
                     ),
                   ]),
 
                   const SizedBox(height: 24),
 
-                  // Ø§Ù„Ø£Ù…Ø§Ù†
-                  _buildSectionTitle('Ø§Ù„Ø£Ù…Ø§Ù†'),
+                  // الأمان
+                  _buildSectionTitle('الأمان'),
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.lock,
-                      title: 'ØªØºÙŠÙŠØ± كلمة المرور',
+                      title: 'تغيير كلمة المرور',
                       onTap: () => _showChangePasswordDialog(),
                     ),
                   ]),
 
                   const SizedBox(height: 24),
 
-                  // Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª
-                  _buildSectionTitle('Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª'),
+                  // الإشعارات
+                  _buildSectionTitle('الإشعارات'),
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.notifications,
-                      title: 'إعدادات الإشعارات Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©',
+                      title: 'إعدادات الإشعارات المتقدمة',
                       onTap: () => context.push('/notification-settings'),
                     ),
                     const Divider(height: 1),
                     _buildSwitchTile(
                       icon: AppIcons.notifications,
-                      title: 'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
+                      title: 'إشعارات التطبيق',
                       subtitle:
-                          'Ø§Ø³ØªÙ„Ø§Ù… Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„طلبØ§Øª ÙˆØ§Ù„تحديثØ§Øª',
+                          'استلام إشعارات الطلبات والتحديثات',
                       value: _notificationsEnabled,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();
@@ -97,9 +97,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     const Divider(height: 1),
                     _buildSwitchTile(
                       icon: AppIcons.email,
-                      title: 'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø¨Ø±ÙŠØ¯',
+                      title: 'إشعارات البريد',
                       subtitle:
-                          'Ø§Ø³ØªÙ„Ø§Ù… تحديثØ§Øª Ø¹Ø¨Ø± البريد الإلكتروني',
+                          'استلام تحديثات عبر البريد الإلكتروني',
                       value: _emailNotifications,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();
@@ -109,8 +109,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     const Divider(height: 1),
                     _buildSwitchTile(
                       icon: AppIcons.megaphone,
-                      title: 'Ø±Ø³Ø§Ø¦Ù„ ØªØ³ÙˆÙŠÙ‚ÙŠØ©',
-                      subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… Ø¹Ø±ÙˆØ¶ ÙˆØ£Ø®Ø¨Ø§Ø± Mbuy',
+                      title: 'رسائل تسويقية',
+                      subtitle: 'استلام عروض وأخبار Mbuy',
                       value: _marketingEmails,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();
@@ -121,8 +121,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Ø§Ù„Ù„ØºØ© ÙˆØ§Ù„Ù…Ø¸Ù‡Ø±
-                  _buildSectionTitle('Ø§Ù„Ù„ØºØ© ÙˆØ§Ù„Ù…Ø¸Ù‡Ø±'),
+                  // اللغة والمظهر
+                  _buildSectionTitle('اللغة والمظهر'),
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.sun,
@@ -161,8 +161,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Ø§Ù„Ù‚Ø§Ù†ÙˆÙ†ÙŠ
-                  _buildSectionTitle('Ø§Ù„Ù‚Ø§Ù†ÙˆÙ†ÙŠ'),
+                  // القانوني
+                  _buildSectionTitle('القانوني'),
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.document,
@@ -172,26 +172,26 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     const Divider(height: 1),
                     _buildActionTile(
                       icon: AppIcons.document,
-                      title: 'Ø´Ø±ÙˆØ· Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…',
+                      title: 'شروط الاستخدام',
                       onTap: () => context.push('/terms'),
                     ),
                   ]),
 
                   const SizedBox(height: 24),
 
-                  // Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨
-                  _buildSectionTitle('Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨'),
+                  // إجراءات الحساب
+                  _buildSectionTitle('إجراءات الحساب'),
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.logout,
-                      title: 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬',
+                      title: 'تسجيل الخروج',
                       titleColor: AppTheme.warningColor,
                       onTap: () => _showLogoutDialog(),
                     ),
                     const Divider(height: 1),
                     _buildActionTile(
                       icon: AppIcons.delete,
-                      title: 'Ø­Ø°Ù Ø§Ù„Ø­Ø³Ø§Ø¨',
+                      title: 'حذف الحساب',
                       titleColor: AppTheme.errorColor,
                       onTap: () => _showDeleteAccountDialog(),
                     ),
@@ -199,7 +199,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
                   const SizedBox(height: 40),
 
-                  // Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„ØªØ·Ø¨ÙŠÙ‚
+                  // معلومات التطبيق
                   Center(
                     child: Column(
                       children: [
@@ -212,7 +212,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Â© 2025 Mbuy. Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ù‚ÙˆÙ‚ Ù…Ø­ÙÙˆØ¸Ø©',
+                          '© 2025 Mbuy. جميع الحقوق محفوظة',
                           style: TextStyle(
                             color: AppTheme.mutedSlate,
                             fontSize: 11,

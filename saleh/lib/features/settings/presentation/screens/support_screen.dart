@@ -7,7 +7,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// شاشة الØ¯Ø¹Ù… ÙˆالÙ…Ø³Ø§Ø¹Ø¯Ø©
+/// شاشة الدعم والمساعدة
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
 
@@ -17,18 +17,18 @@ class SupportScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header Ø«Ø§Ø¨Øª ÙÙŠ الØ£على
+            // Header ثابت في الأعلى
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _buildHeader(context),
             ),
             const SizedBox(height: 16),
-            // الÙ…Ø­ØªÙˆÙ‰ الÙ‚Ø§Ø¨Ù„ Ù„Ù„تمØ±ÙŠØ±
+            // المحتوى القابل للتمرير
             Expanded(
               child: ListView(
                 padding: AppDimensions.paddingM,
                 children: [
-                  // Ø¨Ø·Ø§Ù‚Ø© الØªØ±Ø­ÙŠØ¨
+                  // بطاقة الترحيب
                   Container(
                     padding: AppDimensions.paddingL,
                     decoration: BoxDecoration(
@@ -44,7 +44,7 @@ class SupportScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'ÙƒÙŠÙ ÙŠÙ…ÙƒÙ†Ù†Ø§ Ù…Ø³Ø§Ø¹Ø¯ØªÙƒØŸ',
+                          'كيف يمكننا مساعدتك؟',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -53,7 +53,7 @@ class SupportScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'ÙØ±ÙŠÙ‚ الØ¯Ø¹Ù… Ù…ØªØ§Ø­ على Ù…Ø¯Ø§Ø± الساعة Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ',
+                          'فريق الدعم متاح على مدار الساعة لمساعدتك',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.9),
@@ -66,9 +66,9 @@ class SupportScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Ø·Ø±Ù‚ الØªÙˆØ§ØµÙ„
+                  // طرق التواصل
                   const Text(
-                    'ØªÙˆØ§ØµÙ„ معÙ†Ø§',
+                    'تواصل معنا',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -80,8 +80,8 @@ class SupportScreen extends StatelessWidget {
                   _buildContactCard(
                     context,
                     icon: AppIcons.chat,
-                    title: 'ÙˆØ§ØªØ³Ø§Ø¨',
-                    subtitle: 'Ø£Ø³Ø±Ø¹ Ø·Ø±ÙŠÙ‚Ø© Ù„Ù„ØªÙˆØ§ØµÙ„',
+                    title: 'واتساب',
+                    subtitle: 'أسرع طريقة للتواصل',
                     color: const Color(0xFF25D366),
                     onTap: () => _launchWhatsApp(context),
                   ),
@@ -91,7 +91,7 @@ class SupportScreen extends StatelessWidget {
                   _buildContactCard(
                     context,
                     icon: AppIcons.email,
-                    title: 'الØ¨Ø±ÙŠØ¯ الØ¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
+                    title: 'البريد الإلكتروني',
                     subtitle: 'support@mbuy.app',
                     color: AppTheme.primaryColor,
                     onTap: () => _launchEmail(context),
@@ -102,7 +102,7 @@ class SupportScreen extends StatelessWidget {
                   _buildContactCard(
                     context,
                     icon: AppIcons.phone,
-                    title: 'الÙ‡Ø§ØªÙ',
+                    title: 'الهاتف',
                     subtitle: '+966 50 000 0000',
                     color: AppTheme.successColor,
                     onTap: () => _launchPhone(context),
@@ -110,9 +110,9 @@ class SupportScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // الØ£Ø³Ø¦Ù„Ø© الØ´Ø§Ø¦Ø¹Ø©
+                  // الأسئلة الشائعة
                   const Text(
-                    'الØ£Ø³Ø¦Ù„Ø© الØ´Ø§Ø¦Ø¹Ø©',
+                    'الأسئلة الشائعة',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -123,42 +123,42 @@ class SupportScreen extends StatelessWidget {
 
                   _buildFAQCard([
                     _FAQItem(
-                      question: 'ÙƒÙŠÙ Ø£Ù†Ø´Ø¦ Ù…ØªØ¬Ø±ÙŠØŸ',
+                      question: 'كيف أنشئ متجري؟',
                       answer:
-                          'Ø¨Ø¹Ø¯ ØªØ³Ø¬ÙŠÙ„ الØ¯Ø®ÙˆÙ„ØŒ Ø§Ø°Ù‡Ø¨ إلى "Ø¥Ø¯Ø§Ø±Ø© الÙ…ØªØ¬Ø±" Ø«Ù… Ø§Ø¶ØºØ· على "Ø¥Ù†Ø´Ø§Ø¡ Ù…ØªØ¬Ø±". Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… الÙ…ØªØ¬Ø± ÙˆالÙˆØµÙ ÙˆالØ´Ø¹Ø§Ø±ØŒ Ø«Ù… Ø§Ø¶ØºØ· على "Ø¥Ù†Ø´Ø§Ø¡".',
+                          'بعد تسجيل الدخول، اذهب إلى "إدارة المتجر" ثم اضغط على "إنشاء متجر". أدخل اسم المتجر والوصف والشعار، ثم اضغط على "إنشاء".',
                     ),
                     _FAQItem(
-                      question: 'ÙƒÙŠÙ Ø£Ø¶ÙŠÙ منØªØ¬Ø§ØªØŸ',
+                      question: 'كيف أضيف منتجات؟',
                       answer:
-                          'Ø§Ø¶ØºØ· على Ø²Ø± + ÙÙŠ الØ´Ø±ÙŠØ· الØ³ÙÙ„ÙŠØŒ Ø«Ù… Ø£Ø¯Ø®Ù„ Ø¨ÙŠØ§Ù†Ø§Øª المنØªØ¬ (الØ§Ø³Ù…ØŒ الØ³Ø¹Ø±ØŒ الØµÙˆØ±ØŒ الÙˆØµÙ) ÙˆØ§Ø¶ØºØ· على "Ø­ÙØ¸".',
+                          'اضغط على زر + في الشريط السفلي، ثم أدخل بيانات المنتج (الاسم، السعر، الصور، الوصف) واضغط على "حفظ".',
                     ),
                     _FAQItem(
-                      question: 'ÙƒÙŠÙ Ø£Ø´ØªØ±ÙŠ نقاطØŸ',
+                      question: 'كيف أشتري نقاط؟',
                       answer:
-                          'Ø§Ø°Ù‡Ø¨ إلى ØµÙØ­Ø© "النقاط" من الرئيسيةØŒ Ø«Ù… Ø§Ø®ØªØ± الØ¨Ø§Ù‚Ø© المنØ§Ø³Ø¨Ø© ÙˆØ§ØªØ¨Ø¹ Ø®Ø·ÙˆØ§Øª الØ¯ÙØ¹.',
+                          'اذهب إلى صفحة "النقاط" من الرئيسية، ثم اختر الباقة المناسبة واتبع خطوات الدفع.',
                     ),
                     _FAQItem(
-                      question: 'Ù…Ø§ Ù‡ÙŠ أدوات AIØŸ',
+                      question: 'ما هي أدوات AI؟',
                       answer:
-                          'Ø£Ø¯ÙˆØ§Øª الØ°ÙƒØ§Ø¡ الØ§ØµØ·Ù†Ø§Ø¹ÙŠ ØªØ³Ø§Ø¹Ø¯Ùƒ ÙÙŠ ØªÙˆÙ„ÙŠØ¯ ØµÙˆØ± Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ù„Ù„منØªØ¬Ø§ØªØŒ ÙˆÙƒØªØ§Ø¨Ø© Ø£ÙˆØµØ§Ù Ø¬Ø°Ø§Ø¨Ø©ØŒ ÙˆØªØ­Ø³ÙŠÙ† Ù…ØªØ¬Ø±Ùƒ.',
+                          'أدوات الذكاء الاصطناعي تساعدك في توليد صور احترافية للمنتجات، وكتابة أوصاف جذابة، وتحسين متجرك.',
                     ),
                     _FAQItem(
-                      question: 'ÙƒÙŠÙ Ø£Ø³Ø­Ø¨ Ø£Ø±Ø¨Ø§Ø­ÙŠØŸ',
+                      question: 'كيف أسحب أرباحي؟',
                       answer:
-                          'Ø§Ø°Ù‡Ø¨ إلى "الÙ…Ø­ÙØ¸Ø©"ØŒ Ø«Ù… Ø§Ø¶ØºØ· على "Ø³Ø­Ø¨"ØŒ Ø£Ø¯Ø®Ù„ الÙ…Ø¨Ù„Øº ÙˆØ¨ÙŠØ§Ù†Ø§Øª الØ­Ø³Ø§Ø¨ الØ¨Ù†ÙƒÙŠØŒ ÙˆØ³ÙŠتم الØªØ­ÙˆÙŠÙ„ Ø®Ù„ال 3-5 Ø£ÙŠØ§Ù… Ø¹Ù…Ù„.',
+                          'اذهب إلى "المحفظة"، ثم اضغط على "سحب"، أدخل المبلغ وبيانات الحساب البنكي، وسيتم التحويل خلال 3-5 أيام عمل.',
                     ),
                     _FAQItem(
-                      question: 'ÙƒÙŠÙ Ø£Ù„ØºÙŠ Ø§Ø´ØªØ±Ø§ÙƒÙŠØŸ',
+                      question: 'كيف ألغي اشتراكي؟',
                       answer:
-                          'Ø§Ø°Ù‡Ø¨ إلى "Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الØ­Ø³Ø§Ø¨" Ø«Ù… "الØ§Ø´ØªØ±Ø§ÙƒØ§Øª"ØŒ ÙˆØ§Ø¶ØºØ· على "إلغاء الØ§Ø´ØªØ±Ø§Ùƒ". Ø³ÙŠØ¨Ù‚Ù‰ Ø­Ø³Ø§Ø¨Ùƒ ÙØ¹الØ§Ù‹ Ø­ØªÙ‰ Ù†Ù‡Ø§ÙŠØ© الÙØªØ±Ø© الÙ…Ø¯ÙÙˆØ¹Ø©.',
+                          'اذهب إلى "إعدادات الحساب" ثم "الاشتراكات"، واضغط على "إلغاء الاشتراك". سيبقى حسابك فعالاً حتى نهاية الفترة المدفوعة.',
                     ),
                   ]),
 
                   const SizedBox(height: 32),
 
-                  // Ø±ÙˆØ§Ø¨Ø· Ù…ÙÙŠØ¯Ø©
+                  // روابط مفيدة
                   const Text(
-                    'Ø±ÙˆØ§Ø¨Ø· Ù…ÙÙŠØ¯Ø©',
+                    'روابط مفيدة',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -169,17 +169,17 @@ class SupportScreen extends StatelessWidget {
 
                   _buildLinkTile(
                     icon: AppIcons.document,
-                    title: 'Ø¯Ù„ÙŠÙ„ الÙ…Ø³ØªØ®Ø¯Ù…',
+                    title: 'دليل المستخدم',
                     onTap: () {},
                   ),
                   _buildLinkTile(
                     icon: AppIcons.playCircle,
-                    title: 'ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª ØªØ¹Ù„ÙŠÙ…ÙŠØ©',
+                    title: 'فيديوهات تعليمية',
                     onTap: () {},
                   ),
                   _buildLinkTile(
                     icon: AppIcons.info,
-                    title: 'Ø¹Ù† التطبيق',
+                    title: 'عن التطبيق',
                     onTap: () => context.push('/dashboard/about'),
                   ),
 
@@ -415,7 +415,7 @@ class SupportScreen extends StatelessWidget {
         ),
         const Expanded(
           child: Text(
-            'الØ¯Ø¹Ù… ÙˆالÙ…Ø³Ø§Ø¹Ø¯Ø©',
+            'الدعم والمساعدة',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,

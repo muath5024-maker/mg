@@ -45,11 +45,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    // âš ï¸ بيانات تجريبية للعرض - سيتم ربطها بـ API لاحقاً
+    // بيانات تجريبية للعرض - سيتم ربطها بـ API لاحقاً
     await Future.delayed(const Duration(milliseconds: 800));
 
     setState(() {
-      // ملاحظة: Ù‡Ø°Ù‡ Ø¨ÙŠØ§Ù†Ø§Øª ÙˆÙ‡Ù…ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙ‚Ø·
+      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
       _salesData = {
         'total': 0.0,
         'thisMonth': 0.0,
@@ -62,7 +62,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         'isDemo': true, // علامة البيانات الوهمية
       };
 
-      // ملاحظة: Ù‡Ø°Ù‡ Ø¨ÙŠØ§Ù†Ø§Øª ÙˆÙ‡Ù…ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙ‚Ø·
+      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
       _productsData = {
         'total': 0,
         'active': 0,
@@ -72,7 +72,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         'isDemo': true,
       };
 
-      // ملاحظة: Ù‡Ø°Ù‡ Ø¨ÙŠØ§Ù†Ø§Øª ÙˆÙ‡Ù…ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙ‚Ø·
+      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
       _customersData = {
         'total': 0,
         'newThisMonth': 0,
@@ -169,7 +169,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // ØªÙ†Ø¨ÙŠÙ‡ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ù‚ÙŠØ¯ Ø§Ù„ØªØ·ÙˆÙŠØ±
+                // تنبيه البيانات قيد التطوير
                 Container(
                   width: double.infinity,
                   margin: AppDimensions.paddingS,
