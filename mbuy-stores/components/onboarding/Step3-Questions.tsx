@@ -145,13 +145,6 @@ export default function OnboardingStep3({ onNext, onBack, storeData }: Step3Prop
           تخطي →
         </button>
       </div>
-          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          aria-label={isLastQuestion ? 'الانتقال للخطوة التالية' : 'الانتقال للسؤال التالي'}
-          aria-disabled={!isAnswered}
-        >
-          {isLastQuestion ? 'التالي' : 'السؤال التالي'}
-        </button>
-      </div>
     </div>
   );
 }

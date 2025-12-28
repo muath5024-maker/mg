@@ -9,7 +9,19 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(cat:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git log:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(dir:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(git config:*)",
+      "Bash(mkdir:*)",
+      "Bash(powershell -Command \"Get-Content lib/api.ts | Select-Object -First 30\")",
+      "Bash(powershell -Command \"\\(Get-Content lib/api.ts -Raw\\) -replace \"\"import { supabase } from ''./supabase'';\"\", \"\"import { getSupabase } from ''./supabase'';\"\" | Set-Content lib/api.ts -NoNewline\")",
+      "Bash(powershell:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

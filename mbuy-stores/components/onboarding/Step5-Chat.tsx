@@ -157,7 +157,6 @@ export default function OnboardingStep5({ onComplete, onBack, storeData }: Step5
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors min-w-[52px] min-h-[52px] flex items-center justify-center"
           aria-label="إرسال الرسالة"
           aria-disabled={loading || !input.trim()}
-          aria-disabled={loading || !input.trim()}
         >
           <Send className="w-5 h-5" aria-hidden="true" />
         </button>
