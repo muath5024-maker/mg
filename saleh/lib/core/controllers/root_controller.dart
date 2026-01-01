@@ -1,16 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// التطبيق الحالي - تاجر فقط
+/// التطبيق الحالي - تاجر أو عميل
 enum CurrentApp {
   /// تطبيق التاجر - لوحة التحكم وإدارة المتجر
   merchant,
+
+  /// تطبيق العميل - تصفح المتاجر والشراء
+  customer,
 
   /// غير محدد - لم يتم اختيار التطبيق بعد (شاشة تسجيل الدخول)
   none,
 }
 
 /// نية تسجيل الدخول - مؤقتة أثناء عملية تسجيل الدخول فقط
-enum LoginIntent { merchant }
+enum LoginIntent { merchant, customer }
 
 /// حالة التطبيق الجذري
 class RootState {
@@ -75,6 +78,16 @@ class RootController extends Notifier<RootState> {
       isInitialized: true,
       clearIntent: true,
       canSwitchBackToMerchant: false,
+    );
+  }
+
+  /// الانتقال إلى تطبيق العميل
+  void switchToCustomerApp() {
+    state = state.copyWith(
+      currentApp: CurrentApp.customer,
+      isInitialized: true,
+      clearIntent: true,
+      canSwitchBackToMerchant: true,
     );
   }
 

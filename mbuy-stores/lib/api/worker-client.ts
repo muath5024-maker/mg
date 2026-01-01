@@ -38,8 +38,17 @@ class WorkerClient {
    * GET /public/store/{slug}
    */
   async getStoreBySlug(slug: string) {
-    const response = await this.client.get(`/public/store/${slug}`);
-    return response.data;
+    try {
+      const response = await this.client.get(`/public/store/${slug}`);
+      return response.data;
+    } catch (error: any) {
+      // Handle 503 (Coming Soon) response
+      if (error.response?.status === 503 && error.response?.data?.code === 'COMING_SOON') {
+        return error.response.data;
+      }
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   /**

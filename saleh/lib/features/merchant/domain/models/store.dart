@@ -2,7 +2,8 @@
 /// يمثل بيانات متجر التاجر في النظام
 class Store {
   final String id;
-  final String ownerId;
+  final String?
+  ownerId; // جعله اختياري لأن merchants table لا يحتوي على owner_id
   final String name;
   final String? description;
   final String? city;
@@ -14,10 +15,14 @@ class Store {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final Map<String, dynamic>? settings;
+  // حقول إضافية من merchants table
+  final String? email;
+  final String? phone;
+  final String? logoUrl;
 
   Store({
     required this.id,
-    required this.ownerId,
+    this.ownerId,
     required this.name,
     this.description,
     this.city,
@@ -29,13 +34,16 @@ class Store {
     this.createdAt,
     this.updatedAt,
     this.settings,
+    this.email,
+    this.phone,
+    this.logoUrl,
   });
 
   /// تحويل من JSON إلى Object
   factory Store.fromJson(Map<String, dynamic> json) {
     return Store(
       id: json['id'] as String,
-      ownerId: json['owner_id'] as String,
+      ownerId: json['owner_id'] as String?, // اختياري الآن
       name: json['name'] as String,
       description: json['description'] as String?,
       city: json['city'] as String?,
@@ -55,6 +63,9 @@ class Store {
           ? DateTime.parse(json['updated_at'] as String)
           : null,
       settings: json['store_settings'] as Map<String, dynamic>?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      logoUrl: json['logo_url'] as String?,
     );
   }
 
@@ -74,6 +85,9 @@ class Store {
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'store_settings': settings,
+      'email': email,
+      'phone': phone,
+      'logo_url': logoUrl,
     };
   }
 
@@ -92,6 +106,9 @@ class Store {
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? settings,
+    String? email,
+    String? phone,
+    String? logoUrl,
   }) {
     return Store(
       id: id ?? this.id,
@@ -107,6 +124,9 @@ class Store {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       settings: settings ?? this.settings,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      logoUrl: logoUrl ?? this.logoUrl,
     );
   }
 

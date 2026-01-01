@@ -80,24 +80,35 @@ async function findUserByEmail(env: Env, email: string): Promise<FoundUser | nul
     { table: TABLES.admin_staff, type: 'admin' },
   ];
 
+  console.log('[Auth] findUserByEmail - searching for:', email, 'in tables:', tables.map(t => t.table).join(', '));
+
   for (const { table, type } of tables) {
+    console.log('[Auth] Checking table:', table);
     const { data: users, error } = await supabase.select<Customer | Merchant | MerchantUser | AdminStaff>(
       table,
-      { email: `eq.${encodeURIComponent(email)}` },
+      { email: `eq.${email}` },
       { limit: 1 }
     );
 
+    if (error) {
+      console.log('[Auth] Error querying table', table, ':', error);
+    }
+
     if (!error && users && users.length > 0) {
       const user = users[0];
+      console.log('[Auth] User found in table:', table, 'user_id:', user.id);
       // For admin_staff, check the actual role
       let actualType = type;
       if (table === TABLES.admin_staff && 'role' in user && user.role) {
         actualType = user.role as UserType;
       }
       return { user, userType: actualType, table };
+    } else {
+      console.log('[Auth] No user found in table:', table, 'users:', users?.length ?? 0);
     }
   }
 
+  console.log('[Auth] User not found in any table');
   return null;
 }
 
@@ -205,9 +216,23 @@ export async function registerHandler(c: Context<{ Bindings: Env }>) {
 
     if (insertError || !newUser) {
       console.error('[Auth] Failed to create user:', insertError);
+      
+      // Check for duplicate email error
+      const errorMessage = insertError?.message || insertError?.toString() || '';
+      if (errorMessage.toLowerCase().includes('duplicate') || 
+          errorMessage.toLowerCase().includes('unique') ||
+          errorMessage.toLowerCase().includes('already exists') ||
+          errorMessage.includes('23505')) { // PostgreSQL unique violation code
+        return c.json({
+          error: 'EMAIL_EXISTS',
+          message: 'البريد الإلكتروني مسجل مسبقاً',
+        }, 409);
+      }
+      
       return c.json({
         error: 'CREATE_FAILED',
         message: 'فشل في إنشاء الحساب',
+        details: insertError?.message,
       }, 500);
     }
 
@@ -238,7 +263,8 @@ export async function registerHandler(c: Context<{ Bindings: Env }>) {
       message: userType === 'merchant' 
         ? 'تم إنشاء الحساب بنجاح. في انتظار موافقة الإدارة.'
         : 'تم إنشاء الحساب بنجاح',
-      access_token: token,
+      token: token,
+      access_token: token, // For backwards compatibility
       token_type: 'Bearer',
       expires_in: 86400, // 24 hours in seconds
       user: {
@@ -269,8 +295,11 @@ export async function loginHandler(c: Context<{ Bindings: Env }>) {
     const body = await c.req.json();
     const { email, password } = body;
 
+    console.log('[Auth] Login attempt for email:', email);
+
     // Validation
     if (!email || !password) {
+      console.log('[Auth] Missing email or password');
       return c.json({
         error: 'BAD_REQUEST',
         message: 'البريد الإلكتروني وكلمة المرور مطلوبان',
@@ -278,9 +307,12 @@ export async function loginHandler(c: Context<{ Bindings: Env }>) {
     }
 
     // Find user
-    const result = await findUserByEmail(c.env, email.toLowerCase().trim());
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log('[Auth] Searching for user with email:', normalizedEmail);
+    const result = await findUserByEmail(c.env, normalizedEmail);
 
     if (!result) {
+      console.log('[Auth] User not found with email:', normalizedEmail);
       return c.json({
         error: 'INVALID_CREDENTIALS',
         message: 'بيانات الدخول غير صحيحة',
@@ -288,23 +320,29 @@ export async function loginHandler(c: Context<{ Bindings: Env }>) {
     }
 
     const { user, userType, table } = result;
+    console.log('[Auth] User found in table:', table, 'userType:', userType, 'userId:', user.id);
 
     // Check if user has password_hash
     if (!user.password_hash) {
+      console.log('[Auth] User has no password_hash:', user.id);
       return c.json({
         error: 'INVALID_CREDENTIALS',
         message: 'بيانات الدخول غير صحيحة',
       }, 401);
     }
 
+    console.log('[Auth] Verifying password for user:', user.id);
     // Verify password
     const isValidPassword = await verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
+      console.log('[Auth] Invalid password for user:', user.id);
       return c.json({
         error: 'INVALID_CREDENTIALS',
         message: 'بيانات الدخول غير صحيحة',
       }, 401);
     }
+
+    console.log('[Auth] Password verified successfully for user:', user.id);
 
     // Check user status (only for types that have status field)
     if ('status' in user) {
@@ -316,12 +354,8 @@ export async function loginHandler(c: Context<{ Bindings: Env }>) {
         }, 403);
       }
 
-      if (userType === 'merchant' && status === 'pending') {
-        return c.json({
-          error: 'PENDING_APPROVAL',
-          message: 'حسابك في انتظار موافقة الإدارة',
-        }, 403);
-      }
+      // Note: pending merchants CAN login to setup their store
+      // They just can't sell until approved
     }
 
     // Check is_active for some tables
@@ -375,15 +409,19 @@ export async function loginHandler(c: Context<{ Bindings: Env }>) {
       : 'first_name' in user ? (user as Customer).first_name 
       : null;
 
+    console.log('[Auth] Login successful for user:', user.id, 'type:', userType);
+
     return c.json({
       success: true,
-      access_token: token,
+      token: token,
+      access_token: token, // For backwards compatibility
       token_type: 'Bearer',
       expires_in: 86400,
       user: {
         id: user.id,
         email: user.email,
         user_type: userType,
+        full_name: displayName,
         name: displayName,
         merchant_id: merchantId,
       },

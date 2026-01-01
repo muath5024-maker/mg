@@ -3,6 +3,7 @@ import { workerClient } from '@/lib/api/worker-client';
 import StoreHeader from '@/components/store/StoreHeader';
 import ProductCard from '@/components/store/ProductCard';
 import { getTheme } from '@/lib/themes/themes';
+import ComingSoonPage from '@/components/store/ComingSoonPage';
 
 interface StorePageProps {
   params: {
@@ -16,6 +17,18 @@ export default async function StorePage({ params }: StorePageProps) {
   try {
     // Fetch store data
     const storeResponse = await workerClient.getStoreBySlug(slug);
+    
+    // Handle coming soon (pending merchant)
+    if (!storeResponse.ok && storeResponse.code === 'COMING_SOON') {
+      return (
+        <ComingSoonPage 
+          storeName={storeResponse.store_name}
+          logoUrl={storeResponse.logo_url}
+          message={storeResponse.message}
+        />
+      );
+    }
+    
     if (!storeResponse.ok || !storeResponse.data) {
       notFound();
     }

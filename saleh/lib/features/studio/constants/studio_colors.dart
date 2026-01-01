@@ -1,77 +1,77 @@
 import 'package:flutter/material.dart';
 
-/// ثوابت ألوان الاستوديو
+/// ثوابت ألوان الاستوديو - تصميم فاتح مع هيدر فيروزي
 /// تُستخدم في جميع صفحات الاستوديو لتوحيد التصميم
 class StudioColors {
   StudioColors._();
 
-  // الألوان الأساسية
-  static const Color primaryColor = Color(0xFF2B6CEE);
-  static const Color secondaryColor = Color(0xFF9333EA);
+  // الألوان الأساسية (فيروزي + أبيض)
+  static const Color primaryColor = Color(0xFF00B4B4); // Teal/فيروزي
+  static const Color secondaryColor = Color(0xFF00A3A3); // Darker Teal
   static const Color accentPink = Color(0xFFEC4899);
-  static const Color accentGreen = Color(0xFF10B981);
-  static const Color accentOrange = Color(0xFFF97316);
+  static const Color accentGreen = Color(0xFF00B4B4); // Teal
+  static const Color accentOrange = Color(0xFFFFC107); // Gold
+  static const Color iconOnPrimary = Colors.white; // أيقونات بيضاء على الأزرار
 
-  // ألوان الخلفية (الوضع الداكن)
-  static const Color bgDark = Color(0xFF101622);
-  static const Color surfaceDark = Color(0xFF1C2333);
-  static const Color surfaceDarkAlt = Color(0xFF1C212E);
-  static const Color surfaceLighter = Color(0xFF282E39);
-  static const Color surfaceLight = Color(0xFF1C1F27);
+  // ألوان الخلفية (الوضع الفاتح - Light Theme)
+  static const Color bgDark = Color(0xFFF5F7FA); // Light grey background
+  static const Color surfaceDark = Colors.white; // White surface
+  static const Color surfaceDarkAlt = Color(0xFFF0F4F8);
+  static const Color surfaceLighter = Color(0xFFF8FAFC);
+  static const Color surfaceLight = Color(0xFFF5F7FA);
 
   // ألوان الخلفية (الوضع الفاتح)
-  static const Color bgLight = Color(0xFFF6F6F8);
+  static const Color bgLight = Color(0xFFF5F7FA);
   static const Color surfaceLightMode = Colors.white;
 
   // ألوان الحدود
-  static const Color borderDark = Color(0xFF3B4354);
-  static const Color borderLight = Color(0xFFE2E8F0);
-  static const Color borderSubtle = Color(0xFF334155);
+  static const Color borderDark = Color(0xFFE5E7EB);
+  static const Color borderLight = Color(0xFFE5E7EB);
+  static const Color borderSubtle = Color(0xFFE2E8F0);
 
   // ألوان النصوص
-  static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFF9CA3AF);
-  static const Color textMuted = Color(0xFF6B7280);
+  static const Color textPrimary = Color(0xFF1A1A2E);
+  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textMuted = Color(0xFF94A3B8);
 
-  // ألوان التدرجات
+  // ألوان التدرجات (محدثة - فيروزي)
   static const List<Color> primaryGradient = [
-    Color(0xFF2B6CEE),
-    Color(0xFF9333EA),
+    Color(0xFF00B4B4),
+    Color(0xFF00A3A3),
   ];
 
   static const List<Color> pinkOrangeGradient = [
     Color(0xFFEC4899),
-    Color(0xFFF97316),
+    Color(0xFFFFC107),
   ];
 
   static const List<Color> cyanPurpleGradient = [
     Color(0xFF0EA5E9),
-    Color(0xFF8B5CF6),
+    Color(0xFF00B4B4),
   ];
 
   static const List<Color> bluePurpleGradient = [
-    Color(0xFF3B82F6),
-    Color(0xFF8B5CF6),
+    Color(0xFF00B4B4),
+    Color(0xFF00A3A3),
   ];
 
   static const List<Color> indigoPurpleGradient = [
-    Color(0xFF6366F1),
-    Color(0xFF8B5CF6),
+    Color(0xFF00A3A3),
+    Color(0xFF008888),
   ];
 
   // دوال مساعدة
-  static Color getBackgroundColor(bool isDark) => isDark ? bgDark : bgLight;
+  static Color getBackgroundColor(bool isDark) => bgLight;
 
-  static Color getSurfaceColor(bool isDark) =>
-      isDark ? surfaceDark : surfaceLightMode;
+  static Color getSurfaceColor(bool isDark) => surfaceLightMode;
 
-  static Color getBorderColor(bool isDark) => isDark ? borderDark : borderLight;
+  static Color getBorderColor(bool isDark) => borderLight;
 
   static Color getTextColor(bool isDark, {bool isSecondary = false}) {
     if (isSecondary) {
-      return isDark ? textSecondary : const Color(0xFF6B7280);
+      return textSecondary;
     }
-    return isDark ? textPrimary : const Color(0xFF1F2937);
+    return textPrimary;
   }
 }
 

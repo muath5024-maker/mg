@@ -21,7 +21,8 @@
       "Bash(powershell -Command \"Get-Content lib/api.ts | Select-Object -First 30\")",
       "Bash(powershell -Command \"\\(Get-Content lib/api.ts -Raw\\) -replace \"\"import { supabase } from ''./supabase'';\"\", \"\"import { getSupabase } from ''./supabase'';\"\" | Set-Content lib/api.ts -NoNewline\")",
       "Bash(powershell:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(rm:*)"
     ]
   }
 }

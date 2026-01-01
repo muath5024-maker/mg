@@ -17,20 +17,43 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  // تم تثبيت الدخول كتاجر فقط
-  final LoginIntent _selectedIntent = LoginIntent.merchant;
+
+  late TabController _tabController;
+
+  // 0 = عميل، 1 = تاجر
+  int _selectedUserType = 1; // افتراضي: تاجر
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          _selectedUserType = _tabController.index;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
+
+  LoginIntent get _selectedIntent =>
+      _selectedUserType == 1 ? LoginIntent.merchant : LoginIntent.customer;
+
+  String get _loginAsType => _selectedUserType == 1 ? 'merchant' : 'customer';
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) {
@@ -46,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .login(
           identifier: _emailController.text.trim(),
           password: _passwordController.text,
-          loginAs: 'merchant',
+          loginAs: _loginAsType,
         );
 
     final authState = ref.read(authControllerProvider);
@@ -54,35 +77,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // تحميل بيانات المتجر (دائماً merchant)
-      final storeController = ref.read(
-        merchantStoreControllerProvider.notifier,
-      );
-      await storeController.refresh();
+      if (_selectedUserType == 1) {
+        // تاجر
+        final storeController = ref.read(
+          merchantStoreControllerProvider.notifier,
+        );
+        await storeController.refresh();
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      final hasStore = ref.read(hasMerchantStoreProvider);
+        final hasStore = ref.read(hasMerchantStoreProvider);
 
-      // التهيئة وفتح تطبيق التاجر
-      ref.read(rootControllerProvider.notifier).switchToMerchantApp();
+        ref.read(rootControllerProvider.notifier).switchToMerchantApp();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
+            ),
+            backgroundColor: hasStore
+                ? AppTheme.successColor
+                : AppTheme.warningColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: AppDimensions.borderRadiusS,
+            ),
           ),
-          backgroundColor: hasStore
-              ? AppTheme.successColor
-              : AppTheme.warningColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.borderRadiusS,
+        );
+      } else {
+        // عميل
+        ref.read(rootControllerProvider.notifier).switchToCustomerApp();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('مرحباً بك!'),
+            backgroundColor: AppTheme.successColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: AppDimensions.borderRadiusS,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } else if (authState.errorMessage != null) {
-      // مسح النية عند الفشل
       ref.read(rootControllerProvider.notifier).clearLoginIntent();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,6 +133,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       );
     }
+  }
+
+  void _navigateToRegister() {
+    context.go('/register');
   }
 
   @override
@@ -120,11 +161,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   // Title
                   _buildTitle(),
-                  const SizedBox(height: AppDimensions.spacing32),
+                  const SizedBox(height: AppDimensions.spacing24),
 
-                  // اختيار نوع المستخدم (تم إخفاءه - الدخول كتاجر فقط)
-                  // _buildUserTypeSelection(),
-                  // const SizedBox(height: AppDimensions.spacing32),
+                  // تبويبات عميل - تاجر
+                  _buildUserTypeTabs(),
+                  const SizedBox(height: AppDimensions.spacing24),
 
                   // Email Field
                   _buildEmailField(),
@@ -146,6 +187,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   // Login Button
                   _buildLoginButton(isLoading),
+                  const SizedBox(height: AppDimensions.spacing16),
+
+                  // Register Button
+                  _buildRegisterButton(),
                   const SizedBox(height: AppDimensions.spacing24),
 
                   // Demo Info
@@ -159,6 +204,76 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  Widget _buildUserTypeTabs() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: AppDimensions.borderRadiusM,
+      ),
+      child: TabBar(
+        controller: _tabController,
+        indicator: BoxDecoration(
+          color: AppTheme.primaryColor,
+          borderRadius: AppDimensions.borderRadiusM,
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor: AppTheme.textSecondaryColor,
+        labelStyle: const TextStyle(
+          fontSize: AppDimensions.fontBody,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: AppDimensions.fontBody,
+          fontWeight: FontWeight.w500,
+        ),
+        tabs: [
+          Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  AppIcons.person,
+                  width: 18,
+                  height: 18,
+                  colorFilter: ColorFilter.mode(
+                    _selectedUserType == 0
+                        ? Colors.white
+                        : AppTheme.textSecondaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('عميل'),
+              ],
+            ),
+          ),
+          Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  AppIcons.store,
+                  width: 18,
+                  height: 18,
+                  colorFilter: ColorFilter.mode(
+                    _selectedUserType == 1
+                        ? Colors.white
+                        : AppTheme.textSecondaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('تاجر'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLogo() {
     return Container(
       width: AppDimensions.avatarProfile,
@@ -167,13 +282,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: AppTheme.primaryColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
-      child: SvgPicture.asset(
-        AppIcons.shoppingBag,
-        width: AppDimensions.iconDisplay,
-        height: AppDimensions.iconDisplay,
-        colorFilter: const ColorFilter.mode(
-          AppTheme.primaryColor,
-          BlendMode.srcIn,
+      child: Center(
+        child: SvgPicture.asset(
+          AppIcons.shoppingBag,
+          width: AppDimensions.iconDisplay,
+          height: AppDimensions.iconDisplay,
+          colorFilter: const ColorFilter.mode(
+            AppTheme.primaryColor,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );
@@ -359,6 +476,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildLoginButton(bool isLoading) {
+    final isMerchant = _selectedUserType == 1;
     const buttonColor = AppTheme.primaryColor;
 
     return SizedBox(
@@ -387,7 +505,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SvgPicture.asset(
-                    AppIcons.store,
+                    isMerchant ? AppIcons.store : AppIcons.person,
                     width: 20,
                     height: 20,
                     colorFilter: const ColorFilter.mode(
@@ -396,15 +514,51 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'دخول كبائع',
-                    style: TextStyle(
+                  Text(
+                    isMerchant ? 'دخول كتاجر' : 'دخول كعميل',
+                    style: const TextStyle(
                       fontSize: AppDimensions.fontTitle,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget _buildRegisterButton() {
+    return OutlinedButton(
+      onPressed: _navigateToRegister,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing14),
+        side: const BorderSide(color: AppTheme.primaryColor, width: 2),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppDimensions.borderRadiusM,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            AppIcons.personAdd,
+            width: 20,
+            height: 20,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Text(
+            'إنشاء حساب جديد',
+            style: TextStyle(
+              fontSize: AppDimensions.fontTitle,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primaryColor,
+            ),
+          ),
+        ],
       ),
     );
   }

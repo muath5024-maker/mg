@@ -24,11 +24,11 @@ export async function getStoreBySlug(c: Context<{ Bindings: Env }>) {
       );
     }
 
-    // Fetch store by slug
+    // Fetch store by slug - include status field
     const response = await fetch(
       `${c.env.SUPABASE_URL}/rest/v1/merchants?slug=eq.${encodeURIComponent(
         slug
-      )}&select=id,name,description,slug,public_url,logo_url,cover_image_url,city,rating,followers_count,is_verified,is_active,created_at`,
+      )}&select=id,name,description,slug,public_url,logo_url,cover_image_url,city,rating,followers_count,is_verified,is_active,status,created_at`,
       {
         headers: {
           apikey: c.env.SUPABASE_ANON_KEY,
@@ -62,8 +62,20 @@ export async function getStoreBySlug(c: Context<{ Bindings: Env }>) {
 
     const store = data[0];
 
+    // Check if merchant is pending approval
+    if (store.status === 'pending') {
+      return c.json({
+        ok: false,
+        error: 'Store coming soon',
+        code: 'COMING_SOON',
+        message: 'قريباً... نعمل على وضع اللمسات الأخيرة لتقديم تجربة تسوق متكاملة',
+        store_name: store.name,
+        logo_url: store.logo_url,
+      }, 503);
+    }
+
     // Check if store is active
-    if (!store.is_active) {
+    if (!store.is_active || store.status === 'suspended' || store.status === 'banned') {
       return c.json(
         {
           ok: false,

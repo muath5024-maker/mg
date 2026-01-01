@@ -152,8 +152,15 @@ export async function hashPassword(password: string): Promise<string> {
  */
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
   try {
+    console.log('[Password] Verifying password, stored hash format:', storedHash ? 'exists' : 'empty', 'hash length:', storedHash?.length);
+    
     const [saltB64, hashB64] = storedHash.split(':');
-    if (!saltB64 || !hashB64) return false;
+    if (!saltB64 || !hashB64) {
+      console.log('[Password] Invalid hash format - missing salt or hash');
+      return false;
+    }
+
+    console.log('[Password] Salt length:', saltB64.length, 'Hash length:', hashB64.length);
 
     const encoder = new TextEncoder();
     const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
@@ -178,7 +185,9 @@ export async function verifyPassword(password: string, storedHash: string): Prom
     );
 
     const computedHashB64 = btoa(String.fromCharCode(...new Uint8Array(hash)));
-    return computedHashB64 === hashB64;
+    const isMatch = computedHashB64 === hashB64;
+    console.log('[Password] Hash comparison result:', isMatch);
+    return isMatch;
   } catch (error) {
     console.error('[Password] Verification error:', error);
     return false;

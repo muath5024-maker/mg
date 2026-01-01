@@ -168,20 +168,21 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
   }
 
   /// الحصول على الـ index الحالي بناءً على المسار
-  /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، استديو AI(3)
-  /// المحادثات: لا تظهر في البار السفلي (الوصول عبر الإشعارات)
+  /// الترتيب: الرئيسية(0)، الطلبات(1)، استديو AI(2)، المنتجات(3)، الحساب(4)
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
 
     if (location.startsWith('/dashboard/orders')) return 1;
-    if (location.startsWith('/dashboard/products')) {
-      return 2; // صفحة المنتجات
-    }
     if (location.startsWith('/dashboard/studio') ||
         location.startsWith('/dashboard/content-studio')) {
-      return 3; // استديو AI في البار السفلي
+      return 2; // استديو AI في المنتصف
     }
-    // المحادثات لا تظهر في البار السفلي
+    if (location.startsWith('/dashboard/products')) {
+      return 3; // صفحة المنتجات
+    }
+    if (location.startsWith('/dashboard/account')) {
+      return 4; // صفحة الحساب
+    }
     return 0; // home
   }
 
@@ -194,12 +195,16 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         context.go('/dashboard/orders');
         break;
       case 2:
+        // استديو AI في المنتصف
+        context.go('/dashboard/studio');
+        break;
+      case 3:
         // صفحة المنتجات
         context.go('/dashboard/products');
         break;
-      case 3:
-        // استديو AI في البار السفلي
-        context.go('/dashboard/studio');
+      case 4:
+        // صفحة الحساب
+        context.go('/dashboard/account');
         break;
     }
   }
@@ -332,94 +337,96 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
       ),
       decoration: const BoxDecoration(color: headerColor),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // الجانب الأيمن (في RTL يكون أول عنصر) - القائمة + متجري
-          Row(
-            children: [
-              // أيقونة القائمة الرئيسية
-              if (!isDesktop)
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    _openAllMenu();
-                  },
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.menu,
+          // الجانب الأيمن - القائمة + متجري
+          if (!isDesktop)
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                _openAllMenu();
+              },
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.menu, color: Colors.white, size: 22),
+              ),
+            ),
+          if (!isDesktop) const SizedBox(width: 6),
+          // زر عرض متجري
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              ref.read(overlay.overlayProvider.notifier).openViewStore();
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.storefront_outlined,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'متجري',
+                    style: TextStyle(
+                      fontSize: 11,
                       color: Colors.white,
-                      size: 22,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-              const SizedBox(width: 8),
-              // زر عرض متجري
-              GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  ref.read(overlay.overlayProvider.notifier).openViewStore();
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.visibility,
-                        size: 14,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'متجري',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontCaption,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-          // الجانب الأيسر (في RTL يكون آخر عنصر) - اسم المتجر + الأزرار
-          Row(
-            children: [
-              _buildHeaderButton(Icons.add, _openAddProduct, iconSize),
-              _buildHeaderButton(Icons.bolt, _openShortcuts, iconSize),
-              _buildHeaderButton(
-                Icons.notifications_outlined,
-                _openNotifications,
-                iconSize,
-              ),
-              _buildHeaderButton(Icons.smart_toy_outlined, _openAI, iconSize),
-              _buildHeaderButton(Icons.search, _openSearch, iconSize),
-              const SizedBox(width: 8),
-              Text(
-                storeName,
-                style: const TextStyle(
-                  fontSize: AppDimensions.fontHeadline,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
+          // مساحة مرنة في المنتصف
+          const Spacer(),
+          // الجانب الأيسر - الأزرار + اسم المتجر
+          _buildHeaderButton(
+            Icons.add,
+            _openAddProduct,
+            iconSize,
+            'إضافة منتج',
+          ),
+          _buildHeaderButton(
+            Icons.bolt,
+            _openShortcuts,
+            iconSize,
+            'الاختصارات',
+          ),
+          _buildHeaderButton(
+            Icons.notifications_outlined,
+            _openNotifications,
+            iconSize,
+            'الإشعارات',
+          ),
+          _buildHeaderButton(
+            Icons.smart_toy_outlined,
+            _openAI,
+            iconSize,
+            'مساعد AI',
+          ),
+          _buildHeaderButton(Icons.search, _openSearch, iconSize, 'البحث'),
+          const SizedBox(width: 8),
+          // اسم التطبيق الثابت
+          const Text(
+            'mbuy',
+            style: TextStyle(
+              fontSize: AppDimensions.fontHeadline,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
           ),
         ],
       ),
@@ -430,15 +437,20 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     IconData icon,
     VoidCallback onTap,
     double iconSize,
+    String tooltip,
   ) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: iconSize * 0.27),
-        child: Icon(icon, color: Colors.white, size: iconSize),
+    return Tooltip(
+      message: tooltip,
+      preferBelow: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: iconSize * 0.27),
+          child: Icon(icon, color: Colors.white, size: iconSize),
+        ),
       ),
     );
   }
@@ -491,9 +503,10 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               iconSize: iconSize,
               fontSize: fontSize,
             ),
+            // استديو AI في المنتصف
             _buildNavItem(
-              icon: AppIcons.product,
-              label: 'المنتجات',
+              icon: AppIcons.studio,
+              label: 'استديو AI',
               isSelected: currentIndex == 2,
               onTap: () => _onItemTapped(2, context),
               isDark: isDark,
@@ -501,10 +514,19 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               fontSize: fontSize,
             ),
             _buildNavItem(
-              icon: AppIcons.studio,
-              label: 'استديو AI',
+              icon: AppIcons.product,
+              label: 'المنتجات',
               isSelected: currentIndex == 3,
               onTap: () => _onItemTapped(3, context),
+              isDark: isDark,
+              iconSize: iconSize,
+              fontSize: fontSize,
+            ),
+            _buildNavItem(
+              icon: AppIcons.person,
+              label: 'الحساب',
+              isSelected: currentIndex == 4,
+              onTap: () => _onItemTapped(4, context),
               isDark: isDark,
               iconSize: iconSize,
               fontSize: fontSize,
@@ -636,6 +658,16 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             padding: EdgeInsets.symmetric(vertical: padding * 0.8),
           ),
           NavigationRailDestination(
+            icon: AppIcon(AppIcons.studio, size: iconSize),
+            selectedIcon: AppIcon(
+              AppIcons.studio,
+              size: iconSize,
+              color: selectedColor,
+            ),
+            label: const Text('استديو AI'),
+            padding: EdgeInsets.symmetric(vertical: padding * 0.8),
+          ),
+          NavigationRailDestination(
             icon: AppIcon(AppIcons.product, size: iconSize),
             selectedIcon: AppIcon(
               AppIcons.product,
@@ -646,13 +678,13 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             padding: EdgeInsets.symmetric(vertical: padding * 0.8),
           ),
           NavigationRailDestination(
-            icon: AppIcon(AppIcons.studio, size: iconSize),
+            icon: AppIcon(AppIcons.person, size: iconSize),
             selectedIcon: AppIcon(
-              AppIcons.studio,
+              AppIcons.person,
               size: iconSize,
               color: selectedColor,
             ),
-            label: const Text('استديو AI'),
+            label: const Text('الحساب'),
             padding: EdgeInsets.symmetric(vertical: padding * 0.8),
           ),
         ],

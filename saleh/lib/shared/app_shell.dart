@@ -5,9 +5,9 @@ import '../core/theme/app_theme.dart';
 import '../core/controllers/root_controller.dart';
 import '../core/services/api_service.dart';
 import '../core/services/user_preferences_service.dart';
+import '../core/router/app_router.dart';
 import '../apps/merchant/merchant_app.dart';
 import '../features/auth/data/auth_controller.dart';
-import 'screens/login_screen.dart';
 
 /// AppShell - يقرر أي تطبيق يعرض بناءً على RootController
 /// هذا هو Widget الجذري للتطبيق
@@ -25,6 +25,7 @@ class AppShell extends ConsumerStatefulWidget {
 
 class _AppShellState extends ConsumerState<AppShell> {
   bool _isCheckingSession = true;
+  late final _authRouter = AppRouter.createRouter(ref);
 
   @override
   void initState() {
@@ -103,20 +104,20 @@ class _AppShellState extends ConsumerState<AppShell> {
       // تطبيق التاجر - الوحيد المتاح
       return const MerchantApp();
     } else {
-      // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول
-      return MaterialApp(
+      // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول مع GoRouter للتنقل
+      return MaterialApp.router(
         title: 'MBUY',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
+        routerConfig: _authRouter,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [Locale('ar'), Locale('en')],
-        home: const LoginScreen(),
       );
     }
   }

@@ -40,10 +40,15 @@ class AppRouter {
         final isAuthenticated = authState.isAuthenticated;
         final userType = authState.userType;
         final isLoggingIn = state.matchedLocation == '/login';
+        final isRegistering = state.matchedLocation == '/register';
+        final isForgotPassword = state.matchedLocation == '/forgot-password';
         final isDashboardRoute = state.matchedLocation.startsWith('/dashboard');
 
+        // السماح بالوصول لصفحات المصادقة بدون تسجيل دخول
+        final isAuthPage = isLoggingIn || isRegistering || isForgotPassword;
+
         // إذا المستخدم غير مسجل ويحاول الوصول لصفحة محمية
-        if (!isAuthenticated && !isLoggingIn) {
+        if (!isAuthenticated && !isAuthPage) {
           return '/login';
         }
 

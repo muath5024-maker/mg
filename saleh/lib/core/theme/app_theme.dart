@@ -2,289 +2,232 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
-// ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
+// ║                    ⚠️ تحذير مهم - DESIGN UPDATED ⚠️                       ║
 // ║                                                                           ║
-// ║   هذا الملف يحتوي على التصميم المعتمد والنهائي للتطبيق                     ║
-// ║   تاريخ التثبيت: 19 ديسمبر 2025                                           ║
-// ║                                                                           ║
-// ║   ⛔ ممنوع تعديل الألوان أو التصميم إلا بطلب صريح وواضح من المالك          ║
-// ║   ⛔ DO NOT MODIFY colors or design without EXPLICIT owner request        ║
+// ║   تم تحديث التصميم ليدعم الوضع الفاتح والداكن                             ║
+// ║   تاريخ التحديث: 1 يناير 2026                                             ║
 // ║                                                                           ║
 // ║   الألوان المعتمدة:                                                       ║
-// ║   • Primary: Teal Green #215950 (الثقة والاحترافية)                       ║
-// ║   • Secondary: Teal #00B4B4 (الحداثة والانتعاش)                           ║
-// ║   • Accent: Orange #FF6B35 (الإجراءات والتحفيز)                           ║
+// ║   • Primary: Teal #00B4B4 (فيروزي - للهيدر)                               ║
+// ║   • Buttons/Icons: White #FFFFFF (أبيض)                                   ║
+// ║   • Accent: Gold #FFC107 (ذهبي)                                           ║
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
-/// App Theme Configuration - Modern E-commerce Palette
-/// Professional shopping app design with trust-inspiring colors
-///
-/// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-14
-/// Do not change without explicit request
+/// App Theme Configuration - Light & Dark Theme Support
+/// Professional modern design with teal header and white accents
 class AppTheme {
   // ============================================================================
-  // E-commerce Color Palette - Oxford Blue Theme
+  // Primary Color Palette
   // ============================================================================
 
-  // === Primary Colors (Teal Green - الأخضر الفيروزي) ===
-  static const Color primaryColor = Color(
-    0xFF00B4B4,
-  ); // Teal Light - اللون الأساسي الفاتح
-  static const Color primaryLight = Color(0xFF4DD4D4); // Teal Green Light
-  static const Color primaryDark = Color(0xFF215950); // Teal Green Dark
+  // === Primary Colors (Teal - فيروزي للهيدر) ===
+  static const Color primaryColor = Color(0xFF00B4B4); // Teal - اللون الأساسي
+  static const Color primaryLight = Color(0xFF4DD4D4); // Teal Light
+  static const Color primaryDark = Color(0xFF008585); // Teal Dark
 
-  // === Purple Colors (Reduced Usage) ===
-  static const Color purpleColor = Color(
-    0xFF9333EA,
-  ); // Purple-600 (Limited use)
-  static const Color purpleLight = Color(0xFFA855F7);
-  static const Color purpleDark = Color(0xFF7C3AED);
-
-  // === Secondary Colors (Teal - Fresh & Modern) ===
-  static const Color secondaryColor = Color(0xFF00B4B4); // Shopping Teal
+  // === Secondary Colors (Teal variations) ===
+  static const Color secondaryColor = Color(0xFF00B4B4); // Teal
   static const Color secondaryLight = Color(0xFF4DD4D4);
   static const Color secondaryDark = Color(0xFF008585);
 
-  // === Accent Colors (Orange - CTA & Urgency) ===
-  static const Color accentColor = Color(0xFFFF6B35); // Shopping Orange
-  static const Color accentLight = Color(0xFFFF9A6C);
-  static const Color accentDark = Color(0xFFE54D1B);
+  // === Accent Colors (Gold - Premium) ===
+  static const Color accentColor = Color(0xFFFFC107); // Gold/Star Yellow
+  static const Color accentLight = Color(0xFFFFD54F);
+  static const Color accentDark = Color(0xFFFFB300);
 
-  // === Background & Surface (Light Mode) - Metallic Slate Theme ===
-  static const Color backgroundColor = Color(
-    0xFFF1F5F9,
-  ); // Slate-100 - Cool grey/lead tone
+  // === Background & Surface (Light Theme) ===
+  static const Color backgroundColor = Color(0xFFF5F7FA); // Light Grey
   static const Color surfaceColor = Color(0xFFFFFFFF); // White
-  static const Color cardColor = Color(
-    0xFFFFFFFF,
-  ); // White (will use gradient in cards)
+  static const Color cardColor = Color(0xFFFFFFFF); // White
 
-  // === Metallic Slate Colors (matching image exactly) ===
-  static const Color slate100 = Color(
-    0xFFF1F5F9,
-  ); // Background with slight purple tint
-  static const Color slate200 = Color(0xFFE2E8F0);
-  static const Color slate300 = Color(0xFFCBD5E1); // Metallic edge border
-  static const Color slate400 = Color(0xFF94A3B8); // Inactive icons
-  static const Color slate500 = Color(0xFF64748B); // Medium slate
-  static const Color slate600 = Color(
-    0xFF475569,
-  ); // Dark slate for better contrast
-  static const Color darkSlate = Color(
-    0xFF0F172A,
-  ); // Headings & Icons (dark slate grey)
-  static const Color mutedSlate = Color(
-    0xFF64748B,
-  ); // Body text & Inactive icons
-  static const Color slate700 = Color(
-    0xFF334155,
-  ); // Dark charcoal for ad banners
+  // === Extended Light Palette ===
+  static const Color surface100 = Color(0xFFF5F7FA); // Background
+  static const Color surface200 = Color(0xFFEEF1F5); // Slightly darker
+  static const Color surface300 = Color(0xFFE5E9EF); // Cards hover
+  static const Color surface400 = Color(0xFFDCE1E8); // Borders
+  static const Color surface500 = Color(0xFFCBD2DB); // Dividers
+  static const Color surface600 = Color(0xFFB8C1CC); // Muted elements
 
-  // === Background & Surface (Dark Mode) - Dark Theme with Light Cards ===
-  static const Color backgroundColorDark = Color(
-    0xFF0F1419,
-  ); // خلفية داكنة جداً
-  static const Color surfaceColorDark = Color(
-    0xFF15202B,
-  ); // سطح داكن للـ AppBar
-  static const Color cardColorDark = Color(0xFF1E2D3D); // كروت أفتح للقراءة
+  // === Text Colors (Light Theme) ===
+  static const Color textPrimaryColor = Color(0xFF1A1A2E); // Dark Navy
+  static const Color textSecondaryColor = Color(0xFF6B7280); // Grey
+  static const Color textHintColor = Color(0xFF9CA3AF); // Light Grey
 
-  // === Dark Mode Extended Palette (Single Source of Truth) ===
-  static const Color surfaceDarkAccent = Color(
-    0xFF243447,
-  ); // Accent surface للكروت
-  static const Color iconBgDark = Color(
-    0xFF2C3E50,
-  ); // خلفية الأيقونات - أفتح للوضوح
-  static const Color dividerDark = Color(
-    0xFF2C3E50,
-  ); // Divider/border for dark mode
-  static const Color disabledDark = Color(0xFF6B7C93); // Disabled elements
-  static const Color textMutedDark = Color(0xFF9AA5B1); // Muted text - أوضح
-  static const Color iconPrimaryDark = Color(0xFFFFFFFF); // Primary icons
-  static const Color iconSecondaryDark = Color(
-    0xFFCBD5E0,
-  ); // Secondary icons - أوضح
-  static const Color shadowDark = Color(0x40000000); // Shadow for dark mode
-  static const Color overlayDark = Color(0x0DFFFFFF); // 5% white overlay
+  // === Border & Divider ===
+  static const Color borderColor = Color(0xFFE5E7EB); // Light Border
+  static const Color dividerColor = Color(0xFFE5E7EB); // Light Divider
 
-  // === Card Colors for Dark Mode (Light Cards) ===
-  static const Color cardSurfaceDark = Color(0xFF1E2D3D); // لون الكارت الأساسي
-  static const Color cardHoverDark = Color(
-    0xFF243447,
-  ); // لون الكارت عند التحويم
-  static const Color cardBorderDark = Color(0xFF3D5A73); // حدود الكارت
+  // === Purple Colors (Accent for special elements) ===
+  static const Color purpleColor = Color(0xFF9333EA);
+  static const Color purpleLight = Color(0xFFA855F7);
+  static const Color purpleDark = Color(0xFF7C3AED);
 
-  // === Light Background Variant ===
-  static const Color backgroundLight = Color(0xFFF6F8F7); // Slightly warm slate
-
-  // === Text Colors (Light Mode) - Metallic Slate Theme ===
-  static const Color textPrimaryColor = Color(
-    0xFF0F172A,
-  ); // Dark Slate - Headings
-  static const Color textSecondaryColor = Color(
-    0xFF64748B,
-  ); // Muted Slate - Body text
-  static const Color textHintColor = Color(0xFF94A3B8); // Slate-400
-
-  // === Text Colors (Dark Mode) - Enhanced Readability ===
-  static const Color textPrimaryColorDark = Color(
-    0xFFF7FAFC,
-  ); // أبيض ناصع للعناوين
-  static const Color textSecondaryColorDark = Color(
-    0xFFCBD5E0,
-  ); // رمادي فاتح للنص الثانوي
-  static const Color textHintColorDark = Color(
-    0xFF8899A6,
-  ); // رمادي متوسط للتلميحات
-
-  // === Status Colors (Semantic - Do Not Change) ===
-  static const Color successColor = Color(0xFF28A745);
-  static const Color warningColor = Color(0xFFFFC107);
-  static const Color errorColor = Color(0xFFDC3545);
-  static const Color infoColor = Color(0xFF17A2B8);
+  // === Status Colors (Semantic) ===
+  static const Color successColor = Color(0xFF10B981); // Green
+  static const Color warningColor = Color(0xFFFFC107); // Gold
+  static const Color errorColor = Color(0xFFEF4444); // Red
+  static const Color infoColor = Color(0xFF0EA5E9); // Sky Blue
 
   // === Price Colors ===
-  static const Color priceColor = Color(0xFF1A1A1A);
-  static const Color salePriceColor = Color(0xFFE31837); // Sale Red
-  static const Color discountBadgeColor = Color(0xFFE31837);
+  static const Color priceColor = Color(0xFF1A1A2E);
+  static const Color salePriceColor = Color(0xFFEF4444);
+  static const Color discountBadgeColor = Color(0xFFEF4444);
 
-  // === Rating Colors (Semantic - Do Not Change) ===
-  static const Color ratingStarColor = Color(0xFFFFB800);
-  static const Color ratingTextColor = Color(0xFF666666);
+  // === Rating Colors ===
+  static const Color ratingStarColor = Color(0xFFFFC107);
+  static const Color ratingTextColor = Color(0xFF6B7280);
 
   // ============================================================================
-  // App Store Theme Colors (Dark Green Theme)
+  // Dark Mode Colors
   // ============================================================================
-  static const Color appStorePrimary = Color(0xFF13EC80); // Neon Green
-  static const Color appStoreBackground = Color(
-    0xFF102219,
-  ); // Dark Green Background
-  static const Color appStoreSurface = Color(0xFF193326); // Surface Dark
-  static const Color appStoreCard = Color(0xFF1C3228); // Card Dark
-  static const Color appStoreTextPrimary = Color(0xFFFFFFFF); // White
-  static const Color appStoreTextSecondary = Color(0xFF92C9AD); // Light Green
-  static const Color appStoreTextMuted = Color(0xFF6B9B84); // Muted Green
-  static const Color appStoreBorder = Color(0xFF2A4A3A); // Border Green
-  static const Color appStoreStar = Color(0xFFFFC107); // Star/PRO Yellow
+  static const Color backgroundColorDark = Color(0xFF102219);
+  static const Color surfaceColorDark = Color(0xFF193326);
+  static const Color cardColorDark = Color(0xFF1C3228);
+  static const Color textPrimaryColorDark = Color(0xFFFFFFFF);
+  static const Color textSecondaryColorDark = Color(0xFF92C9AD);
+  static const Color textHintColorDark = Color(0xFF6B9B84);
+  static const Color dividerColorDark = Color(0xFF2A4A3A);
+  static const Color borderColorDark = Color(0xFF2A4A3A);
+
+  // Slate colors (for compatibility)
+  static const Color slate100 = surface100;
+  static const Color slate200 = surface200;
+  static const Color slate300 = surface300;
+  static const Color slate400 = surface400;
+  static const Color slate500 = surface500;
+  static const Color slate600 = surface600;
+  static const Color slate700 = Color(0xFF374151);
+  static const Color darkSlate = textPrimaryColor;
+  static const Color mutedSlate = textSecondaryColor;
+
+  // Dark mode extended palette
+  static const Color surfaceDarkAccent = Color(0xFF234137);
+  static const Color iconBgDark = Color(0xFF234137);
+  static const Color dividerDark = dividerColorDark;
+  static const Color disabledDark = Color(0xFF4A7060);
+  static const Color textMutedDark = textHintColorDark;
+  static const Color iconPrimaryDark = Color(0xFFFFFFFF);
+  static const Color iconSecondaryDark = textSecondaryColorDark;
+  static const Color shadowDark = Color(0x40000000);
+  static const Color overlayDark = Color(0x0DFFFFFF);
+  static const Color cardSurfaceDark = cardColorDark;
+  static const Color cardHoverDark = Color(0xFF234137);
+  static const Color cardBorderDark = borderColorDark;
+  static const Color backgroundLight = backgroundColor;
+
+  // ============================================================================
+  // App Store Theme Colors
+  // ============================================================================
+  static const Color appStorePrimary = primaryColor;
+  static const Color appStoreBackground = backgroundColorDark;
+  static const Color appStoreSurface = surfaceColorDark;
+  static const Color appStoreCard = cardColorDark;
+  static const Color appStoreTextPrimary = textPrimaryColorDark;
+  static const Color appStoreTextSecondary = textSecondaryColorDark;
+  static const Color appStoreTextMuted = textHintColorDark;
+  static const Color appStoreBorder = borderColorDark;
+  static const Color appStoreStar = accentColor;
 
   // === Badge Colors ===
-  static const Color freeShippingColor = Color(0xFF28A745);
-  static const Color fastDeliveryColor = Color(0xFF17A2B8);
-  static const Color verifiedSellerColor = Color(0xFF6F42C1);
+  static const Color freeShippingColor = Color(0xFF10B981);
+  static const Color fastDeliveryColor = Color(0xFF0EA5E9);
+  static const Color verifiedSellerColor = Color(0xFF9333EA);
 
-  // === Pro Badge Colors (from image) ===
-  static const Color proBadgeColor = Color(
-    0xFF2563EB,
-  ); // Blue for "جرب خطة Pro"
-  static const Color proLabelColor = Color(
-    0xFF0EA5E9,
-  ); // Sky Blue for "خطة Pro" label
-
-  // === Divider & Border - Metallic Edge ===
-  static const Color dividerColor = Color(
-    0xFFCBD5E1,
-  ); // Slate-300 - Metallic edge
-  static const Color borderColor = Color(
-    0xFFCBD5E1,
-  ); // Slate-300 - Metallic edge
-  static const Color dividerColorDark = Color(0xFF2C3E50); // حدود مرئية
-  static const Color borderColorDark = Color(0xFF3D5A73); // حدود الكروت - أوضح
+  // === Pro Badge Colors ===
+  static const Color proBadgeColor = Color(0xFF00B4B4); // Teal for Pro
+  static const Color proLabelColor = Color(0xFF4DD4D4); // Light Teal
 
   // ============================================================================
-  // Gradients - E-commerce Identity
+  // Gradients - Dark Green Theme
   // ============================================================================
 
-  // Brand Identity Gradient (Navy → Teal)
+  // Brand Identity Gradient (Dark Green → Neon Green)
   static const LinearGradient brandGradient = LinearGradient(
     colors: [
-      Color(0xFF1E3A5F), // Deep Navy
-      Color(0xFF00B4B4), // Teal
+      Color(0xFF102219), // Dark Green
+      Color(0xFF13EC80), // Neon Green
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Metallic Modern Gradient for FAB (Blue Gradient) - Main color
-  static const LinearGradient metallicGradient = LinearGradient(
-    colors: [
-      Color(0xFF2563EB), // Blue - Primary
-      Color(0xFF3B82F6), // Blue-500
-      Color(0xFF60A5FA), // Blue-400
-    ],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  // Accent Gradient (Orange variations)
-  static const LinearGradient accentGradient = LinearGradient(
-    colors: [
-      Color(0xFFFF6B35), // Orange
-      Color(0xFFE54D1B), // Deep Orange
-    ],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  // Primary Gradient (Blue Gradient) - Reduced Purple Usage
+  // Primary Gradient (Neon Green variations)
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [
-      Color(0xFF2563EB), // Blue - Primary
-      Color(0xFF3B82F6), // Blue-500
-      Color(0xFF60A5FA), // Blue-400
+      Color(0xFF13EC80), // Neon Green
+      Color(0xFF10B981), // Emerald
+      Color(0xFF059669), // Darker Emerald
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Header Banner Gradient (Blue with minimal purple)
+  // Metallic Gradient for FAB
+  static const LinearGradient metallicGradient = LinearGradient(
+    colors: [
+      Color(0xFF13EC80), // Neon Green
+      Color(0xFF10B981), // Emerald
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Accent Gradient (Gold variations)
+  static const LinearGradient accentGradient = LinearGradient(
+    colors: [
+      Color(0xFFFFC107), // Gold
+      Color(0xFFFFB300), // Deep Gold
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Header Banner Gradient
   static const LinearGradient headerBannerGradient = LinearGradient(
     colors: [
-      Color(0xFF2563EB), // Blue - Primary
-      Color(0xFF3B82F6), // Blue-500
-      Color(0xFF60A5FA), // Blue-400
+      Color(0xFF193326), // Surface
+      Color(0xFF102219), // Background
     ],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
 
-  // Card Gradient (White to Slate-100) - Metallic Surface
+  // Card Gradient (Dark Green surfaces)
   static const LinearGradient cardGradient = LinearGradient(
     colors: [
-      Color(0xFFFFFFFF), // White
-      Color(0xFFF1F5F9), // Slate-100
+      Color(0xFF1C3228), // Card
+      Color(0xFF193326), // Surface
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Card Gradient Deep (White to Slate-200) - For elevated cards
+  // Card Gradient Deep
   static const LinearGradient cardGradientDeep = LinearGradient(
     colors: [
-      Color(0xFFFFFFFF), // White
-      Color(0xFFE2E8F0), // Slate-200
+      Color(0xFF234137), // Lighter card
+      Color(0xFF1C3228), // Card
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Recessed Metal Input Gradient
+  // Recessed Input Gradient
   static const LinearGradient recessedMetalGradient = LinearGradient(
     colors: [
-      Color(0xFFE2E8F0), // Slate-200
-      Color(0xFFF1F5F9), // Slate-100
+      Color(0xFF152A20), // Dark
+      Color(0xFF193326), // Surface
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Subtle Overlay Gradient (for cards/headers) - Blue only
+  // Subtle Overlay Gradient
   static const LinearGradient subtleGradient = LinearGradient(
     colors: [
-      Color(0x0A2563EB), // Blue 4%
-      Color(0x0A3B82F6), // Blue-500 4%
+      Color(0x1A13EC80), // Neon Green 10%
+      Color(0x1A10B981), // Emerald 10%
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -293,8 +236,8 @@ class AppTheme {
   // Sale/Promo Gradient
   static const LinearGradient saleGradient = LinearGradient(
     colors: [
-      Color(0xFFE31837), // Sale Red
-      Color(0xFFFF4757), // Bright Red
+      Color(0xFFEF4444), // Red
+      Color(0xFFDC2626), // Deep Red
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -319,27 +262,26 @@ class AppTheme {
   static const double spacingXLarge = 32.0;
 
   // ============================================================================
-  // Light Theme
+  // Light Theme - وضع فاتح مع هيدر فيروزي
   // ============================================================================
 
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-
-      // Color Scheme - Meta AI Inspired
+      // Color Scheme - Light Theme
       colorScheme: const ColorScheme.light(
         primary: primaryColor,
         onPrimary: Colors.white,
-        primaryContainer: Color(0xFFE3F7FD),
+        primaryContainer: Color(0xFFE0F7F7),
         onPrimaryContainer: primaryDark,
         secondary: secondaryColor,
-        onSecondary: Color(0xFF1A1D21),
-        secondaryContainer: Color(0xFFE8FEF8),
+        onSecondary: Colors.white,
+        secondaryContainer: Color(0xFFE0F7F7),
         onSecondaryContainer: secondaryDark,
         tertiary: accentColor,
-        onTertiary: Color(0xFF1A1D21),
-        tertiaryContainer: Color(0xFFFEF0FA),
+        onTertiary: Color(0xFF1A1A2E),
+        tertiaryContainer: Color(0xFFFFF8E1),
         onTertiaryContainer: accentDark,
         surface: surfaceColor,
         onSurface: textPrimaryColor,
@@ -350,22 +292,23 @@ class AppTheme {
         outlineVariant: dividerColor,
       ),
 
-      // Scaffold - Metallic Slate Background
-      scaffoldBackgroundColor: backgroundColor, // Slate-100
-      // AppBar - Clean & Modern with Meta Blue
+      // Scaffold - Light Background
+      scaffoldBackgroundColor: backgroundColor,
+
+      // AppBar - Teal Header (فيروزي)
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 1,
-        backgroundColor: surfaceColor,
+        backgroundColor: primaryColor, // هيدر فيروزي
         surfaceTintColor: Colors.transparent,
-        foregroundColor: textPrimaryColor,
+        foregroundColor: Colors.white, // نص أبيض
         titleTextStyle: GoogleFonts.cairo(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: textPrimaryColor,
+          color: Colors.white,
         ),
-        iconTheme: const IconThemeData(color: primaryColor, size: 24),
+        iconTheme: const IconThemeData(color: Colors.white, size: 24), // أيقونات بيضاء
       ),
 
       // Text Theme - Cairo for Arabic
@@ -458,11 +401,11 @@ class AppTheme {
         ),
       ),
 
-      // Elevated Button - Primary CTA with Meta Blue
+      // Elevated Button - Primary CTA with White Text
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.white, // نص أبيض على الأزرار
           elevation: buttonElevation,
           shadowColor: primaryColor.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -504,23 +447,21 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration - Recessed Metal Look
+      // Input Decoration - Light Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: slate200, // Recessed metal background
+        fillColor: const Color(0xFFF5F7FA),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: BorderSide(
-            color: slate300.withValues(alpha: 0.5),
-          ), // Subtle metallic edge
+          borderSide: const BorderSide(color: borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: BorderSide(color: slate300.withValues(alpha: 0.5)),
+          borderSide: const BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
@@ -540,24 +481,24 @@ class AppTheme {
         suffixIconColor: textSecondaryColor,
       ),
 
-      // Card Theme - Metallic Cards with Gradient
+      // Card Theme - Light Cards
       cardTheme: CardThemeData(
         elevation: cardElevation,
         shadowColor: Colors.black.withValues(alpha: 0.08),
+        color: cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadiusLarge),
-          side: const BorderSide(color: borderColor, width: 1), // Metallic edge
+          side: const BorderSide(color: borderColor, width: 1),
         ),
-        color: cardColor,
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
       ),
 
       // Chip Theme - Filters & Tags
       chipTheme: ChipThemeData(
-        backgroundColor: backgroundColor,
+        backgroundColor: const Color(0xFFF5F7FA),
         selectedColor: primaryColor.withValues(alpha: 0.1),
-        disabledColor: backgroundColor,
+        disabledColor: const Color(0xFFE5E7EB),
         labelStyle: GoogleFonts.cairo(
           fontSize: 12,
           fontWeight: FontWeight.w500,
@@ -575,7 +516,7 @@ class AppTheme {
         ),
       ),
 
-      // Bottom Navigation - Main Nav with Meta Colors
+      // Bottom Navigation - Main Nav
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surfaceColor,
         elevation: 8,

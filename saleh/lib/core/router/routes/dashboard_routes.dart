@@ -56,6 +56,8 @@ import '../../../features/merchant/presentation/screens/heatmap_screen.dart';
 import '../../../features/settings/presentation/screens/about_screen.dart';
 // Studio
 import '../../../features/studio/studio.dart';
+// Account
+import '../../../features/account/presentation/screens/account_screen.dart';
 // Shared
 import '../../../shared/widgets/base_screen.dart';
 
@@ -103,6 +105,12 @@ ShellRoute dashboardShellRoute = ShellRoute(
       name: 'about',
       builder: (context, state) => const AboutScreen(),
     ),
+    // صفحة الحساب
+    GoRoute(
+      path: '/dashboard/account',
+      name: 'account',
+      builder: (context, state) => const AccountScreen(),
+    ),
   ],
 );
 
@@ -130,10 +138,7 @@ List<GoRoute> _homeSubRoutes = [
           final extra = state.extra as Map<String, dynamic>?;
           final projectId = extra?['projectId'] as String? ?? '';
           final script = extra?['script'] as ScriptData?;
-          return SceneEditorScreen(
-            projectId: projectId,
-            initialScript: script,
-          );
+          return SceneEditorScreen(projectId: projectId, initialScript: script);
         },
       ),
       GoRoute(
