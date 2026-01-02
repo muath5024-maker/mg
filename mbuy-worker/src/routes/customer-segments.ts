@@ -1,18 +1,19 @@
 import { Hono } from 'hono';
 import { createClient } from '@supabase/supabase-js';
-import type { Env } from '../types';
+import type { Env, AuthContext } from '../types';
 
-const customerSegments = new Hono<{ Bindings: Env }>();
+const customerSegments = new Hono<{ Bindings: Env; Variables: AuthContext }>();
 
 // Get all segments for store
 customerSegments.get('/segments', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('customer_segments')
     .select('*')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('priority', { ascending: true });
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -22,7 +23,8 @@ customerSegments.get('/segments', async (c) => {
 // Get segment by ID with customers
 customerSegments.get('/segments/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const [segmentRes, customersRes] = await Promise.all([
@@ -30,7 +32,7 @@ customerSegments.get('/segments/:id', async (c) => {
       .from('customer_segments')
       .select('*')
       .eq('id', id)
-      .eq('store_id', user.store_id)
+      .eq('store_id', merchantId)
       .single(),
     supabase
       .from('segment_customers')
@@ -56,14 +58,15 @@ customerSegments.get('/segments/:id', async (c) => {
 
 // Create segment
 customerSegments.post('/segments', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('customer_segments')
     .insert({
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       description: body.description,
       segment_type: body.segment_type || 'custom',
@@ -87,7 +90,8 @@ customerSegments.post('/segments', async (c) => {
 // Update segment
 customerSegments.put('/segments/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -103,7 +107,7 @@ customerSegments.put('/segments/:id', async (c) => {
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .select()
     .single();
   
@@ -114,14 +118,15 @@ customerSegments.put('/segments/:id', async (c) => {
 // Delete segment
 customerSegments.delete('/segments/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { error } = await supabase
     .from('customer_segments')
     .delete()
     .eq('id', id)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   return c.json({ ok: true });
@@ -130,7 +135,8 @@ customerSegments.delete('/segments/:id', async (c) => {
 // Refresh auto segment
 customerSegments.post('/segments/:id/refresh', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Verify ownership
@@ -138,7 +144,7 @@ customerSegments.post('/segments/:id/refresh', async (c) => {
     .from('customer_segments')
     .select('id')
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (!segment) return c.json({ ok: false, error: 'Segment not found' }, 404);
@@ -154,7 +160,8 @@ customerSegments.post('/segments/:id/refresh', async (c) => {
 // Add customer to segment manually
 customerSegments.post('/segments/:id/customers', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -163,9 +170,9 @@ customerSegments.post('/segments/:id/customers', async (c) => {
     .insert({
       segment_id: id,
       customer_id: body.customer_id,
-      store_id: user.store_id,
+      store_id: merchantId,
       added_reason: 'manual',
-      added_by: user.id
+      added_by: userId
     })
     .select()
     .single();
@@ -183,7 +190,8 @@ customerSegments.post('/segments/:id/customers', async (c) => {
 // Remove customer from segment
 customerSegments.delete('/segments/:segmentId/customers/:customerId', async (c) => {
   const { segmentId, customerId } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { error } = await supabase
@@ -191,7 +199,7 @@ customerSegments.delete('/segments/:segmentId/customers/:customerId', async (c) 
     .delete()
     .eq('segment_id', segmentId)
     .eq('customer_id', customerId)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   
@@ -205,13 +213,14 @@ customerSegments.delete('/segments/:segmentId/customers/:customerId', async (c) 
 
 // Get all tags
 customerSegments.get('/tags', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('customer_tags')
     .select('*')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('name');
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -220,14 +229,15 @@ customerSegments.get('/tags', async (c) => {
 
 // Create tag
 customerSegments.post('/tags', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('customer_tags')
     .insert({
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       color: body.color || '#3B82F6',
       description: body.description
@@ -242,14 +252,15 @@ customerSegments.post('/tags', async (c) => {
 // Delete tag
 customerSegments.delete('/tags/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { error } = await supabase
     .from('customer_tags')
     .delete()
     .eq('id', id)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   return c.json({ ok: true });
@@ -257,7 +268,8 @@ customerSegments.delete('/tags/:id', async (c) => {
 
 // Get customer analytics for store
 customerSegments.get('/analytics', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const tier = c.req.query('tier');
   const limit = parseInt(c.req.query('limit') || '50');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -268,7 +280,7 @@ customerSegments.get('/analytics', async (c) => {
       *,
       customer:customers(id, full_name, phone, email, avatar_url)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('total_spent', { ascending: false })
     .limit(limit);
   
@@ -284,13 +296,14 @@ customerSegments.get('/analytics', async (c) => {
 
 // Get analytics summary
 customerSegments.get('/analytics/summary', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('customer_analytics')
     .select('customer_tier')
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   
@@ -312,12 +325,13 @@ customerSegments.get('/analytics/summary', async (c) => {
 // Calculate RFM for a customer
 customerSegments.post('/analytics/calculate/:customerId', async (c) => {
   const { customerId } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { error } = await supabase.rpc('calculate_customer_rfm', {
     p_customer_id: customerId,
-    p_store_id: user.store_id
+    p_store_id: merchantId
   });
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -326,14 +340,15 @@ customerSegments.post('/analytics/calculate/:customerId', async (c) => {
 
 // Bulk calculate RFM for all customers
 customerSegments.post('/analytics/calculate-all', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Get all customers who have ordered from this store
   const { data: customers } = await supabase
     .from('orders')
     .select('customer_id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .not('customer_id', 'is', null);
   
   if (!customers) return c.json({ ok: true, processed: 0 });
@@ -344,7 +359,7 @@ customerSegments.post('/analytics/calculate-all', async (c) => {
   for (const customerId of uniqueCustomers) {
     await supabase.rpc('calculate_customer_rfm', {
       p_customer_id: customerId,
-      p_store_id: user.store_id
+      p_store_id: merchantId
     });
   }
   
@@ -354,7 +369,8 @@ customerSegments.post('/analytics/calculate-all', async (c) => {
 // Assign tag to customer
 customerSegments.post('/customers/:customerId/tags', async (c) => {
   const { customerId } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -363,8 +379,8 @@ customerSegments.post('/customers/:customerId/tags', async (c) => {
     .insert({
       customer_id: customerId,
       tag_id: body.tag_id,
-      store_id: user.store_id,
-      assigned_by: user.id
+      store_id: merchantId,
+      assigned_by: userId
     })
     .select()
     .single();
@@ -376,7 +392,8 @@ customerSegments.post('/customers/:customerId/tags', async (c) => {
 // Remove tag from customer
 customerSegments.delete('/customers/:customerId/tags/:tagId', async (c) => {
   const { customerId, tagId } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { error } = await supabase
@@ -384,7 +401,7 @@ customerSegments.delete('/customers/:customerId/tags/:tagId', async (c) => {
     .delete()
     .eq('customer_id', customerId)
     .eq('tag_id', tagId)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   return c.json({ ok: true });
@@ -393,7 +410,8 @@ customerSegments.delete('/customers/:customerId/tags/:tagId', async (c) => {
 // Get customer tags
 customerSegments.get('/customers/:customerId/tags', async (c) => {
   const { customerId } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
@@ -403,7 +421,7 @@ customerSegments.get('/customers/:customerId/tags', async (c) => {
       tag:customer_tags(*)
     `)
     .eq('customer_id', customerId)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   return c.json({ ok: true, data: data.map(d => d.tag) });
@@ -411,7 +429,8 @@ customerSegments.get('/customers/:customerId/tags', async (c) => {
 
 // Get segment campaigns
 customerSegments.get('/campaigns', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const status = c.req.query('status');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -421,7 +440,7 @@ customerSegments.get('/campaigns', async (c) => {
       *,
       segment:customer_segments(id, name, color, customer_count)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('created_at', { ascending: false });
   
   if (status) {
@@ -436,7 +455,8 @@ customerSegments.get('/campaigns', async (c) => {
 
 // Create campaign for segment
 customerSegments.post('/campaigns', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -451,14 +471,14 @@ customerSegments.post('/campaigns', async (c) => {
     .from('segment_campaigns')
     .insert({
       segment_id: body.segment_id,
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       campaign_type: body.campaign_type,
       content: body.content || {},
       status: body.status || 'draft',
       scheduled_at: body.scheduled_at,
       target_count: segment?.customer_count || 0,
-      created_by: user.id
+      created_by: userId
     })
     .select()
     .single();

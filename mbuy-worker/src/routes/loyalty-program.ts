@@ -1,18 +1,19 @@
 import { Hono } from 'hono';
 import { createClient } from '@supabase/supabase-js';
-import type { Env } from '../types';
+import type { Env, AuthContext } from '../types';
 
-const loyaltyProgram = new Hono<{ Bindings: Env }>();
+const loyaltyProgram = new Hono<{ Bindings: Env; Variables: AuthContext }>();
 
 // Get program settings
 loyaltyProgram.get('/program', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('loyalty_programs')
     .select('*')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (error && error.code !== 'PGRST116') {
@@ -24,14 +25,15 @@ loyaltyProgram.get('/program', async (c) => {
 
 // Update program settings
 loyaltyProgram.put('/program', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('loyalty_programs')
     .upsert({
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       description: body.description,
       program_type: body.program_type,
@@ -56,14 +58,15 @@ loyaltyProgram.put('/program', async (c) => {
 
 // Get tiers
 loyaltyProgram.get('/tiers', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Get program first
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (!program) return c.json({ ok: true, data: [] });
@@ -80,7 +83,8 @@ loyaltyProgram.get('/tiers', async (c) => {
 
 // Create tier
 loyaltyProgram.post('/tiers', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -88,7 +92,7 @@ loyaltyProgram.post('/tiers', async (c) => {
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (!program) return c.json({ ok: false, error: 'Program not found' }, 404);
@@ -119,7 +123,8 @@ loyaltyProgram.post('/tiers', async (c) => {
 // Update tier
 loyaltyProgram.put('/tiers/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -127,7 +132,7 @@ loyaltyProgram.put('/tiers/:id', async (c) => {
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   const { data, error } = await supabase
@@ -157,13 +162,14 @@ loyaltyProgram.put('/tiers/:id', async (c) => {
 // Delete tier
 loyaltyProgram.delete('/tiers/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   const { error } = await supabase
@@ -178,7 +184,8 @@ loyaltyProgram.delete('/tiers/:id', async (c) => {
 
 // Get members
 loyaltyProgram.get('/members', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const limit = parseInt(c.req.query('limit') || '50');
   const tierId = c.req.query('tier_id');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -190,7 +197,7 @@ loyaltyProgram.get('/members', async (c) => {
       customer:customers(id, full_name, phone, email, avatar_url),
       tier:loyalty_tiers(id, name, color, icon)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('lifetime_points', { ascending: false })
     .limit(limit);
   
@@ -207,7 +214,8 @@ loyaltyProgram.get('/members', async (c) => {
 // Get member details
 loyaltyProgram.get('/members/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const [memberRes, transactionsRes] = await Promise.all([
@@ -219,7 +227,7 @@ loyaltyProgram.get('/members/:id', async (c) => {
         tier:loyalty_tiers(*)
       `)
       .eq('id', id)
-      .eq('store_id', user.store_id)
+      .eq('store_id', merchantId)
       .single(),
     supabase
       .from('loyalty_points_transactions')
@@ -243,7 +251,8 @@ loyaltyProgram.get('/members/:id', async (c) => {
 // Adjust points manually
 loyaltyProgram.post('/members/:id/adjust', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -252,7 +261,7 @@ loyaltyProgram.post('/members/:id/adjust', async (c) => {
     .from('loyalty_members')
     .select('*')
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (!member) return c.json({ ok: false, error: 'Member not found' }, 404);
@@ -265,12 +274,12 @@ loyaltyProgram.post('/members/:id/adjust', async (c) => {
     .from('loyalty_points_transactions')
     .insert({
       member_id: id,
-      store_id: user.store_id,
+      store_id: merchantId,
       transaction_type: 'adjust',
       points: points,
       description: body.reason || 'تعديل يدوي',
       balance_after: newBalance,
-      created_by: user.id
+      created_by: userId
     });
   
   // Update member
@@ -288,13 +297,14 @@ loyaltyProgram.post('/members/:id/adjust', async (c) => {
 
 // Get rewards
 loyaltyProgram.get('/rewards', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (!program) return c.json({ ok: true, data: [] });
@@ -311,14 +321,15 @@ loyaltyProgram.get('/rewards', async (c) => {
 
 // Create reward
 loyaltyProgram.post('/rewards', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (!program) return c.json({ ok: false, error: 'Program not found' }, 404);
@@ -348,14 +359,15 @@ loyaltyProgram.post('/rewards', async (c) => {
 // Update reward
 loyaltyProgram.put('/rewards/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   const { data, error } = await supabase
@@ -380,13 +392,14 @@ loyaltyProgram.put('/rewards/:id', async (c) => {
 // Delete reward
 loyaltyProgram.delete('/rewards/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data: program } = await supabase
     .from('loyalty_programs')
     .select('id')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   const { error } = await supabase
@@ -401,7 +414,8 @@ loyaltyProgram.delete('/rewards/:id', async (c) => {
 
 // Get redemptions
 loyaltyProgram.get('/redemptions', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const status = c.req.query('status');
   const limit = parseInt(c.req.query('limit') || '50');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -416,7 +430,7 @@ loyaltyProgram.get('/redemptions', async (c) => {
       ),
       reward:loyalty_rewards(id, name, reward_type)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('created_at', { ascending: false })
     .limit(limit);
   
@@ -432,23 +446,24 @@ loyaltyProgram.get('/redemptions', async (c) => {
 
 // Get statistics
 loyaltyProgram.get('/stats', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const [programRes, membersRes, tiersRes] = await Promise.all([
     supabase
       .from('loyalty_programs')
       .select('total_members, total_points_issued, total_points_redeemed')
-      .eq('store_id', user.store_id)
+      .eq('store_id', merchantId)
       .single(),
     supabase
       .from('loyalty_members')
       .select('tier_id, current_points')
-      .eq('store_id', user.store_id),
+      .eq('store_id', merchantId),
     supabase
       .from('loyalty_tiers')
       .select('id, name')
-      .eq('program_id', (await supabase.from('loyalty_programs').select('id').eq('store_id', user.store_id).single()).data?.id)
+      .eq('program_id', (await supabase.from('loyalty_programs').select('id').eq('store_id', merchantId).single()).data?.id)
   ]);
   
   const program = programRes.data;

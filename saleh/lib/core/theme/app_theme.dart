@@ -308,7 +308,10 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        iconTheme: const IconThemeData(color: Colors.white, size: 24), // أيقونات بيضاء
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+          size: 24,
+        ), // أيقونات بيضاء
       ),
 
       // Text Theme - Cairo for Arabic

@@ -22,7 +22,8 @@
       "Bash(powershell -Command \"\\(Get-Content lib/api.ts -Raw\\) -replace \"\"import { supabase } from ''./supabase'';\"\", \"\"import { getSupabase } from ''./supabase'';\"\" | Set-Content lib/api.ts -NoNewline\")",
       "Bash(powershell:*)",
       "Bash(npm run build:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(flutter create:*)"
     ]
   }
 }

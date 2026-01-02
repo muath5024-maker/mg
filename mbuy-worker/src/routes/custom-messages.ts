@@ -1,19 +1,20 @@
 import { Hono } from 'hono';
 import { createClient } from '@supabase/supabase-js';
-import type { Env } from '../types';
+import type { Env, AuthContext } from '../types';
 
-const customMessages = new Hono<{ Bindings: Env }>();
+const customMessages = new Hono<{ Bindings: Env; Variables: AuthContext }>();
 
 // Get all templates
 customMessages.get('/templates', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const type = c.req.query('type');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
-  
+
   let query = supabase
     .from('message_templates')
     .select('*')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('is_system', { ascending: false })
     .order('name');
   
@@ -30,14 +31,14 @@ customMessages.get('/templates', async (c) => {
 // Get template by ID
 customMessages.get('/templates/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
-  
+
   const { data, error } = await supabase
     .from('message_templates')
     .select('*')
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -46,14 +47,14 @@ customMessages.get('/templates/:id', async (c) => {
 
 // Create template
 customMessages.post('/templates', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
-  
+
   const { data, error } = await supabase
     .from('message_templates')
     .insert({
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       description: body.description,
       template_type: body.template_type || 'custom',
@@ -71,21 +72,21 @@ customMessages.post('/templates', async (c) => {
 // Update template
 customMessages.put('/templates/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
-  
+
   // Don't allow editing system templates
   const { data: existing } = await supabase
     .from('message_templates')
     .select('is_system')
     .eq('id', id)
     .single();
-  
+
   if (existing?.is_system) {
     return c.json({ ok: false, error: 'Cannot edit system templates' }, 400);
   }
-  
+
   const { data, error } = await supabase
     .from('message_templates')
     .update({
@@ -97,7 +98,7 @@ customMessages.put('/templates/:id', async (c) => {
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .select()
     .single();
   
@@ -108,14 +109,14 @@ customMessages.put('/templates/:id', async (c) => {
 // Delete template
 customMessages.delete('/templates/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
-  
+
   const { error } = await supabase
     .from('message_templates')
     .delete()
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .eq('is_system', false);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -124,7 +125,8 @@ customMessages.delete('/templates/:id', async (c) => {
 
 // Get all campaigns
 customMessages.get('/campaigns', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const status = c.req.query('status');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -134,7 +136,7 @@ customMessages.get('/campaigns', async (c) => {
       *,
       template:message_templates(id, name)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('created_at', { ascending: false });
   
   if (status) {
@@ -150,7 +152,8 @@ customMessages.get('/campaigns', async (c) => {
 // Get campaign by ID
 customMessages.get('/campaigns/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
@@ -160,7 +163,7 @@ customMessages.get('/campaigns/:id', async (c) => {
       template:message_templates(*)
     `)
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -169,14 +172,15 @@ customMessages.get('/campaigns/:id', async (c) => {
 
 // Create campaign
 customMessages.post('/campaigns', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('message_campaigns')
     .insert({
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       description: body.description,
       template_id: body.template_id,
@@ -188,7 +192,7 @@ customMessages.post('/campaigns', async (c) => {
       target_customers: body.target_customers,
       status: body.scheduled_at ? 'scheduled' : 'draft',
       scheduled_at: body.scheduled_at,
-      created_by: user.id
+      created_by: userId
     })
     .select()
     .single();
@@ -200,7 +204,8 @@ customMessages.post('/campaigns', async (c) => {
 // Update campaign
 customMessages.put('/campaigns/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -217,7 +222,7 @@ customMessages.put('/campaigns/:id', async (c) => {
       status: body.status
     })
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .eq('status', 'draft') // Only update draft campaigns
     .select()
     .single();
@@ -229,7 +234,8 @@ customMessages.put('/campaigns/:id', async (c) => {
 // Send campaign now
 customMessages.post('/campaigns/:id/send', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Queue messages
@@ -244,7 +250,8 @@ customMessages.post('/campaigns/:id/send', async (c) => {
 // Cancel campaign
 customMessages.post('/campaigns/:id/cancel', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Update campaign status
@@ -252,7 +259,7 @@ customMessages.post('/campaigns/:id/cancel', async (c) => {
     .from('message_campaigns')
     .update({ status: 'cancelled' })
     .eq('id', id)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   // Cancel pending queue items
   await supabase
@@ -266,7 +273,8 @@ customMessages.post('/campaigns/:id/cancel', async (c) => {
 
 // Get message history
 customMessages.get('/history', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const limit = parseInt(c.req.query('limit') || '50');
   const customerId = c.req.query('customer_id');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -277,7 +285,7 @@ customMessages.get('/history', async (c) => {
       *,
       customer:customers(id, full_name, phone)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('created_at', { ascending: false })
     .limit(limit);
   
@@ -293,7 +301,8 @@ customMessages.get('/history', async (c) => {
 
 // Get automated messages
 customMessages.get('/automation', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
@@ -302,7 +311,7 @@ customMessages.get('/automation', async (c) => {
       *,
       template:message_templates(id, name)
     `)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('created_at');
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
@@ -311,14 +320,15 @@ customMessages.get('/automation', async (c) => {
 
 // Create automated message
 customMessages.post('/automation', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('automated_messages')
     .insert({
-      store_id: user.store_id,
+      store_id: merchantId,
       name: body.name,
       trigger_type: body.trigger_type,
       trigger_config: body.trigger_config || {},
@@ -337,7 +347,8 @@ customMessages.post('/automation', async (c) => {
 // Update automated message
 customMessages.put('/automation/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -353,7 +364,7 @@ customMessages.put('/automation/:id', async (c) => {
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .select()
     .single();
   
@@ -364,7 +375,8 @@ customMessages.put('/automation/:id', async (c) => {
 // Toggle automated message
 customMessages.patch('/automation/:id/toggle', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Get current state
@@ -378,7 +390,7 @@ customMessages.patch('/automation/:id/toggle', async (c) => {
     .from('automated_messages')
     .update({ is_active: !current?.is_active })
     .eq('id', id)
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .select()
     .single();
   
@@ -389,14 +401,15 @@ customMessages.patch('/automation/:id/toggle', async (c) => {
 // Delete automated message
 customMessages.delete('/automation/:id', async (c) => {
   const { id } = c.req.param();
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { error } = await supabase
     .from('automated_messages')
     .delete()
     .eq('id', id)
-    .eq('store_id', user.store_id);
+    .eq('store_id', merchantId);
   
   if (error) return c.json({ ok: false, error: error.message }, 500);
   return c.json({ ok: true });
@@ -404,13 +417,14 @@ customMessages.delete('/automation/:id', async (c) => {
 
 // Get settings
 customMessages.get('/settings', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('message_settings')
     .select('*')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .single();
   
   if (error && error.code !== 'PGRST116') {
@@ -422,14 +436,15 @@ customMessages.get('/settings', async (c) => {
 
 // Update settings
 customMessages.put('/settings', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   const { data, error } = await supabase
     .from('message_settings')
     .upsert({
-      store_id: user.store_id,
+      store_id: merchantId,
       notifications_enabled: body.notifications_enabled,
       sms_enabled: body.sms_enabled,
       email_enabled: body.email_enabled,
@@ -452,7 +467,8 @@ customMessages.put('/settings', async (c) => {
 
 // Send test message
 customMessages.post('/test', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const body = await c.req.json();
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
@@ -469,7 +485,8 @@ customMessages.post('/test', async (c) => {
 
 // Get queue status
 customMessages.get('/queue', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const status = c.req.query('status');
   const limit = parseInt(c.req.query('limit') || '50');
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -477,7 +494,7 @@ customMessages.get('/queue', async (c) => {
   let query = supabase
     .from('message_queue')
     .select('*')
-    .eq('store_id', user.store_id)
+    .eq('store_id', merchantId)
     .order('created_at', { ascending: false })
     .limit(limit);
   
@@ -493,7 +510,8 @@ customMessages.get('/queue', async (c) => {
 
 // Get statistics
 customMessages.get('/stats', async (c) => {
-  const user = c.get('user' as never) as { id: string; store_id: string };
+  const merchantId = c.get('merchantId') as string;
+  const userId = c.get('userId') as string;
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Get message counts
@@ -501,16 +519,16 @@ customMessages.get('/stats', async (c) => {
     supabase
       .from('message_campaigns')
       .select('status')
-      .eq('store_id', user.store_id),
+      .eq('store_id', merchantId),
     supabase
       .from('message_history')
       .select('status')
-      .eq('store_id', user.store_id)
+      .eq('store_id', merchantId)
       .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
     supabase
       .from('automated_messages')
       .select('is_active, triggered_count, sent_count')
-      .eq('store_id', user.store_id)
+      .eq('store_id', merchantId)
   ]);
   
   const campaigns = campaignsRes.data || [];

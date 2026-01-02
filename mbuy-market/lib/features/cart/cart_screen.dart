@@ -10,7 +10,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   bool _isExpanded = false; // للتحكم في عرض التفاصيل
-  
+
   final List<Map<String, dynamic>> _cartItems = [
     {
       'name': 'حذاء رياضي Nike',
@@ -268,10 +268,15 @@ class _CartScreenState extends State<CartScreen> {
               ),
               const SizedBox(height: 12),
               // Price Summary
-              _priceRow('المجموع الفرعي', '${_subtotal.toStringAsFixed(0)} ر.س'),
+              _priceRow(
+                'المجموع الفرعي',
+                '${_subtotal.toStringAsFixed(0)} ر.س',
+              ),
               _priceRow(
                 'الشحن',
-                _shipping == 0 ? 'مجاني' : '${_shipping.toStringAsFixed(0)} ر.س',
+                _shipping == 0
+                    ? 'مجاني'
+                    : '${_shipping.toStringAsFixed(0)} ر.س',
                 isGreen: _shipping == 0,
               ),
               const Divider(),
@@ -314,7 +319,10 @@ class _CartScreenState extends State<CartScreen> {
                   child: GestureDetector(
                     onTap: () => setState(() => _isExpanded = !_isExpanded),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -350,7 +358,9 @@ class _CartScreenState extends State<CartScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
-                              _isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+                              _isExpanded
+                                  ? Icons.keyboard_arrow_down
+                                  : Icons.keyboard_arrow_up,
                               color: Colors.grey.shade600,
                               size: 28,
                             ),

@@ -19,6 +19,8 @@ const TABLES = {
   merchants: 'merchants',
   merchant_users: 'merchant_users',
   merchant_settings: 'merchant_settings',
+  merchant_followers: 'merchant_followers',
+  merchant_reviews: 'merchant_reviews',
 } as const;
 
 /**
@@ -432,4 +434,615 @@ export async function addMerchantUser(c: Context<{ Bindings: Env; Variables: Aut
   }
 }
 
+// ============================================
+// MERCHANT FOLLOWERS (متابعة المتجر)
+// ============================================
+
+/**
+ * POST /public/merchants/:merchantId/follow
+ * Follow a merchant (for customers)
+ */
+export async function followMerchant(c: Context<{ Bindings: Env; Variables: AuthContext }>) {
+  try {
+    const customerId = c.get('userId' as any) as string;
+    const userType = c.get('userType' as any) as UserType;
+    const merchantId = c.req.param('merchantId');
+
+    if (!customerId) {
+      return c.json({
+        ok: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      }, 401);
+    }
+
+    if (userType !== 'customer') {
+      return c.json({
+        ok: false,
+        error: 'FORBIDDEN',
+        message: 'Only customers can follow merchants',
+      }, 403);
+    }
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    // Check if already following
+    const { data: existing } = await supabase.selectSingle<any>(
+      TABLES.merchant_followers,
+      {
+        merchant_id: `eq.${merchantId}`,
+        customer_id: `eq.${customerId}`
+      }
+    );
+
+    if (existing) {
+      return c.json({
+        ok: false,
+        error: 'ALREADY_FOLLOWING',
+        message: 'Already following this merchant',
+      }, 409);
+    }
+
+    // Create follow
+    const { data: follow, error } = await supabase.insertSingle<any>(
+      TABLES.merchant_followers,
+      {
+        merchant_id: merchantId,
+        customer_id: customerId,
+        followed_at: new Date().toISOString(),
+      }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to follow merchant',
+      }, 500);
+    }
+
+    return c.json({
+      ok: true,
+      data: follow,
+      message: 'Successfully followed merchant',
+    }, 201);
+
+  } catch (error: any) {
+    console.error('[followMerchant] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * DELETE /public/merchants/:merchantId/follow
+ * Unfollow a merchant
+ */
+export async function unfollowMerchant(c: Context<{ Bindings: Env; Variables: AuthContext }>) {
+  try {
+    const customerId = c.get('userId' as any) as string;
+    const merchantId = c.req.param('merchantId');
+
+    if (!customerId) {
+      return c.json({
+        ok: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      }, 401);
+    }
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    const { error } = await supabase.delete(
+      TABLES.merchant_followers,
+      {
+        merchant_id: `eq.${merchantId}`,
+        customer_id: `eq.${customerId}`
+      }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to unfollow merchant',
+      }, 500);
+    }
+
+    return c.json({
+      ok: true,
+      message: 'Successfully unfollowed merchant',
+    });
+
+  } catch (error: any) {
+    console.error('[unfollowMerchant] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * GET /public/merchants/:merchantId/followers/count
+ * Get merchant followers count
+ */
+export async function getMerchantFollowersCount(c: Context<{ Bindings: Env }>) {
+  try {
+    const merchantId = c.req.param('merchantId');
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    const { data: followers, error } = await supabase.select<any>(
+      TABLES.merchant_followers,
+      { merchant_id: `eq.${merchantId}` },
+      { select: 'id' }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to get followers count',
+      }, 500);
+    }
+
+    return c.json({
+      ok: true,
+      data: {
+        count: followers?.length || 0,
+      },
+    });
+
+  } catch (error: any) {
+    console.error('[getMerchantFollowersCount] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * GET /public/merchants/:merchantId/is-following
+ * Check if current customer is following merchant
+ */
+export async function isFollowingMerchant(c: Context<{ Bindings: Env; Variables: AuthContext }>) {
+  try {
+    const customerId = c.get('userId' as any) as string;
+    const merchantId = c.req.param('merchantId');
+
+    if (!customerId) {
+      return c.json({
+        ok: true,
+        data: { is_following: false },
+      });
+    }
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    const { data: existing } = await supabase.selectSingle<any>(
+      TABLES.merchant_followers,
+      {
+        merchant_id: `eq.${merchantId}`,
+        customer_id: `eq.${customerId}`
+      }
+    );
+
+    return c.json({
+      ok: true,
+      data: {
+        is_following: !!existing,
+      },
+    });
+
+  } catch (error: any) {
+    console.error('[isFollowingMerchant] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * GET /secure/customer/following
+ * Get list of merchants the customer is following
+ */
+export async function getFollowingMerchants(c: Context<{ Bindings: Env; Variables: AuthContext }>) {
+  try {
+    const customerId = c.get('userId' as any) as string;
+
+    if (!customerId) {
+      return c.json({
+        ok: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      }, 401);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    // Get following with merchant details
+    const { data: following, error } = await supabase.select<any>(
+      TABLES.merchant_followers,
+      { customer_id: `eq.${customerId}` },
+      { select: 'id,merchant_id,followed_at' }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to get following list',
+      }, 500);
+    }
+
+    // Get merchant details for each
+    if (following && following.length > 0) {
+      const merchantIds = following.map((f: any) => f.merchant_id);
+      const { data: merchants } = await supabase.select<Merchant>(
+        TABLES.merchants,
+        { id: `in.(${merchantIds.join(',')})` },
+        { select: 'id,name,logo_url,phone' }
+      );
+
+      // Merge data
+      const result = following.map((f: any) => ({
+        ...f,
+        merchant: merchants?.find((m: any) => m.id === f.merchant_id) || null,
+      }));
+
+      return c.json({
+        ok: true,
+        data: result,
+      });
+    }
+
+    return c.json({
+      ok: true,
+      data: [],
+    });
+
+  } catch (error: any) {
+    console.error('[getFollowingMerchants] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+// ============================================
+// MERCHANT REVIEWS (تقييم المتجر)
+// ============================================
+
+/**
+ * POST /public/merchants/:merchantId/reviews
+ * Add a review for a merchant
+ */
+export async function addMerchantReview(c: Context<{ Bindings: Env; Variables: AuthContext }>) {
+  try {
+    const customerId = c.get('userId' as any) as string;
+    const userType = c.get('userType' as any) as UserType;
+    const merchantId = c.req.param('merchantId');
+
+    if (!customerId) {
+      return c.json({
+        ok: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      }, 401);
+    }
+
+    if (userType !== 'customer') {
+      return c.json({
+        ok: false,
+        error: 'FORBIDDEN',
+        message: 'Only customers can add reviews',
+      }, 403);
+    }
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const body = await c.req.json();
+    const { rating, title, review } = body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Rating must be between 1 and 5',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    // Check if customer already reviewed this merchant
+    const { data: existing } = await supabase.selectSingle<any>(
+      TABLES.merchant_reviews,
+      {
+        merchant_id: `eq.${merchantId}`,
+        customer_id: `eq.${customerId}`
+      }
+    );
+
+    if (existing) {
+      return c.json({
+        ok: false,
+        error: 'ALREADY_REVIEWED',
+        message: 'You have already reviewed this merchant',
+      }, 409);
+    }
+
+    // Create review
+    const { data: newReview, error } = await supabase.insertSingle<any>(
+      TABLES.merchant_reviews,
+      {
+        merchant_id: merchantId,
+        customer_id: customerId,
+        rating: Math.round(rating),
+        title: title || null,
+        review: review || null,
+        created_at: new Date().toISOString(),
+      }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to add review',
+      }, 500);
+    }
+
+    return c.json({
+      ok: true,
+      data: newReview,
+      message: 'Review added successfully',
+    }, 201);
+
+  } catch (error: any) {
+    console.error('[addMerchantReview] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * GET /public/merchants/:merchantId/reviews
+ * Get merchant reviews
+ */
+export async function getMerchantReviews(c: Context<{ Bindings: Env }>) {
+  try {
+    const merchantId = c.req.param('merchantId');
+    const limit = parseInt(c.req.query('limit') || '20');
+    const offset = parseInt(c.req.query('offset') || '0');
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    const { data: reviews, error } = await supabase.select<any>(
+      TABLES.merchant_reviews,
+      { merchant_id: `eq.${merchantId}` },
+      {
+        select: 'id,rating,title,review,created_at,customer_id',
+        order: 'created_at.desc',
+        limit,
+        offset
+      }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to get reviews',
+      }, 500);
+    }
+
+    return c.json({
+      ok: true,
+      data: reviews || [],
+    });
+
+  } catch (error: any) {
+    console.error('[getMerchantReviews] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * GET /public/merchants/:merchantId/rating
+ * Get merchant average rating and stats
+ */
+export async function getMerchantRating(c: Context<{ Bindings: Env }>) {
+  try {
+    const merchantId = c.req.param('merchantId');
+
+    if (!merchantId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID is required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    const { data: reviews, error } = await supabase.select<any>(
+      TABLES.merchant_reviews,
+      { merchant_id: `eq.${merchantId}` },
+      { select: 'rating' }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to get rating',
+      }, 500);
+    }
+
+    if (!reviews || reviews.length === 0) {
+      return c.json({
+        ok: true,
+        data: {
+          average_rating: 0,
+          total_reviews: 0,
+          rating_distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        },
+      });
+    }
+
+    // Calculate stats
+    const total = reviews.length;
+    const sum = reviews.reduce((acc: number, r: any) => acc + r.rating, 0);
+    const average = sum / total;
+
+    // Rating distribution
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    reviews.forEach((r: any) => {
+      if (r.rating >= 1 && r.rating <= 5) {
+        distribution[r.rating as keyof typeof distribution]++;
+      }
+    });
+
+    return c.json({
+      ok: true,
+      data: {
+        average_rating: Math.round(average * 10) / 10,
+        total_reviews: total,
+        rating_distribution: distribution,
+      },
+    });
+
+  } catch (error: any) {
+    console.error('[getMerchantRating] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
+
+/**
+ * DELETE /public/merchants/:merchantId/reviews/:reviewId
+ * Delete own review
+ */
+export async function deleteMerchantReview(c: Context<{ Bindings: Env; Variables: AuthContext }>) {
+  try {
+    const customerId = c.get('userId' as any) as string;
+    const merchantId = c.req.param('merchantId');
+    const reviewId = c.req.param('reviewId');
+
+    if (!customerId) {
+      return c.json({
+        ok: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      }, 401);
+    }
+
+    if (!merchantId || !reviewId) {
+      return c.json({
+        ok: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Merchant ID and Review ID are required',
+      }, 400);
+    }
+
+    const supabase = createSupabase(c.env);
+
+    // Only allow deleting own review
+    const { error } = await supabase.delete(
+      TABLES.merchant_reviews,
+      {
+        id: `eq.${reviewId}`,
+        customer_id: `eq.${customerId}`
+      }
+    );
+
+    if (error) {
+      return c.json({
+        ok: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to delete review',
+      }, 500);
+    }
+
+    return c.json({
+      ok: true,
+      message: 'Review deleted successfully',
+    });
+
+  } catch (error: any) {
+    console.error('[deleteMerchantReview] Error:', error);
+    return c.json({
+      ok: false,
+      error: 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+    }, 500);
+  }
+}
 
