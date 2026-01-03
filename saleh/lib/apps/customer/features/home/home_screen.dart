@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/app_theme.dart';
 import 'widgets/home_banner_carousel.dart';
 import 'widgets/featured_stores_section.dart';
 import 'widgets/trending_products_section.dart';
 import 'widgets/categories_grid.dart';
 import 'widgets/flash_deals_section.dart';
+import 'widgets/rectangular_cards.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final ScrollController? scrollController;
@@ -34,29 +36,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      child: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          // Banner Carousel
-          const SliverToBoxAdapter(child: HomeBannerCarousel()),
+    return Container(
+      color: AppTheme.surfaceColor,
+      child: RefreshIndicator(
+        onRefresh: _onRefresh,
+        color: AppTheme.primaryColor,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              // Hero Banner (400px)
+              const HomeBannerCarousel(),
+              const SizedBox(height: 16),
 
-          // Categories Grid
-          const SliverToBoxAdapter(child: CategoriesGrid()),
+              // Rectangular Cards (Horizontal Scroll)
+              const RectangularCards(),
+              const SizedBox(height: 24),
 
-          // Flash Deals
-          const SliverToBoxAdapter(child: FlashDealsSection()),
+              // Categories Grid (Circles)
+              const CategoriesGrid(),
+              const SizedBox(height: 24),
 
-          // Featured Stores
-          const SliverToBoxAdapter(child: FeaturedStoresSection()),
+              // Flash Deals
+              const FlashDealsSection(),
+              const SizedBox(height: 24),
 
-          // Trending Products
-          const SliverToBoxAdapter(child: TrendingProductsSection()),
+              // Featured Stores
+              const FeaturedStoresSection(),
+              const SizedBox(height: 24),
 
-          // Bottom Padding
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
-        ],
+              // Trending Products
+              const TrendingProductsSection(),
+
+              // Bottom Padding
+              const SizedBox(height: 100),
+            ],
+          ),
+        ),
       ),
     );
   }

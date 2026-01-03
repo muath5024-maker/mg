@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/theme/app_theme.dart';
 import '../../data/data.dart';
 import '../../models/models.dart';
 
@@ -91,7 +92,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                     border: Border(
                       right: BorderSide(
                         color: isSelected
-                            ? Theme.of(context).primaryColor
+                            ? AppTheme.primaryColor
                             : Colors.transparent,
                         width: 3,
                       ),
@@ -102,7 +103,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                       Icon(
                         _getCategoryIcon(category.name),
                         color: isSelected
-                            ? Theme.of(context).primaryColor
+                            ? AppTheme.primaryColor
                             : Colors.grey[600],
                         size: 24,
                       ),
@@ -115,7 +116,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                               ? FontWeight.bold
                               : FontWeight.normal,
                           color: isSelected
-                              ? Theme.of(context).primaryColor
+                              ? AppTheme.primaryColor
                               : Colors.grey[700],
                         ),
                         textAlign: TextAlign.center,

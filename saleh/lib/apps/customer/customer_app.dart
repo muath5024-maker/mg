@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/services/user_preferences_service.dart';
+import 'core/theme/app_theme.dart';
 import 'routes/customer_router.dart';
 
 /// تطبيق العميل - السوق للتسوق والشراء
@@ -18,17 +18,31 @@ class _CustomerAppState extends ConsumerState<CustomerApp> {
   late final router = CustomerRouter.createRouter(ref);
 
   @override
-  Widget build(BuildContext context) {
-    final themeMode = ref.watch(preferencesStateProvider).themeMode;
+  void initState() {
+    super.initState();
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'MBUY Market',
+      title: 'MBUY',
       debugShowCheckedModeBanner: false,
 
-      // Theme - يدعم Light و Dark
+      // Theme - Dark Brown Theme
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,
+      
+      // Arabic RTL Support
+      locale: const Locale('ar'),
+      builder: (context, child) {
+        return Directionality(textDirection: TextDirection.rtl, child: child!);
+      },
 
       // Router خاص بالعميل فقط
       routerConfig: router,

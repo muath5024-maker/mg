@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../core/theme/app_theme.dart';
 import '../home/home_screen.dart';
 import '../categories/categories_screen.dart';
 import '../media/media_screen.dart';
@@ -132,8 +132,8 @@ class _CustomerMainScreenState extends ConsumerState<CustomerMainScreen> {
                 Icon(
                   isSelected ? activeIcon : icon,
                   color: isSelected
-                      ? AppTheme.primaryColor
-                      : AppTheme.textHintColor,
+                      ? AppTheme.navBarSelected
+                      : AppTheme.navBarUnselected,
                   size: 24,
                 ),
                 if (badgeCount != null && badgeCount > 0)
@@ -170,8 +170,8 @@ class _CustomerMainScreenState extends ConsumerState<CustomerMainScreen> {
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: isSelected
-                    ? AppTheme.primaryColor
-                    : AppTheme.textHintColor,
+                    ? AppTheme.navBarSelected
+                    : AppTheme.navBarUnselected,
               ),
             ),
           ],
