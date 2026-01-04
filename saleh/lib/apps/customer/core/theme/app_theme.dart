@@ -64,7 +64,9 @@ class AppTheme {
   // Navigation Bar Colors
   // ============================================================================
   static const Color navBarBackground = Color(0xFFFFFFFF);
-  static const Color navBarSelected = Color(0xFF372018); // Dark Brown when selected
+  static const Color navBarSelected = Color(
+    0xFF372018,
+  ); // Dark Brown when selected
   static const Color navBarUnselected = Color(0xFF999999);
 
   // ============================================================================
@@ -241,7 +243,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide.none,

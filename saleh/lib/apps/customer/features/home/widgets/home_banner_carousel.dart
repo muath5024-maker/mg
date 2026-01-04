@@ -16,17 +16,20 @@ class _HomeBannerCarouselState extends ConsumerState<HomeBannerCarousel> {
   // Banners data
   final List<Map<String, String>> _banners = [
     {
-      'image': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
+      'image':
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
       'brand': 'ESTAVOR',
       'title': 'خصم يصل إلى 50%',
     },
     {
-      'image': 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800',
+      'image':
+          'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800',
       'brand': 'FASHION',
       'title': 'تشكيلة صيف 2026',
     },
     {
-      'image': 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800',
+      'image':
+          'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800',
       'brand': 'PREMIUM',
       'title': 'شحن مجاني',
     },
@@ -78,7 +81,8 @@ class _HomeBannerCarouselState extends ConsumerState<HomeBannerCarousel> {
                   Image.network(
                     banner['image']!,
                     fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => Container(color: Colors.grey.shade300),
+                    errorBuilder: (c, e, s) =>
+                        Container(color: Colors.grey.shade300),
                   ),
                   // Gradient Overlay
                   Container(

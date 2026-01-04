@@ -15,7 +15,7 @@ import 'customer_api_service.dart';
 /// Provider for the API service
 final customerApiProvider = Provider<CustomerApiService>((ref) {
   final api = CustomerApiService(
-    baseUrl: 'https://api.mbuy.pro', // TODO: استخدام environment variable
+    baseUrl: 'https://misty-mode-b68b.baharista1.workers.dev',
   );
 
   // TODO: Set auth token from auth state

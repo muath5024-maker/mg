@@ -8,27 +8,32 @@ class RectangularCards extends StatelessWidget {
   Widget build(BuildContext context) {
     final cards = [
       {
-        'image': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300',
+        'image':
+            'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300',
         'title': 'علامات تجارية',
         'subtitle': 'ESTAVOR',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300',
+        'image':
+            'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300',
         'title': 'الجديد',
         'subtitle': null,
       },
       {
-        'image': 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300',
+        'image':
+            'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300',
         'title': 'خريف وشتاء',
         'subtitle': null,
       },
       {
-        'image': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=300',
+        'image':
+            'https://images.unsplash.com/photo-1445205170230-053b83016050?w=300',
         'title': 'مقاسات كبيرة',
         'subtitle': null,
       },
       {
-        'image': 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300',
+        'image':
+            'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300',
         'title': 'التخفيضات',
         'subtitle': null,
       },
@@ -60,7 +65,8 @@ class RectangularCards extends StatelessWidget {
                       card['image']!,
                       fit: BoxFit.cover,
                       width: double.infinity,
-                      errorBuilder: (_, e, s) => Container(color: Colors.grey.shade300),
+                      errorBuilder: (_, e, s) =>
+                          Container(color: Colors.grey.shade300),
                     ),
                   ),
                 ),

@@ -82,7 +82,8 @@ class CategoriesGrid extends ConsumerWidget {
                     child: Image.network(
                       _images[i % _images.length],
                       fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => Container(color: Colors.grey.shade300),
+                      errorBuilder: (c, e, s) =>
+                          Container(color: Colors.grey.shade300),
                     ),
                   ),
                 ),

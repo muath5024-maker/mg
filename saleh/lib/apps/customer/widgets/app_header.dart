@@ -85,7 +85,11 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           // AI Assistant Icon
           GestureDetector(
             onTap: onAITap,
-            child: const Icon(Icons.support_agent, color: Colors.white, size: 24),
+            child: const Icon(
+              Icons.support_agent,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           // Bell Icon with Badge
@@ -126,7 +130,11 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           // Heart Icon
           GestureDetector(
             onTap: onFavoriteTap,
-            child: const Icon(Icons.favorite_outline, color: Colors.white, size: 24),
+            child: const Icon(
+              Icons.favorite_outline,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
         ],
       ),

@@ -37,7 +37,7 @@ class _CustomerAppState extends ConsumerState<CustomerApp> {
 
       // Theme - Dark Brown Theme
       theme: AppTheme.lightTheme,
-      
+
       // Arabic RTL Support
       locale: const Locale('ar'),
       builder: (context, child) {
