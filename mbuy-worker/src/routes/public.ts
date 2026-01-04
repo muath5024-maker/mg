@@ -5,7 +5,8 @@
 
 import { Hono } from 'hono';
 import { Env } from '../types';
-import { getCategories } from '../endpoints/categories';
+import { listPublicCategories } from '../endpoints/categories-crud';
+import { listPublicProducts, getPublicProduct } from '../endpoints/products-crud';
 import { createDropshipOrder } from '../endpoints/dropshipping';
 import { getAvailableShortcuts } from '../endpoints/shortcuts';
 import { 

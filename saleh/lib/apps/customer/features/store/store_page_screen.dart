@@ -251,7 +251,7 @@ class _StorePageScreenState extends ConsumerState<StorePageScreen>
                   indicatorColor: Theme.of(context).primaryColor,
                   tabs: const [
                     Tab(text: 'المنتجات'),
-                    Tab(text: 'التصنيفات'),
+                    Tab(text: 'الفئات'),
                     Tab(text: 'عن المتجر'),
                   ],
                 ),

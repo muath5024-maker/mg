@@ -1,7 +1,13 @@
 /**
- * Orders CRUD Endpoints - New System
+ * Orders CRUD Endpoints
  * 
- * Handles orders for both merchants and customers
+ * Compatible with DATABASE_SCHEMA.md
+ * 
+ * orders columns: id, store_id, customer_id, merchant_id, status, source,
+ * subtotal, shipping_total, tax_total, discount_total, grand_total,
+ * currency, notes, metadata, created_at, updated_at
+ * 
+ * NOTE: No payment_method column in orders table!
  * 
  * @module endpoints/orders-crud
  */
@@ -50,15 +56,15 @@ export async function listMerchantOrders(c: OrdersContext) {
     let query = supabase
       .from('orders')
       .select(`
-        *,
+        id, store_id, customer_id, merchant_id, status, source,
+        subtotal, shipping_total, tax_total, discount_total, grand_total,
+        currency, notes, metadata, created_at, updated_at,
         customers(id, name, email, phone),
         order_items(*)
       `, { count: 'exact' })
+      .eq('merchant_id', merchantId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
-
-    // Filter by merchant_id
-    query = query.eq('merchant_id', merchantId);
 
     if (status) query = query.eq('status', status);
     if (customerId) query = query.eq('customer_id', customerId);
@@ -102,7 +108,9 @@ export async function getMerchantOrder(c: OrdersContext) {
     const { data, error } = await supabase
       .from('orders')
       .select(`
-        *,
+        id, store_id, customer_id, merchant_id, status, source,
+        subtotal, shipping_total, tax_total, discount_total, grand_total,
+        currency, notes, metadata, created_at, updated_at,
         customers(id, name, email, phone),
         order_items(*),
         order_addresses(*),
@@ -224,8 +232,10 @@ export async function listCustomerOrders(c: OrdersContext) {
     let query = supabase
       .from('orders')
       .select(`
-        *,
-        order_items(*, products(id, name, main_image_url))
+        id, store_id, customer_id, merchant_id, status, source,
+        subtotal, shipping_total, tax_total, discount_total, grand_total,
+        currency, notes, created_at, updated_at,
+        order_items(*, products(id, name))
       `, { count: 'exact' })
       .eq('customer_id', customerId)
       .order('created_at', { ascending: false })
@@ -275,8 +285,10 @@ export async function getCustomerOrder(c: OrdersContext) {
     const { data, error } = await supabase
       .from('orders')
       .select(`
-        *,
-        order_items(*, products(id, name, main_image_url)),
+        id, store_id, customer_id, merchant_id, status, source,
+        subtotal, shipping_total, tax_total, discount_total, grand_total,
+        currency, notes, created_at, updated_at,
+        order_items(*, products(id, name)),
         order_addresses(*),
         order_shipments(*)
       `)
@@ -299,6 +311,12 @@ export async function getCustomerOrder(c: OrdersContext) {
 /**
  * POST /api/customer/orders
  * Create new order (customer checkout)
+ * 
+ * Uses correct column names from DATABASE_SCHEMA.md:
+ * - shipping_total (not shipping_cost)
+ * - tax_total (not tax_amount)
+ * - discount_total (not discount_amount)
+ * - grand_total (not total_amount)
  */
 export async function createCustomerOrder(c: OrdersContext) {
   const customerId = c.get('userId');
@@ -310,7 +328,7 @@ export async function createCustomerOrder(c: OrdersContext) {
 
   try {
     const body = await c.req.json();
-    const { items, shipping_address_id, payment_method, notes, merchant_id } = body;
+    const { items, shipping_address_id, notes, merchant_id } = body;
 
     // Validate
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -334,14 +352,15 @@ export async function createCustomerOrder(c: OrdersContext) {
       return c.json({ ok: false, error: 'INVALID_ADDRESS', message: 'Invalid shipping address' }, 400);
     }
 
-    // Calculate totals from items
+    // Calculate totals from items (get prices from product_pricing table)
     let subtotal = 0;
     const orderItems: any[] = [];
+    let resolvedMerchantId = merchant_id;
 
     for (const item of items) {
       const { data: product } = await supabase
         .from('products')
-        .select('id, name, price, merchant_id')
+        .select('id, name, merchant_id, product_pricing(base_price)')
         .eq('id', item.product_id)
         .single();
 
@@ -349,33 +368,46 @@ export async function createCustomerOrder(c: OrdersContext) {
         return c.json({ ok: false, error: 'INVALID_PRODUCT', message: `Product ${item.product_id} not found` }, 400);
       }
 
-      const itemTotal = product.price * item.quantity;
+      // Get price from product_pricing table
+      const price = product.product_pricing?.[0]?.base_price || 0;
+      const itemTotal = price * item.quantity;
       subtotal += itemTotal;
+
+      if (!resolvedMerchantId) {
+        resolvedMerchantId = product.merchant_id;
+      }
 
       orderItems.push({
         product_id: product.id,
         product_name: product.name,
         quantity: item.quantity,
-        unit_price: product.price,
+        unit_price: price,
         total_price: itemTotal,
         variant_id: item.variant_id || null,
       });
     }
 
-    // Create order
+    // Calculate totals with correct column names
+    const shippingTotal = body.shipping_total || body.shipping_cost || 0;
+    const taxTotal = body.tax_total || body.tax_amount || 0;
+    const discountTotal = body.discount_total || body.discount_amount || 0;
+    const grandTotal = subtotal + shippingTotal + taxTotal - discountTotal;
+
+    // Create order with schema-compliant columns
     const orderData = {
       customer_id: customerId,
-      merchant_id: merchant_id || orderItems[0]?.merchant_id || null,
-      store_id: merchant_id || orderItems[0]?.merchant_id || null, // store_id = merchant_id
+      merchant_id: resolvedMerchantId,
+      store_id: resolvedMerchantId,
       status: 'pending',
+      source: body.source || 'mobile',
       subtotal,
-      shipping_cost: body.shipping_cost || 0,
-      tax_amount: body.tax_amount || 0,
-      discount_amount: body.discount_amount || 0,
-      total_amount: subtotal + (body.shipping_cost || 0) + (body.tax_amount || 0) - (body.discount_amount || 0),
-      payment_method: payment_method || 'cod',
+      shipping_total: shippingTotal,
+      tax_total: taxTotal,
+      discount_total: discountTotal,
+      grand_total: grandTotal,
+      currency: body.currency || 'SAR',
       notes: notes || null,
-      source: 'mobile',
+      metadata: body.metadata || {},
     };
 
     const { data: order, error: orderError } = await supabase

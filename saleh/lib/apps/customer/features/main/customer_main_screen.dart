@@ -30,7 +30,7 @@ class _CustomerMainScreenState extends ConsumerState<CustomerMainScreen> {
     {
       'icon': Icons.grid_view_outlined,
       'activeIcon': Icons.grid_view,
-      'label': 'التصنيفات',
+      'label': 'الفئات',
     },
     {
       'icon': Icons.play_circle_outline,

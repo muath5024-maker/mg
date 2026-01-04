@@ -19,8 +19,8 @@ import { authMiddleware, requireUserType } from './middleware/authMiddleware';
 import { handleOrderQueue } from './queues/orderQueue';
 import { generateDailyReports } from './endpoints/pdfReports';
 import { serveMedia } from './endpoints/media';
-import { getCategories } from './endpoints/categories';
 import { getAvailableShortcuts } from './endpoints/shortcuts';
+import { listPublicCategories } from './endpoints/categories-crud';
 import { deprecatedRouteGroup } from './endpoints/_deprecated';
 /* DEPRECATED - Old store subdomain system
 import {
@@ -199,8 +199,8 @@ app.all('/admin/api/*', deprecatedRouteGroup);
 // Public Routes
 app.route('/public', publicRoutes);
 
-// Categories
-app.get('/categories', getCategories);
+// Categories (using new schema-compliant endpoint)
+app.get('/categories', listPublicCategories);
 
 // Shortcuts
 app.get('/shortcuts/available', getAvailableShortcuts);

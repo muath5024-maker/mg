@@ -79,35 +79,31 @@ class CustomerAppHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           const SizedBox(width: 12),
-          // Bell Icon with Badge
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(
-                Icons.notifications_outlined,
-                color: Colors.white,
-                size: 24,
-              ),
-              Positioned(
-                top: -4,
-                right: -4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
+          // AI Assistant Icon
+          GestureDetector(
+            onTap: () => context.push('/ai-assistant'),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(
+                  Icons.smart_toy_outlined,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.greenAccent,
+                      shape: BoxShape.circle,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

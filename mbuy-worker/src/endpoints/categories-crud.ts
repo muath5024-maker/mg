@@ -1,5 +1,10 @@
 /**
- * Categories CRUD Endpoints - New System
+ * Categories CRUD Endpoints
+ * 
+ * Compatible with DATABASE_SCHEMA.md
+ * 
+ * product_categories columns: id, store_id, name, slug, parent_id, metadata, created_at
+ * NOTE: No merchant_id, image_url, position, is_active, description columns!
  * 
  * @module endpoints/categories-crud
  */
@@ -22,7 +27,7 @@ function getSupabase(env: Env) {
 
 /**
  * GET /api/merchant/categories
- * List categories for merchant
+ * List categories for merchant's store
  */
 export async function listMerchantCategories(c: CategoriesContext) {
   const merchantId = c.get('merchantId') || c.get('userId');
@@ -34,15 +39,12 @@ export async function listMerchantCategories(c: CategoriesContext) {
   try {
     const supabase = getSupabase(c.env);
 
-    let query = supabase
+    // Filter by store_id (which equals merchant_id)
+    const { data, error } = await supabase
       .from('product_categories')
-      .select('*')
-      .order('position', { ascending: true });
-
-    // Filter by merchant_id
-    query = query.eq('merchant_id', merchantId);
-
-    const { data, error } = await query;
+      .select('id, store_id, name, slug, parent_id, metadata, created_at')
+      .eq('store_id', merchantId)
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('[listCategories] Error:', error);
@@ -76,15 +78,16 @@ export async function createMerchantCategory(c: CategoriesContext) {
 
     const supabase = getSupabase(c.env);
 
+    // Generate slug from name
+    const slug = body.slug || body.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    // Only use columns that exist in product_categories table
     const categoryData = {
-      merchant_id: merchantId,
-      store_id: merchantId, // store_id = merchant_id
+      store_id: merchantId,
       name: body.name.trim(),
-      description: body.description || null,
+      slug: slug,
       parent_id: body.parent_id || null,
-      image_url: body.image_url || null,
-      position: body.position || 0,
-      is_active: body.is_active ?? true,
+      metadata: body.metadata || {},
     };
 
     const { data, error } = await supabase
@@ -121,8 +124,9 @@ export async function updateMerchantCategory(c: CategoriesContext) {
     const body = await c.req.json();
     const supabase = getSupabase(c.env);
 
-    const updateData: Record<string, any> = { updated_at: new Date().toISOString() };
-    const allowedFields = ['name', 'description', 'parent_id', 'image_url', 'position', 'is_active'];
+    // Only allow updating columns that exist in product_categories
+    const updateData: Record<string, any> = {};
+    const allowedFields = ['name', 'slug', 'parent_id', 'metadata'];
     
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
@@ -130,11 +134,12 @@ export async function updateMerchantCategory(c: CategoriesContext) {
       }
     }
 
+    // Update using store_id filter (not merchant_id)
     const { data, error } = await supabase
       .from('product_categories')
       .update(updateData)
       .eq('id', categoryId)
-      .eq('merchant_id', merchantId)
+      .eq('store_id', merchantId)
       .select()
       .single();
 
@@ -164,9 +169,9 @@ export async function deleteMerchantCategory(c: CategoriesContext) {
   try {
     const supabase = getSupabase(c.env);
 
-    // Check if category has products
+    // Check if category has product assignments (M2M table)
     const { count } = await supabase
-      .from('products')
+      .from('product_category_assignments')
       .select('*', { count: 'exact', head: true })
       .eq('category_id', categoryId);
 
@@ -174,11 +179,12 @@ export async function deleteMerchantCategory(c: CategoriesContext) {
       return c.json({ ok: false, error: 'HAS_PRODUCTS', message: `Cannot delete: ${count} products in this category` }, 400);
     }
 
+    // Delete using store_id filter
     const { error } = await supabase
       .from('product_categories')
       .delete()
       .eq('id', categoryId)
-      .eq('merchant_id', merchantId);
+      .eq('store_id', merchantId);
 
     if (error) {
       return c.json({ ok: false, error: 'DATABASE_ERROR', message: error.message }, 500);
@@ -197,7 +203,7 @@ export async function deleteMerchantCategory(c: CategoriesContext) {
 
 /**
  * GET /api/public/categories
- * List active categories for a store
+ * List categories for a store
  */
 export async function listPublicCategories(c: Context<{ Bindings: Env }>) {
   try {
@@ -205,15 +211,14 @@ export async function listPublicCategories(c: Context<{ Bindings: Env }>) {
     
     const storeIdParam = c.req.query('store_id');
     const merchantIdParam = c.req.query('merchant_id');
-    const merchantId = merchantIdParam || storeIdParam; // support both
+    const storeId = merchantIdParam || storeIdParam;
 
     let query = supabase
       .from('product_categories')
-      .select('id, name, description, image_url, parent_id')
-      .eq('is_active', true)
-      .order('position', { ascending: true });
+      .select('id, store_id, name, slug, parent_id, metadata')
+      .order('name', { ascending: true });
 
-    if (merchantId) query = query.eq('merchant_id', merchantId);
+    if (storeId) query = query.eq('store_id', storeId);
 
     const { data, error } = await query;
 

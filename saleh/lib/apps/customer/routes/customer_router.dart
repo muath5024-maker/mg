@@ -8,6 +8,9 @@ import '../features/search/search_screen.dart';
 import '../features/checkout/checkout_screen.dart';
 import '../features/orders/orders_screen.dart';
 import '../features/favorites/favorites_screen.dart';
+import '../features/cart/cart_screen.dart';
+import '../features/categories/category_products_screen.dart';
+import '../features/categories/category_suppliers_screen.dart';
 
 /// Customer Router - التنقل داخل تطبيق العميل
 class CustomerRouter {
@@ -43,6 +46,26 @@ class CustomerRouter {
           },
         ),
 
+        // منتجات الفئة (عرض الكل)
+        GoRoute(
+          path: '/category/:name/products',
+          name: 'category-products',
+          builder: (context, state) {
+            final categoryName = state.pathParameters['name'] ?? '';
+            return CategoryProductsScreen(categoryName: categoryName);
+          },
+        ),
+
+        // موردون الفئة (عرض الكل)
+        GoRoute(
+          path: '/category/:name/suppliers',
+          name: 'category-suppliers',
+          builder: (context, state) {
+            final categoryName = state.pathParameters['name'] ?? '';
+            return CategorySuppliersScreen(categoryName: categoryName);
+          },
+        ),
+
         // البحث
         GoRoute(
           path: '/search',
@@ -60,6 +83,22 @@ class CustomerRouter {
           builder: (context, state) => const FavoritesScreen(),
         ),
 
+        // السلة
+        GoRoute(
+          path: '/cart',
+          name: 'cart',
+          builder: (context, state) => Scaffold(
+            appBar: AppBar(
+              title: const Text('سلة التسوق'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: () => context.pop(),
+              ),
+            ),
+            body: const CartScreen(),
+          ),
+        ),
+
         // طلباتي
         GoRoute(
           path: '/orders',
@@ -72,6 +111,39 @@ class CustomerRouter {
           path: '/checkout',
           name: 'checkout',
           builder: (context, state) => const CheckoutScreen(),
+        ),
+
+        // المساعد الشخصي
+        GoRoute(
+          path: '/ai-assistant',
+          name: 'ai-assistant',
+          builder: (context, state) => Scaffold(
+            appBar: AppBar(
+              title: const Text('المساعد الشخصي'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: () => context.pop(),
+              ),
+            ),
+            body: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.smart_toy, size: 80, color: Color(0xFF00BFA5)),
+                  SizedBox(height: 24),
+                  Text(
+                    'المساعد الذكي',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'قريبًا - مساعدك الشخصي للتسوق',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
       errorBuilder: (context, state) => Scaffold(
