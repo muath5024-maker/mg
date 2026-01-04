@@ -1450,13 +1450,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               child: OutlinedButton(
                 onPressed: () async {
                   final notifier = ref.read(cartProvider.notifier);
-                  final success = await notifier.addToCart(_product.id, quantity: 1);
+                  final success = await notifier.addToCart(
+                    _product.id,
+                    quantity: 1,
+                  );
 
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          success ? 'تمت الإضافة إلى السلة' : 'فشل في الإضافة إلى السلة',
+                          success
+                              ? 'تمت الإضافة إلى السلة'
+                              : 'فشل في الإضافة إلى السلة',
                         ),
                         duration: const Duration(seconds: 2),
                         action: success
