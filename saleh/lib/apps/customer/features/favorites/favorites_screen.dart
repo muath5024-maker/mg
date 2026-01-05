@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../features/auth/data/auth_controller.dart';
 import '../../data/data.dart';
 import '../../models/models.dart';
 
@@ -15,16 +16,28 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    // Load favorites on init
+    // Load favorites on init only if authenticated
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(favoritesProvider.notifier).loadFavorites();
+      final isAuthenticated = ref.read(authControllerProvider).isAuthenticated;
+      if (isAuthenticated) {
+        ref.read(favoritesProvider.notifier).loadFavorites();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
     final favoritesState = ref.watch(favoritesProvider);
     final favorites = favoritesState.favorites;
+
+    // إذا لم يكن مسجل دخول، اعرض رسالة تسجيل الدخول
+    if (!authState.isAuthenticated) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('المفضلة')),
+        body: _buildLoginRequiredState(),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -46,6 +59,74 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           : favorites.isEmpty
           ? _buildEmptyState()
           : _buildFavoritesList(favorites),
+    );
+  }
+
+  Widget _buildLoginRequiredState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: const Color(0xFF00BFA5).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.favorite_border,
+                size: 50,
+                color: Color(0xFF00BFA5),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'سجل دخولك لحفظ المفضلة',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'قم بتسجيل الدخول لحفظ المنتجات المفضلة لديك والوصول إليها من أي جهاز',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.push('/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00BFA5),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'تسجيل الدخول',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text(
+                'تصفح المنتجات',
+                style: TextStyle(color: Color(0xFF00BFA5)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../features/auth/data/auth_controller.dart';
 import '../../data/customer_providers.dart';
 
 /// ═══════════════════════════════════════════════════════════════════════════
@@ -290,6 +291,22 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ),
           ),
           onPressed: () async {
+            // تحقق من تسجيل الدخول أولاً
+            final isAuthenticated = ref
+                .read(authControllerProvider)
+                .isAuthenticated;
+            if (!isAuthenticated) {
+              // عرض رسالة وفتح صفحة تسجيل الدخول
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('الرجاء تسجيل الدخول لإضافة المنتج للمفضلة'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              context.push('/login');
+              return;
+            }
+
             final notifier = ref.read(favoritesProvider.notifier);
             final success = _isFavorite
                 ? await notifier.removeFromFavorites(_product.id)
@@ -1449,6 +1466,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () async {
+                  // تحقق من تسجيل الدخول أولاً
+                  final isAuthenticated = ref
+                      .read(authControllerProvider)
+                      .isAuthenticated;
+                  if (!isAuthenticated) {
+                    // عرض رسالة وفتح صفحة تسجيل الدخول
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'الرجاء تسجيل الدخول لإضافة المنتج للسلة',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    context.push('/login');
+                    return;
+                  }
+
                   final notifier = ref.read(cartProvider.notifier);
                   final success = await notifier.addToCart(
                     _product.id,

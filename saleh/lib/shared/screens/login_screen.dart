@@ -139,6 +139,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     context.go('/register');
   }
 
+  /// الدخول كضيف - تخطي تسجيل الدخول
+  void _skipLogin() {
+    ref.read(rootControllerProvider.notifier).switchToCustomerApp();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
@@ -146,59 +151,81 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: AppDimensions.screenPadding,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo
-                  _buildLogo(),
-                  const SizedBox(height: AppDimensions.spacing16),
-
-                  // Title
-                  _buildTitle(),
-                  const SizedBox(height: AppDimensions.spacing24),
-
-                  // تبويبات عميل - تاجر
-                  _buildUserTypeTabs(),
-                  const SizedBox(height: AppDimensions.spacing24),
-
-                  // Email Field
-                  _buildEmailField(),
-                  const SizedBox(height: AppDimensions.spacing16),
-
-                  // Password Field
-                  _buildPasswordField(),
-                  const SizedBox(height: AppDimensions.spacing12),
-
-                  // Forgot Password Link
-                  _buildForgotPasswordLink(),
-                  const SizedBox(height: AppDimensions.spacing24),
-
-                  // Error Message
-                  if (authState.errorMessage != null) ...[
-                    _buildErrorMessage(authState.errorMessage!),
-                    const SizedBox(height: AppDimensions.spacing16),
-                  ],
-
-                  // Login Button
-                  _buildLoginButton(isLoading),
-                  const SizedBox(height: AppDimensions.spacing16),
-
-                  // Register Button
-                  _buildRegisterButton(),
-                  const SizedBox(height: AppDimensions.spacing24),
-
-                  // Demo Info
-                  _buildDemoInfo(),
-                ],
+        child: Column(
+          children: [
+            // زر التخطي في الأعلى
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton.icon(
+                  onPressed: _skipLogin,
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('تخطي'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey[600],
+                  ),
+                ),
               ),
             ),
-          ),
+            // المحتوى
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: AppDimensions.screenPadding,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Logo
+                        _buildLogo(),
+                        const SizedBox(height: AppDimensions.spacing16),
+
+                        // Title
+                        _buildTitle(),
+                        const SizedBox(height: AppDimensions.spacing24),
+
+                        // تبويبات عميل - تاجر
+                        _buildUserTypeTabs(),
+                        const SizedBox(height: AppDimensions.spacing24),
+
+                        // Email Field
+                        _buildEmailField(),
+                        const SizedBox(height: AppDimensions.spacing16),
+
+                        // Password Field
+                        _buildPasswordField(),
+                        const SizedBox(height: AppDimensions.spacing12),
+
+                        // Forgot Password Link
+                        _buildForgotPasswordLink(),
+                        const SizedBox(height: AppDimensions.spacing24),
+
+                        // Error Message
+                        if (authState.errorMessage != null) ...[
+                          _buildErrorMessage(authState.errorMessage!),
+                          const SizedBox(height: AppDimensions.spacing16),
+                        ],
+
+                        // Login Button
+                        _buildLoginButton(isLoading),
+                        const SizedBox(height: AppDimensions.spacing16),
+
+                        // Register Button
+                        _buildRegisterButton(),
+                        const SizedBox(height: AppDimensions.spacing24),
+
+                        // Demo Info
+                        _buildDemoInfo(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

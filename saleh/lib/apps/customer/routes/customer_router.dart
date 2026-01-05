@@ -11,6 +11,8 @@ import '../features/favorites/favorites_screen.dart';
 import '../features/cart/cart_screen.dart';
 import '../features/categories/category_products_screen.dart';
 import '../features/categories/category_suppliers_screen.dart';
+import '../features/settings/customer_settings_screen.dart';
+import '../../../shared/screens/login_screen.dart';
 
 /// Customer Router - التنقل داخل تطبيق العميل
 class CustomerRouter {
@@ -144,6 +146,20 @@ class CustomerRouter {
               ),
             ),
           ),
+        ),
+
+        // تسجيل الدخول
+        GoRoute(
+          path: '/login',
+          name: 'customer-login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+
+        // الإعدادات
+        GoRoute(
+          path: '/settings',
+          name: 'customer-settings',
+          builder: (context, state) => const CustomerSettingsScreen(),
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../features/auth/data/auth_controller.dart';
 import '../../data/customer_providers.dart';
 import '../../models/cart.dart' as models;
 
@@ -16,13 +17,22 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(cartProvider.notifier).loadCart();
+      final isAuthenticated = ref.read(authControllerProvider).isAuthenticated;
+      if (isAuthenticated) {
+        ref.read(cartProvider.notifier).loadCart();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
     final cartState = ref.watch(cartProvider);
+
+    // إذا لم يكن مسجل دخول، اعرض رسالة تسجيل الدخول
+    if (!authState.isAuthenticated) {
+      return _buildLoginRequired();
+    }
 
     if (cartState.isLoading && cartState.cart == null) {
       return const Center(child: CircularProgressIndicator());
@@ -175,6 +185,74 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoginRequired() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: const Color(0xFF00BFA5).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                size: 50,
+                color: Color(0xFF00BFA5),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'سجل دخولك لعرض السلة',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'قم بتسجيل الدخول لإضافة المنتجات إلى سلة التسوق وإتمام عملية الشراء',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.push('/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00BFA5),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'تسجيل الدخول',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                context.go('/');
+              },
+              child: const Text(
+                'تصفح المنتجات',
+                style: TextStyle(color: Color(0xFF00BFA5)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
