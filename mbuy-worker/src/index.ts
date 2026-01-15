@@ -44,6 +44,7 @@ import publicRoutes from './routes/public';
 import merchantRoutes from './routes/merchant';
 import { apiRoutes } from './routes/api'; // NEW: CRUD API Routes
 import paymentProcessor from './routes/payment-processor'; // Multi-Gateway Payment System
+import platformSettingsRoutes from './routes/platform-settings'; // Platform Settings
 // DEPRECATED Routes - These need rebuild
 // import cartRoutes from './routes/cart';
 // import ordersRoutes from './routes/orders';
@@ -70,9 +71,9 @@ import searchRoutes from './routes/search';
 // import webstore from './routes/webstore';
 // import whatsapp from './routes/whatsapp';
 // import qrcode from './routes/qrcode';
-// import studioPackages from './routes/packages';
-// import studioRoutes from './routes/studio';
-// import studioTools from './routes/tools';
+import studioPackages from './routes/packages';
+import studioRoutes from './routes/studio';
+import studioTools from './routes/tools';
 // import revenue from './routes/revenue';
 // import analyticsRoutes from './routes/analytics';
 // import inventoryRoutes from './routes/inventory';
@@ -192,12 +193,16 @@ app.get('/media/*', serveMedia);
 // Auth Routes
 app.route('/auth', authRoutes);
 
+// Admin Settings Routes (Public for now - add admin auth later)
+app.route('/admin/settings', platformSettingsRoutes);
+
 // DEPRECATED: Admin API Routes (needs rebuild)
 // app.route('/admin/api', adminRoutes);
 app.all('/admin/api/*', deprecatedRouteGroup);
 
-// Public Routes
+// Public Routes - BOTH paths for compatibility
 app.route('/public', publicRoutes);
+app.route('/api/public', publicRoutes); // Alias for Flutter app compatibility
 
 // Categories (using new schema-compliant endpoint)
 app.get('/categories', listPublicCategories);
@@ -279,9 +284,9 @@ app.all('/secure/store/*', deprecatedRouteGroup);
 // app.route('/secure/webstore', webstore);
 // app.route('/secure/whatsapp', whatsapp);
 // app.route('/secure/qrcode', qrcode);
-// app.route('/secure/studio/packages', studioPackages);
-// app.route('/secure/studio', studioRoutes);
-// app.route('/secure/studio/tools', studioTools);
+app.route('/secure/studio/packages', studioPackages);
+app.route('/secure/studio', studioRoutes);
+app.route('/secure/studio/tools', studioTools);
 // app.route('/secure/revenue', revenue);
 // app.route('/secure/analytics', analyticsRoutes);
 // app.route('/secure/inventory', inventoryRoutes);
@@ -313,7 +318,7 @@ app.all('/secure/cod/*', deprecatedRouteGroup);
 app.all('/secure/webstore/*', deprecatedRouteGroup);
 app.all('/secure/whatsapp/*', deprecatedRouteGroup);
 app.all('/secure/qrcode/*', deprecatedRouteGroup);
-app.all('/secure/studio/*', deprecatedRouteGroup);
+// Studio routes are now ACTIVE - removed from deprecated
 app.all('/secure/revenue/*', deprecatedRouteGroup);
 app.all('/secure/analytics/*', deprecatedRouteGroup);
 app.all('/secure/inventory/*', deprecatedRouteGroup);

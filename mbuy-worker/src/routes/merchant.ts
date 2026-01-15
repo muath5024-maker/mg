@@ -15,6 +15,14 @@ import {
   getMerchantUsers,
   addMerchantUser,
 } from '../endpoints/merchant';
+import {
+  getBoostPricing,
+  getActiveBoosts,
+  getBoostHistory,
+  purchaseProductBoost,
+  purchaseStoreBoost,
+  cancelBoost,
+} from '../endpoints/boost';
 import merchantPayments from './merchant-payments';
 
 type Variables = AuthContext & {
@@ -350,5 +358,27 @@ merchantRoutes.put('/orders/:id/status', async (c) => {
 // ========================================
 
 merchantRoutes.route('/payments', merchantPayments);
+
+// ========================================
+// Boost System (دعم الظهور)
+// ========================================
+
+// Get boost pricing info
+merchantRoutes.get('/boost/pricing', getBoostPricing);
+
+// Get active boosts
+merchantRoutes.get('/boost/active', getActiveBoosts);
+
+// Get boost history
+merchantRoutes.get('/boost/history', getBoostHistory);
+
+// Purchase product boost
+merchantRoutes.post('/boost/product', purchaseProductBoost);
+
+// Purchase store boost
+merchantRoutes.post('/boost/store', purchaseStoreBoost);
+
+// Cancel boost
+merchantRoutes.post('/boost/cancel', cancelBoost);
 
 export default merchantRoutes;

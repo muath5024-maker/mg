@@ -1,31 +1,85 @@
 /// Customer Providers - مزودي البيانات للعميل
 ///
-/// Riverpod providers for the customer app
+/// Riverpod providers for the customer app with Repository Pattern
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../models/models.dart';
 import 'customer_api_service.dart';
+import 'repositories/repositories.dart';
 
 // =====================================================
-// API Service Provider
+// CONFIGURATION PROVIDER
+// =====================================================
+
+/// Current environment (change this to switch environments)
+const _currentEnv = String.fromEnvironment('ENV', defaultValue: 'production');
+
+/// App configuration based on environment
+final appConfigProvider = Provider<AppConfig>((ref) {
+  switch (_currentEnv) {
+    case 'development':
+      return AppConfig.development;
+    case 'staging':
+      return AppConfig.staging;
+    default:
+      return AppConfig.production;
+  }
+});
+
+// =====================================================
+// API SERVICE PROVIDER
 // =====================================================
 
 /// Provider for the API service
 final customerApiProvider = Provider<CustomerApiService>((ref) {
-  final api = CustomerApiService(
-    baseUrl: 'https://misty-mode-b68b.baharista1.workers.dev',
-  );
+  final config = ref.watch(appConfigProvider);
+  final api = CustomerApiService(config: config);
 
-  // TODO: Set auth token from auth state
-  // final authState = ref.watch(authStateProvider);
-  // if (authState.isAuthenticated) {
-  //   api.setAuthToken(authState.token);
-  // }
+  // Dispose when no longer used
+  ref.onDispose(() => api.dispose());
 
   return api;
 });
+
+// =====================================================
+// REPOSITORY PROVIDERS
+// =====================================================
+
+/// Product Repository Provider
+final productRepositoryProvider = Provider<ProductRepository>((ref) {
+  final api = ref.watch(customerApiProvider);
+  return ProductRepository(api);
+});
+
+/// Cart Repository Provider
+final cartRepositoryProvider = Provider<CartRepository>((ref) {
+  final api = ref.watch(customerApiProvider);
+  return CartRepository(api);
+});
+
+/// Store Repository Provider
+final storeRepositoryProvider = Provider<StoreRepository>((ref) {
+  final api = ref.watch(customerApiProvider);
+  return StoreRepository(api);
+});
+
+/// Category Repository Provider
+final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
+  final api = ref.watch(customerApiProvider);
+  return CategoryRepository(api);
+});
+
+// =====================================================
+// ASYNC VALUE EXTENSIONS
+// =====================================================
+
+/// Extension for easier AsyncValue handling
+extension AsyncValueX<T> on AsyncValue<T> {
+  /// Get data or null
+  T? get dataOrNull => whenOrNull(data: (data) => data);
+}
 
 // =====================================================
 // PRODUCTS PROVIDERS
@@ -39,7 +93,7 @@ class ProductsState {
   final int page;
   final bool hasMore;
 
-  ProductsState({
+  const ProductsState({
     this.products = const [],
     this.isLoading = false,
     this.error,
@@ -62,14 +116,34 @@ class ProductsState {
       hasMore: hasMore ?? this.hasMore,
     );
   }
+
+  /// Check if initial loading
+  bool get isInitialLoading => isLoading && products.isEmpty;
+
+  /// Check if loading more
+  bool get isLoadingMore => isLoading && products.isNotEmpty;
+
+  /// Check if has error
+  bool get hasError => error != null;
+
+  /// Check if empty
+  bool get isEmpty => products.isEmpty && !isLoading && error == null;
 }
 
-/// Products notifier
-class ProductsNotifier extends StateNotifier<ProductsState> {
-  final CustomerApiService _api;
-  final String? _categoryId;
+/// Products notifier using Repository
+class ProductsNotifier extends Notifier<ProductsState> {
+  late final ProductRepository _repository;
+  String? _categoryId;
 
-  ProductsNotifier(this._api, this._categoryId) : super(ProductsState()) {
+  @override
+  ProductsState build() {
+    _repository = ref.watch(productRepositoryProvider);
+    return const ProductsState();
+  }
+
+  /// Initialize with category
+  void init({String? categoryId}) {
+    _categoryId = categoryId;
     loadProducts();
   }
 
@@ -78,25 +152,25 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
 
     state = state.copyWith(isLoading: true, error: null);
 
-    final response = await _api.getProducts(
+    final result = await _repository.getProducts(
       categoryId: _categoryId,
       page: 1,
       limit: 20,
     );
 
-    if (response.ok && response.data != null) {
-      state = state.copyWith(
-        products: response.data!,
-        isLoading: false,
-        page: 1,
-        hasMore: response.data!.length >= 20,
-      );
-    } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message ?? response.error,
-      );
-    }
+    result.fold(
+      onSuccess: (products) {
+        state = state.copyWith(
+          products: products,
+          isLoading: false,
+          page: 1,
+          hasMore: products.length >= 20,
+        );
+      },
+      onFailure: (message, code) {
+        state = state.copyWith(isLoading: false, error: message);
+      },
+    );
   }
 
   Future<void> loadMore() async {
@@ -104,45 +178,139 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
 
     state = state.copyWith(isLoading: true);
 
-    final response = await _api.getProducts(
+    final result = await _repository.getProducts(
       categoryId: _categoryId,
       page: state.page + 1,
       limit: 20,
     );
 
-    if (response.ok && response.data != null) {
-      state = state.copyWith(
-        products: [...state.products, ...response.data!],
-        isLoading: false,
-        page: state.page + 1,
-        hasMore: response.data!.length >= 20,
-      );
-    } else {
-      state = state.copyWith(isLoading: false);
-    }
+    result.fold(
+      onSuccess: (products) {
+        state = state.copyWith(
+          products: [...state.products, ...products],
+          isLoading: false,
+          page: state.page + 1,
+          hasMore: products.length >= 20,
+        );
+      },
+      onFailure: (message, code) {
+        state = state.copyWith(isLoading: false);
+      },
+    );
   }
 
   Future<void> refresh() async {
-    state = ProductsState();
+    state = const ProductsState();
     await loadProducts();
   }
 }
 
 /// Provider for products list
-final productsProvider =
-    StateNotifierProvider.family<ProductsNotifier, ProductsState, String?>(
-      (ref, categoryId) =>
-          ProductsNotifier(ref.watch(customerApiProvider), categoryId),
+final productsProvider = NotifierProvider<ProductsNotifier, ProductsState>(
+  ProductsNotifier.new,
+);
+
+/// Products by category notifier (using StateNotifier for family support)
+class ProductsByCategoryNotifier extends StateNotifier<ProductsState> {
+  final ProductRepository _repository;
+  final String? _categoryId;
+
+  ProductsByCategoryNotifier(this._repository, this._categoryId)
+    : super(const ProductsState()) {
+    loadProducts();
+  }
+
+  Future<void> loadProducts() async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.getProducts(
+      categoryId: _categoryId,
+      page: 1,
+      limit: 20,
     );
+
+    result.fold(
+      onSuccess: (products) {
+        state = state.copyWith(
+          products: products,
+          isLoading: false,
+          page: 1,
+          hasMore: products.length >= 20,
+        );
+      },
+      onFailure: (message, code) {
+        state = state.copyWith(isLoading: false, error: message);
+      },
+    );
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true);
+
+    final result = await _repository.getProducts(
+      categoryId: _categoryId,
+      page: state.page + 1,
+      limit: 20,
+    );
+
+    result.fold(
+      onSuccess: (products) {
+        state = state.copyWith(
+          products: [...state.products, ...products],
+          isLoading: false,
+          page: state.page + 1,
+          hasMore: products.length >= 20,
+        );
+      },
+      onFailure: (message, code) {
+        state = state.copyWith(isLoading: false);
+      },
+    );
+  }
+
+  Future<void> refresh() async {
+    state = const ProductsState();
+    await loadProducts();
+  }
+}
+
+/// Provider for products by category
+final productsByCategoryProvider =
+    StateNotifierProvider.family<
+      ProductsByCategoryNotifier,
+      ProductsState,
+      String?
+    >((ref, categoryId) {
+      final repository = ref.watch(productRepositoryProvider);
+      return ProductsByCategoryNotifier(repository, categoryId);
+    });
 
 /// Provider for single product
 final productProvider = FutureProvider.family<Product?, String>((
   ref,
   productId,
 ) async {
-  final api = ref.watch(customerApiProvider);
-  final response = await api.getProduct(productId);
-  return response.ok ? response.data : null;
+  final repository = ref.watch(productRepositoryProvider);
+  final result = await repository.getProduct(productId);
+  return result.dataOrNull;
+});
+
+/// Provider for flash deals
+final flashDealsProvider = FutureProvider<List<Product>>((ref) async {
+  final repository = ref.watch(productRepositoryProvider);
+  final result = await repository.getFlashDeals(limit: 20);
+  return result.dataOrNull ?? [];
+});
+
+/// Provider for trending products
+final trendingProductsProvider = FutureProvider<List<Product>>((ref) async {
+  final repository = ref.watch(productRepositoryProvider);
+  final result = await repository.getTrendingProducts(limit: 20);
+  return result.dataOrNull ?? [];
 });
 
 // =====================================================
@@ -151,9 +319,40 @@ final productProvider = FutureProvider.family<Product?, String>((
 
 /// Provider for categories list
 final categoriesProvider = FutureProvider<List<Category>>((ref) async {
-  final api = ref.watch(customerApiProvider);
-  final response = await api.getCategories();
-  return response.ok ? response.data ?? [] : [];
+  final repository = ref.watch(categoryRepositoryProvider);
+  final result = await repository.getCategories();
+  return result.dataOrNull ?? [];
+});
+
+// =====================================================
+// STORES PROVIDERS
+// =====================================================
+
+/// Provider for featured stores
+final featuredStoresProvider = FutureProvider<List<Store>>((ref) async {
+  final repository = ref.watch(storeRepositoryProvider);
+  final result = await repository.getFeaturedStores(limit: 10);
+  return result.dataOrNull ?? [];
+});
+
+/// Provider for single store
+final storeProvider = FutureProvider.family<Store?, String>((
+  ref,
+  storeId,
+) async {
+  final repository = ref.watch(storeRepositoryProvider);
+  final result = await repository.getStore(storeId);
+  return result.dataOrNull;
+});
+
+/// Provider for store products
+final storeProductsProvider = FutureProvider.family<List<Product>, String>((
+  ref,
+  storeId,
+) async {
+  final repository = ref.watch(storeRepositoryProvider);
+  final result = await repository.getStoreProducts(storeId);
+  return result.dataOrNull ?? [];
 });
 
 // =====================================================
@@ -168,7 +367,7 @@ class SearchState {
   final bool isLoading;
   final String? error;
 
-  SearchState({
+  const SearchState({
     this.query = '',
     this.results = const [],
     this.suggestions = const [],
@@ -191,32 +390,39 @@ class SearchState {
       error: error,
     );
   }
+
+  bool get hasResults => results.isNotEmpty;
+  bool get isEmpty => results.isEmpty && !isLoading && query.isNotEmpty;
 }
 
 /// Search notifier
-class SearchNotifier extends StateNotifier<SearchState> {
-  final CustomerApiService _api;
+class SearchNotifier extends Notifier<SearchState> {
+  late final ProductRepository _repository;
 
-  SearchNotifier(this._api) : super(SearchState());
+  @override
+  SearchState build() {
+    _repository = ref.watch(productRepositoryProvider);
+    return const SearchState();
+  }
 
   Future<void> search(String query) async {
     if (query.isEmpty) {
-      state = SearchState();
+      state = const SearchState();
       return;
     }
 
     state = state.copyWith(query: query, isLoading: true, error: null);
 
-    final response = await _api.searchProducts(query: query);
+    final result = await _repository.searchProducts(query: query);
 
-    if (response.ok && response.data != null) {
-      state = state.copyWith(results: response.data!, isLoading: false);
-    } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message ?? response.error,
-      );
-    }
+    result.fold(
+      onSuccess: (products) {
+        state = state.copyWith(results: products, isLoading: false);
+      },
+      onFailure: (message, code) {
+        state = state.copyWith(isLoading: false, error: message);
+      },
+    );
   }
 
   Future<void> loadSuggestions(String query) async {
@@ -225,28 +431,28 @@ class SearchNotifier extends StateNotifier<SearchState> {
       return;
     }
 
-    final response = await _api.getSearchSuggestions(query);
+    final result = await _repository.getSearchSuggestions(query);
 
-    if (response.ok && response.data != null) {
-      state = state.copyWith(suggestions: response.data!);
+    if (result.isSuccess) {
+      state = state.copyWith(suggestions: result.data);
     }
   }
 
   void clear() {
-    state = SearchState();
+    state = const SearchState();
   }
 }
 
 /// Provider for search
-final searchProvider = StateNotifierProvider<SearchNotifier, SearchState>(
-  (ref) => SearchNotifier(ref.watch(customerApiProvider)),
+final searchProvider = NotifierProvider<SearchNotifier, SearchState>(
+  SearchNotifier.new,
 );
 
 /// Provider for trending searches
 final trendingSearchesProvider = FutureProvider<List<String>>((ref) async {
-  final api = ref.watch(customerApiProvider);
-  final response = await api.getTrendingSearches();
-  return response.ok ? response.data ?? [] : [];
+  final repository = ref.watch(productRepositoryProvider);
+  final result = await repository.getTrendingSearches();
+  return result.dataOrNull ?? [];
 });
 
 // =====================================================
@@ -260,7 +466,7 @@ class CartState {
   final String? error;
   final bool isUpdating;
 
-  CartState({
+  const CartState({
     this.cart,
     this.isLoading = false,
     this.error,
@@ -284,45 +490,47 @@ class CartState {
   int get itemsCount => cart?.totalItems ?? 0;
   double get subtotal => cart?.subtotal ?? 0;
   bool get isEmpty => cart?.isEmpty ?? true;
+  bool get isInitialLoading => isLoading && cart == null;
 }
 
 /// Cart notifier
-class CartNotifier extends StateNotifier<CartState> {
-  final CustomerApiService _api;
+class CartNotifier extends Notifier<CartState> {
+  late final CartRepository _repository;
 
-  CartNotifier(this._api) : super(CartState());
+  @override
+  CartState build() {
+    _repository = ref.watch(cartRepositoryProvider);
+    return const CartState();
+  }
 
   Future<void> loadCart() async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final response = await _api.getCart();
+    final result = await _repository.getCart();
 
-    if (response.ok && response.data != null) {
-      state = state.copyWith(cart: response.data!, isLoading: false);
-    } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message ?? response.error,
-      );
-    }
+    result.fold(
+      onSuccess: (cart) {
+        state = state.copyWith(cart: cart, isLoading: false);
+      },
+      onFailure: (message, code) {
+        state = state.copyWith(isLoading: false, error: message);
+      },
+    );
   }
 
   Future<bool> addToCart(String productId, {int quantity = 1}) async {
     state = state.copyWith(isUpdating: true, error: null);
 
-    final response = await _api.addToCart(
+    final result = await _repository.addToCart(
       productId: productId,
       quantity: quantity,
     );
 
-    if (response.ok) {
-      await loadCart(); // Reload cart
+    if (result.isSuccess) {
+      await loadCart();
       return true;
     } else {
-      state = state.copyWith(
-        isUpdating: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isUpdating: false, error: result.errorMessage);
       return false;
     }
   }
@@ -330,19 +538,16 @@ class CartNotifier extends StateNotifier<CartState> {
   Future<bool> updateQuantity(String itemId, int quantity) async {
     state = state.copyWith(isUpdating: true, error: null);
 
-    final response = await _api.updateCartItem(
+    final result = await _repository.updateCartItem(
       itemId: itemId,
       quantity: quantity,
     );
 
-    if (response.ok) {
+    if (result.isSuccess) {
       await loadCart();
       return true;
     } else {
-      state = state.copyWith(
-        isUpdating: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isUpdating: false, error: result.errorMessage);
       return false;
     }
   }
@@ -350,16 +555,13 @@ class CartNotifier extends StateNotifier<CartState> {
   Future<bool> removeItem(String itemId) async {
     state = state.copyWith(isUpdating: true, error: null);
 
-    final response = await _api.removeFromCart(itemId);
+    final result = await _repository.removeFromCart(itemId);
 
-    if (response.ok) {
+    if (result.isSuccess) {
       await loadCart();
       return true;
     } else {
-      state = state.copyWith(
-        isUpdating: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isUpdating: false, error: result.errorMessage);
       return false;
     }
   }
@@ -367,16 +569,13 @@ class CartNotifier extends StateNotifier<CartState> {
   Future<bool> clearCart() async {
     state = state.copyWith(isUpdating: true, error: null);
 
-    final response = await _api.clearCart();
+    final result = await _repository.clearCart();
 
-    if (response.ok) {
+    if (result.isSuccess) {
       state = state.copyWith(cart: null, isUpdating: false);
       return true;
     } else {
-      state = state.copyWith(
-        isUpdating: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isUpdating: false, error: result.errorMessage);
       return false;
     }
   }
@@ -388,15 +587,15 @@ class CartNotifier extends StateNotifier<CartState> {
 }
 
 /// Provider for cart
-final cartProvider = StateNotifierProvider<CartNotifier, CartState>(
-  (ref) => CartNotifier(ref.watch(customerApiProvider)),
+final cartProvider = NotifierProvider<CartNotifier, CartState>(
+  CartNotifier.new,
 );
 
 /// Provider for cart count (lightweight)
 final cartCountProvider = FutureProvider<int>((ref) async {
-  final api = ref.watch(customerApiProvider);
-  final response = await api.getCartCount();
-  return response.ok ? response.data ?? 0 : 0;
+  final repository = ref.watch(cartRepositoryProvider);
+  final result = await repository.getCartCount();
+  return result.dataOrNull ?? 0;
 });
 
 // =====================================================
@@ -410,7 +609,7 @@ class FavoritesState {
   final bool isLoading;
   final String? error;
 
-  FavoritesState({
+  const FavoritesState({
     this.favorites = const [],
     this.favoriteIds = const {},
     this.isLoading = false,
@@ -435,10 +634,14 @@ class FavoritesState {
 }
 
 /// Favorites notifier
-class FavoritesNotifier extends StateNotifier<FavoritesState> {
-  final CustomerApiService _api;
+class FavoritesNotifier extends Notifier<FavoritesState> {
+  late final CustomerApiService _api;
 
-  FavoritesNotifier(this._api) : super(FavoritesState());
+  @override
+  FavoritesState build() {
+    _api = ref.watch(customerApiProvider);
+    return const FavoritesState();
+  }
 
   Future<void> loadFavorites() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -453,10 +656,7 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
         isLoading: false,
       );
     } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isLoading: false, error: response.error);
     }
   }
 
@@ -474,8 +674,6 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
       }
 
       state = state.copyWith(favoriteIds: newIds);
-
-      // Reload full list if needed
       await loadFavorites();
       return true;
     }
@@ -506,21 +704,20 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     return false;
   }
 
+  /// Clear all favorites
   Future<void> clearFavorites() async {
-    // Clear all favorites one by one
     final ids = List<String>.from(state.favoriteIds);
     for (final id in ids) {
       await removeFromFavorites(id);
     }
-    state = FavoritesState();
+    state = const FavoritesState();
   }
 }
 
 /// Provider for favorites
-final favoritesProvider =
-    StateNotifierProvider<FavoritesNotifier, FavoritesState>(
-      (ref) => FavoritesNotifier(ref.watch(customerApiProvider)),
-    );
+final favoritesProvider = NotifierProvider<FavoritesNotifier, FavoritesState>(
+  FavoritesNotifier.new,
+);
 
 /// Provider for checking if a product is favorite
 final isFavoriteProvider = Provider.family<bool, String>((ref, productId) {
@@ -541,7 +738,7 @@ class OrdersState {
   final bool hasMore;
   final String? statusFilter;
 
-  OrdersState({
+  const OrdersState({
     this.orders = const [],
     this.isLoading = false,
     this.error,
@@ -570,10 +767,14 @@ class OrdersState {
 }
 
 /// Orders notifier
-class OrdersNotifier extends StateNotifier<OrdersState> {
-  final CustomerApiService _api;
+class OrdersNotifier extends Notifier<OrdersState> {
+  late final CustomerApiService _api;
 
-  OrdersNotifier(this._api) : super(OrdersState());
+  @override
+  OrdersState build() {
+    _api = ref.watch(customerApiProvider);
+    return const OrdersState();
+  }
 
   Future<void> loadOrders({String? status}) async {
     state = state.copyWith(isLoading: true, error: null, statusFilter: status);
@@ -588,10 +789,7 @@ class OrdersNotifier extends StateNotifier<OrdersState> {
         hasMore: response.data!.length >= 20,
       );
     } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isLoading: false, error: response.error);
     }
   }
 
@@ -622,7 +820,6 @@ class OrdersNotifier extends StateNotifier<OrdersState> {
     final response = await _api.cancelOrder(orderId);
 
     if (response.ok) {
-      // Update local state
       final updatedOrders = state.orders.map((order) {
         if (order.id == orderId) {
           return order.copyWith(status: OrderStatus.cancelled);
@@ -643,8 +840,8 @@ class OrdersNotifier extends StateNotifier<OrdersState> {
 }
 
 /// Provider for orders
-final ordersProvider = StateNotifierProvider<OrdersNotifier, OrdersState>(
-  (ref) => OrdersNotifier(ref.watch(customerApiProvider)),
+final ordersProvider = NotifierProvider<OrdersNotifier, OrdersState>(
+  OrdersNotifier.new,
 );
 
 /// Provider for single order
@@ -673,7 +870,7 @@ class CheckoutState {
   final String? error;
   final Map<String, dynamic>? orderResult;
 
-  CheckoutState({
+  const CheckoutState({
     this.isValidating = false,
     this.isPlacingOrder = false,
     this.isLoading = false,
@@ -715,10 +912,14 @@ class CheckoutState {
 }
 
 /// Checkout notifier
-class CheckoutNotifier extends StateNotifier<CheckoutState> {
-  final CustomerApiService _api;
+class CheckoutNotifier extends Notifier<CheckoutState> {
+  late final CustomerApiService _api;
 
-  CheckoutNotifier(this._api) : super(CheckoutState());
+  @override
+  CheckoutState build() {
+    _api = ref.watch(customerApiProvider);
+    return const CheckoutState();
+  }
 
   Future<void> loadAddresses() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -728,10 +929,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
     if (response.ok && response.data != null) {
       state = state.copyWith(addresses: response.data!, isLoading: false);
     } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isLoading: false, error: response.error);
     }
   }
 
@@ -747,10 +945,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
       );
       return response.data!['is_valid'] ?? false;
     } else {
-      state = state.copyWith(
-        isValidating: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isValidating: false, error: response.error);
       return false;
     }
   }
@@ -763,13 +958,18 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
     state = state.copyWith(paymentMethod: method);
   }
 
+  /// إضافة عنوان محلياً (بدون API)
+  void addLocalAddress(ShippingAddress address) {
+    final updatedAddresses = [...state.addresses, address];
+    state = state.copyWith(addresses: updatedAddresses);
+  }
+
   Future<String?> placeOrder({
     required String? addressId,
     required String paymentMethod,
     String? notes,
     String? couponCode,
   }) async {
-    // Find the address by ID
     final address = state.addresses.firstWhere(
       (a) => a.id == addressId,
       orElse: () => state.addresses.first,
@@ -796,27 +996,37 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
       );
       return response.data!['order_number'] as String?;
     } else {
-      state = state.copyWith(
-        isPlacingOrder: false,
-        error: response.message ?? response.error,
-      );
+      state = state.copyWith(isPlacingOrder: false, error: response.error);
       return null;
     }
   }
 
   void reset() {
-    state = CheckoutState();
+    state = const CheckoutState();
   }
 }
 
 /// Provider for checkout
-final checkoutProvider = StateNotifierProvider<CheckoutNotifier, CheckoutState>(
-  (ref) => CheckoutNotifier(ref.watch(customerApiProvider)),
+final checkoutProvider = NotifierProvider<CheckoutNotifier, CheckoutState>(
+  CheckoutNotifier.new,
 );
 
 /// Provider for saved addresses
 final addressesProvider = FutureProvider<List<ShippingAddress>>((ref) async {
   final api = ref.watch(customerApiProvider);
   final response = await api.getAddresses();
+  return response.ok ? response.data ?? [] : [];
+});
+
+// =====================================================
+// HOME DATA PROVIDERS
+// =====================================================
+
+/// Provider for home banners
+final homeBannersProvider = FutureProvider<List<Map<String, dynamic>>>((
+  ref,
+) async {
+  final api = ref.watch(customerApiProvider);
+  final response = await api.getHomeBanners();
   return response.ok ? response.data ?? [] : [];
 });

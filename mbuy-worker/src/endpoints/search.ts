@@ -36,6 +36,7 @@ export async function searchProducts(c: SearchContext) {
     // Query parameters
     const query = c.req.query('q') || '';
     const categoryId = c.req.query('category_id');
+    const platformCategoryId = c.req.query('platform_category_id');
     const storeId = c.req.query('store_id');
     const minPrice = c.req.query('min_price');
     const maxPrice = c.req.query('max_price');
@@ -44,8 +45,11 @@ export async function searchProducts(c: SearchContext) {
     const page = parseInt(c.req.query('page') || '1');
     const limit = parseInt(c.req.query('limit') || '20');
     const offset = (page - 1) * limit;
+    
+    // Check if we should include boosted products first
+    const includeBoosted = c.req.query('include_boosted') !== 'false'; // Default true
 
-    // Build query
+    // Build query - include boost fields
     let dbQuery = supabase
       .from('products')
       .select(`
@@ -57,11 +61,16 @@ export async function searchProducts(c: SearchContext) {
         stock,
         image_url,
         main_image_url,
+        images,
         status,
         rating,
         reviews_count,
         sales_count,
         created_at,
+        boost_type,
+        boost_points,
+        boost_expires_at,
+        platform_category_id,
         stores!inner (
           id,
           name,
@@ -94,6 +103,11 @@ export async function searchProducts(c: SearchContext) {
       }
     }
 
+    // Filter by platform category
+    if (platformCategoryId) {
+      dbQuery = dbQuery.eq('platform_category_id', platformCategoryId);
+    }
+
     // Filter by store
     if (storeId) {
       dbQuery = dbQuery.eq('store_id', storeId);
@@ -112,7 +126,13 @@ export async function searchProducts(c: SearchContext) {
       dbQuery = dbQuery.gt('stock', 0);
     }
 
-    // Sorting
+    // Sorting - with boost support
+    // When including boosted products, add secondary sort by boost_points
+    if (includeBoosted) {
+      // First sort by whether product has active search_top boost
+      dbQuery = dbQuery.order('boost_points', { ascending: false, nullsFirst: false });
+    }
+    
     switch (sortBy) {
       case 'price_asc':
         dbQuery = dbQuery.order('price', { ascending: true });
@@ -144,22 +164,34 @@ export async function searchProducts(c: SearchContext) {
     }
 
     // Transform results
-    const products = (data || []).map((product: any) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      compare_at_price: product.compare_at_price,
-      discount_percent: product.compare_at_price 
-        ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
-        : null,
-      stock: product.stock,
-      is_in_stock: product.stock > 0,
-      image_url: product.main_image_url || product.image_url,
-      rating: product.rating,
-      reviews_count: product.reviews_count,
-      store: product.stores
-    }));
+    const now = new Date().toISOString();
+    const products = (data || []).map((product: any) => {
+      // Check if boost is active
+      const isBoosted = product.boost_type === 'search_top' && 
+                       product.boost_expires_at && 
+                       product.boost_expires_at > now;
+      
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        compare_at_price: product.compare_at_price,
+        discount_percent: product.compare_at_price 
+          ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
+          : null,
+        stock: product.stock,
+        is_in_stock: product.stock > 0,
+        image_url: product.main_image_url || product.image_url || (product.images?.[0] ?? null),
+        images: product.images || [],
+        rating: product.rating,
+        reviews_count: product.reviews_count,
+        store: product.stores,
+        is_boosted: isBoosted,
+        boost_type: isBoosted ? product.boost_type : null,
+        platform_category_id: product.platform_category_id,
+      };
+    });
 
     return c.json({
       ok: true,

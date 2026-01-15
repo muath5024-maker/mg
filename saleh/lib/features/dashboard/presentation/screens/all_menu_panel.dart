@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/remote_config_provider.dart';
 
 /// قائمة "الكل" - صفحة كاملة مع تبويبات على اليمين وخيارات على اليسار
 class AllMenuPanel extends ConsumerStatefulWidget {
@@ -204,6 +205,9 @@ class _AllMenuPanelState extends ConsumerState<AllMenuPanel> {
 
   /// الحصول على جميع الأقسام مع بياناتها
   List<_TabSection> _getAllSections() {
+    // الحصول على Remote Config للتحقق من الميزات المفعلة
+    final config = ref.read(appRemoteConfigProvider);
+
     return [
       _TabSection(
         title: 'الطلبات',
@@ -249,8 +253,12 @@ class _AllMenuPanelState extends ConsumerState<AllMenuPanel> {
           _MenuItem('العروض الخاصة', '/dashboard/flash-sales'),
           _MenuItem('الحملات التسويقية', '/dashboard/marketing'),
           _MenuItem('كاش باك', '/dashboard/feature/كاش باك'),
-          _MenuItem('الولاء', '/dashboard/loyalty-program'),
-          _MenuItem('دعم الظهور', '/dashboard/boost-sales'),
+          // ميزة الولاء - يتم التحكم بها عبر Remote Config
+          if (config.isLoyaltyEnabled)
+            _MenuItem('الولاء', '/dashboard/loyalty-program'),
+          // ميزة دعم الظهور - يتم التحكم بها عبر Remote Config
+          if (config.isBoostEnabled)
+            _MenuItem('دعم الظهور', '/dashboard/boost-sales'),
           _MenuItem(
             'تحسين محركات البحث',
             '/dashboard/feature/تحسين محركات البحث',

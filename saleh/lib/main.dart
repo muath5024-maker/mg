@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'core/services/remote_config_service.dart';
 import 'shared/app_shell.dart';
 import 'shared/widgets/error_boundary.dart';
 
@@ -23,6 +25,12 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  // تهيئة Firebase
+  await Firebase.initializeApp();
+
+  // تهيئة Remote Config
+  await RemoteConfigService.instance.initialize();
 
   runApp(const ProviderScope(child: AppShell()));
 }

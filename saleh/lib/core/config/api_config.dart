@@ -7,6 +7,9 @@ class ApiConfig {
   static const String baseUrl =
       'https://misty-mode-b68b.baharista1.workers.dev';
 
+  /// Worker URL (alias for baseUrl)
+  static const String workerUrl = baseUrl;
+
   /// Supabase URL
   static const String supabaseUrl = 'https://sirqidofuvphqcxqchyc.supabase.co';
 

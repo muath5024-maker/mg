@@ -1,6 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
+
+/// Model for live stream data
+class LiveStreamItem {
+  final String streamId;
+  final String userName;
+  final String userAvatar;
+  final String title;
+  final int viewersCount;
+
+  const LiveStreamItem({
+    required this.streamId,
+    required this.userName,
+    required this.userAvatar,
+    this.title = '',
+    this.viewersCount = 0,
+  });
+}
+
+/// شاشة البث المباشر القابلة للتمرير - Swipeable Live Stream Screen
+class SwipeableLiveStreamScreen extends StatefulWidget {
+  final List<LiveStreamItem> streams;
+  final int initialIndex;
+
+  const SwipeableLiveStreamScreen({
+    super.key,
+    required this.streams,
+    this.initialIndex = 0,
+  });
+
+  @override
+  State<SwipeableLiveStreamScreen> createState() =>
+      _SwipeableLiveStreamScreenState();
+}
+
+class _SwipeableLiveStreamScreenState extends State<SwipeableLiveStreamScreen> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialIndex);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: PageView.builder(
+        controller: _pageController,
+        scrollDirection: Axis.vertical,
+        itemCount: widget.streams.length,
+        itemBuilder: (context, index) {
+          final stream = widget.streams[index];
+          return LiveStreamPage(
+            streamId: stream.streamId,
+            userName: stream.userName,
+            userAvatar: stream.userAvatar,
+            title: stream.title,
+            viewersCount: stream.viewersCount,
+          );
+        },
+      ),
+    );
+  }
+}
 
 /// شاشة البث المباشر - Live Stream Screen
 class LiveStreamScreen extends ConsumerStatefulWidget {
@@ -23,7 +98,53 @@ class LiveStreamScreen extends ConsumerStatefulWidget {
   ConsumerState<LiveStreamScreen> createState() => _LiveStreamScreenState();
 }
 
-class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
+class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen> {
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LiveStreamPage(
+      streamId: widget.streamId,
+      userName: widget.userName,
+      userAvatar: widget.userAvatar,
+      title: widget.title,
+      viewersCount: widget.viewersCount,
+    );
+  }
+}
+
+/// Single live stream page widget for use in PageView
+class LiveStreamPage extends ConsumerStatefulWidget {
+  final String streamId;
+  final String userName;
+  final String userAvatar;
+  final String title;
+  final int viewersCount;
+
+  const LiveStreamPage({
+    super.key,
+    required this.streamId,
+    required this.userName,
+    required this.userAvatar,
+    this.title = '',
+    this.viewersCount = 0,
+  });
+
+  @override
+  ConsumerState<LiveStreamPage> createState() => _LiveStreamPageState();
+}
+
+class _LiveStreamPageState extends ConsumerState<LiveStreamPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _chatScrollController = ScrollController();
@@ -33,9 +154,6 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
   bool _showChat = true;
   bool _showProducts = false;
   int _currentViewers = 0;
-  int _likesCount = 0;
-
-  static const Color _primaryColor = Color(0xFF00BFA5);
 
   // Mock chat messages
   final List<ChatMessage> _chatMessages = [];
@@ -153,45 +271,168 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
     }
   }
 
-  void _sendLike() {
-    setState(() => _likesCount++);
-    // Show floating heart animation
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Live Video Background (Placeholder)
-          _buildLiveVideo(),
+    return GestureDetector(
+      onTap: () {
+        // إلغاء التركيز من حقل النص عند الضغط في أي مكان
+        FocusScope.of(context).unfocus();
+      },
+      onHorizontalDragEnd: (details) {
+        // Swipe right to show host profile
+        if (details.primaryVelocity != null && details.primaryVelocity! > 200) {
+          _showHostProfile();
+        }
+        // Swipe left to go back
+        if (details.primaryVelocity != null &&
+            details.primaryVelocity! < -200) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Live Video Background (Placeholder)
+            _buildLiveVideo(),
 
-          // Gradient Overlay
-          _buildGradientOverlay(),
+            // Gradient Overlay
+            _buildGradientOverlay(),
 
-          // Top Bar
-          _buildTopBar(),
+            // Top Bar
+            _buildTopBar(),
 
-          // Live Badge & Viewers
-          _buildLiveBadge(),
+            // Live Badge & Viewers
+            _buildLiveBadge(),
 
-          // Right Side Actions
-          _buildRightActions(),
+            // Vertical Products at Bottom (only when showing products)
+            if (_showProducts) _buildVerticalProducts(),
 
-          // Products Panel
-          if (_showProducts) _buildProductsPanel(),
+            // Chat Messages (only when showing chat)
+            if (_showChat) _buildChatMessages(),
 
-          // Chat Messages
-          if (_showChat) _buildChatMessages(),
+            // Bottom Input & Actions
+            _buildBottomBar(),
 
-          // Bottom Input & Actions
-          _buildBottomBar(),
+            // Floating Hearts Animation
+            _buildFloatingHearts(),
+          ],
+        ),
+      ),
+    );
+  }
 
-          // Floating Hearts Animation
-          _buildFloatingHearts(),
-        ],
+  Widget _buildVerticalProducts() {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 70,
+      child: SizedBox(
+        height: 120,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          itemCount: _products.length,
+          itemBuilder: (context, index) {
+            final product = _products[index];
+            return Container(
+              width: 200,
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      product.imageUrl,
+                      width: 70,
+                      height: 90,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 70,
+                        height: 90,
+                        color: Colors.grey[800],
+                        child: const Icon(
+                          Icons.image,
+                          color: Colors.white54,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          product.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${product.price} ر.س',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 28,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // إضافة للسلة محلياً (بدون API)
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'تمت إضافة ${product.name} للسلة ✅',
+                                  ),
+                                  backgroundColor: AppColors.primary,
+                                  duration: const Duration(seconds: 1),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            child: const Text(
+                              'أضف للسلة',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -256,7 +497,10 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: _primaryColor, width: 2),
+                            border: Border.all(
+                              color: AppColors.primary,
+                              width: 2,
+                            ),
                           ),
                           child: CircleAvatar(
                             radius: 18,
@@ -304,7 +548,7 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
                             decoration: BoxDecoration(
                               color: _isFollowing
                                   ? Colors.white24
-                                  : _primaryColor,
+                                  : AppColors.primary,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
@@ -410,241 +654,6 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
     );
   }
 
-  Widget _buildRightActions() {
-    return Positioned(
-      right: 12,
-      bottom: 150,
-      child: Column(
-        children: [
-          // Products
-          _buildActionButton(
-            icon: Icons.shopping_bag,
-            label: '${_products.length}',
-            onTap: () => setState(() => _showProducts = !_showProducts),
-            isActive: _showProducts,
-          ),
-          const SizedBox(height: 16),
-          // Chat Toggle
-          _buildActionButton(
-            icon: _showChat ? Icons.chat_bubble : Icons.chat_bubble_outline,
-            label: 'دردشة',
-            onTap: () => setState(() => _showChat = !_showChat),
-            isActive: _showChat,
-          ),
-          const SizedBox(height: 16),
-          // Share
-          _buildActionButton(
-            icon: Icons.share,
-            label: 'مشاركة',
-            onTap: () => _showShareSheet(),
-          ),
-          const SizedBox(height: 16),
-          // Gift
-          _buildActionButton(
-            icon: Icons.card_giftcard,
-            label: 'هدية',
-            onTap: () => _showGiftSheet(),
-            color: Colors.amber,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isActive = false,
-    Color? color,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? _primaryColor.withValues(alpha: 0.3)
-                  : Colors.black.withValues(alpha: 0.4),
-              shape: BoxShape.circle,
-              border: isActive
-                  ? Border.all(color: _primaryColor, width: 2)
-                  : null,
-            ),
-            child: Icon(
-              icon,
-              color: color ?? (isActive ? _primaryColor : Colors.white),
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductsPanel() {
-    return Positioned(
-      left: 16,
-      right: 80,
-      bottom: 100,
-      child: Container(
-        constraints: const BoxConstraints(maxHeight: 280),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'المنتجات',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => setState(() => _showProducts = false),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white70,
-                      size: 16,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                itemCount: _products.length,
-                itemBuilder: (context, index) =>
-                    _buildProductItem(_products[index]),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProductItem(LiveProduct product) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to product
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                product.imageUrl,
-                width: 55,
-                height: 55,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 55,
-                  height: 55,
-                  color: Colors.grey[800],
-                  child: const Icon(Icons.image, color: Colors.white54),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        '${product.price} ر.س',
-                        style: const TextStyle(
-                          color: _primaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${product.originalPrice}',
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 11,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: _primaryColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                'شراء',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildChatMessages() {
     return Positioned(
       left: 12,
@@ -681,11 +690,11 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: message.isHost
-              ? _primaryColor.withValues(alpha: 0.3)
+              ? AppColors.primary.withValues(alpha: 0.3)
               : Colors.black.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(16),
           border: message.isHost
-              ? Border.all(color: _primaryColor, width: 1)
+              ? Border.all(color: AppColors.primary, width: 1)
               : null,
         ),
         child: Row(
@@ -695,7 +704,7 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
             Text(
               '${message.userName}: ',
               style: TextStyle(
-                color: message.isHost ? _primaryColor : Colors.amber,
+                color: message.isHost ? AppColors.primary : Colors.amber,
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
               ),
@@ -721,72 +730,110 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
         top: false,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [Colors.black.withValues(alpha: 0.9), Colors.transparent],
+            ),
+          ),
           child: Row(
             children: [
               // Chat Input
               Expanded(
                 child: Container(
-                  height: 44,
+                  height: 46,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: Colors.white24),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(23),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _chatController,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          decoration: const InputDecoration(
-                            hintText: 'قل شيئاً...',
-                            hintStyle: TextStyle(color: Colors.white54),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                            ),
-                          ),
-                          onSubmitted: (_) => _sendMessage(),
-                        ),
+                  child: TextField(
+                    controller: _chatController,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    cursorColor: AppColors.primary,
+                    decoration: InputDecoration(
+                      hintText: 'اكتب رسالة...',
+                      hintStyle: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
                       ),
-                      IconButton(
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      suffixIcon: IconButton(
                         icon: const Icon(
                           Icons.send,
-                          color: _primaryColor,
+                          color: AppColors.primary,
                           size: 22,
                         ),
                         onPressed: _sendMessage,
                       ),
-                    ],
+                    ),
+                    onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              // Like Button
-              GestureDetector(
-                onTap: _sendLike,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Colors.pink, Colors.red],
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.favorite,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
+              // Share Button
+              _buildBottomActionButton(
+                icon: Icons.share,
+                onTap: () => _showShareSheet(),
+              ),
+              const SizedBox(width: 6),
+              // Chat Toggle Button
+              _buildBottomActionButton(
+                icon: Icons.chat_bubble,
+                isActive: _showChat,
+                onTap: () {
+                  setState(() {
+                    _showChat = !_showChat;
+                  });
+                },
+              ),
+              const SizedBox(width: 6),
+              // Products Toggle Button
+              _buildBottomActionButton(
+                icon: Icons.shopping_bag,
+                isActive: _showProducts,
+                onTap: () {
+                  setState(() {
+                    _showProducts = !_showProducts;
+                  });
+                },
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomActionButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isActive = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppColors.primary
+              : Colors.white.withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+          border: isActive ? null : Border.all(color: Colors.white38),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
       ),
     );
   }
@@ -852,7 +899,7 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isFollowing
                             ? Colors.white24
-                            : _primaryColor,
+                            : AppColors.primary,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -867,7 +914,10 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.push('/store/store_${widget.streamId}');
+                      },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.white24),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -929,7 +979,10 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('البقاء', style: TextStyle(color: _primaryColor)),
+            child: const Text(
+              'البقاء',
+              style: TextStyle(color: AppColors.primary),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -1018,139 +1071,6 @@ class _LiveStreamScreenState extends ConsumerState<LiveStreamScreen>
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showGiftSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[600],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                'إرسال هدية',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  _buildGiftItem('🌹', 'وردة', 10),
-                  _buildGiftItem('💎', 'ماسة', 50),
-                  _buildGiftItem('🎁', 'هدية', 100),
-                  _buildGiftItem('👑', 'تاج', 500),
-                  _buildGiftItem('🚀', 'صاروخ', 1000),
-                ],
-              ),
-            ),
-            // Balance
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.account_balance_wallet,
-                    color: Colors.amber,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'رصيدك: ',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  const Text(
-                    '250 عملة',
-                    style: TextStyle(
-                      color: Colors.amber,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'شحن',
-                      style: TextStyle(color: _primaryColor),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGiftItem(String emoji, String name, int price) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-          // Send gift animation
-        },
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white24),
-              ),
-              child: Center(
-                child: Text(emoji, style: const TextStyle(fontSize: 32)),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              name,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.monetization_on,
-                  color: Colors.amber,
-                  size: 14,
-                ),
-                const SizedBox(width: 2),
-                Text(
-                  '$price',
-                  style: const TextStyle(color: Colors.amber, fontSize: 11),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }

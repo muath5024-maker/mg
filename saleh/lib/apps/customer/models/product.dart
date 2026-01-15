@@ -32,6 +32,13 @@ class Product {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  // Boost fields
+  final bool isBoosted;
+  final String? boostType;
+  final int boostPoints;
+  final DateTime? boostExpiresAt;
+  final String? platformCategoryId;
+
   Product({
     required this.id,
     required this.name,
@@ -60,6 +67,11 @@ class Product {
     this.attributes,
     this.createdAt,
     this.updatedAt,
+    this.isBoosted = false,
+    this.boostType,
+    this.boostPoints = 0,
+    this.boostExpiresAt,
+    this.platformCategoryId,
   });
 
   /// Create Product from JSON
@@ -87,8 +99,12 @@ class Product {
       description: json['description'],
       descriptionAr: json['description_ar'],
       price: (json['price'] ?? 0).toDouble(),
-      originalPrice: json['original_price']?.toDouble(),
-      discountPercentage: json['discount_percentage']?.toDouble(),
+      originalPrice:
+          json['original_price']?.toDouble() ??
+          json['compare_at_price']?.toDouble(),
+      discountPercentage:
+          json['discount_percentage']?.toDouble() ??
+          json['discount_percent']?.toDouble(),
       stock: json['stock'] ?? 0,
       mainImageUrl: json['main_image_url'] ?? json['image_url'],
       images: imageList,
@@ -101,7 +117,7 @@ class Product {
       status: json['status'] ?? 'active',
       isActive: json['is_active'] ?? true,
       rating: json['rating']?.toDouble(),
-      reviewCount: json['review_count'],
+      reviewCount: json['review_count'] ?? json['reviews_count'],
       views: json['views'],
       salesCount: json['sales_count'],
       sku: json['sku'],
@@ -113,6 +129,14 @@ class Product {
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'])
           : null,
+      // Boost fields
+      isBoosted: json['is_boosted'] ?? false,
+      boostType: json['boost_type'],
+      boostPoints: json['boost_points'] ?? 0,
+      boostExpiresAt: json['boost_expires_at'] != null
+          ? DateTime.parse(json['boost_expires_at'])
+          : null,
+      platformCategoryId: json['platform_category_id']?.toString(),
     );
   }
 

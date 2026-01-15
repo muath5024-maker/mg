@@ -19,6 +19,11 @@ class Store {
   final String? email;
   final String? phone;
   final String? logoUrl;
+  // حقول النقاط والـ boost
+  final int pointsBalance;
+  final bool? isBoosted;
+  final String? boostType;
+  final DateTime? boostExpiresAt;
 
   Store({
     required this.id,
@@ -37,6 +42,10 @@ class Store {
     this.email,
     this.phone,
     this.logoUrl,
+    this.pointsBalance = 0,
+    this.isBoosted,
+    this.boostType,
+    this.boostExpiresAt,
   });
 
   /// تحويل من JSON إلى Object
@@ -66,6 +75,12 @@ class Store {
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       logoUrl: json['logo_url'] as String?,
+      pointsBalance: json['points_balance'] as int? ?? 0,
+      isBoosted: json['is_boosted'] as bool?,
+      boostType: json['boost_type'] as String?,
+      boostExpiresAt: json['boost_expires_at'] != null
+          ? DateTime.parse(json['boost_expires_at'] as String)
+          : null,
     );
   }
 
@@ -88,6 +103,10 @@ class Store {
       'email': email,
       'phone': phone,
       'logo_url': logoUrl,
+      'points_balance': pointsBalance,
+      'is_boosted': isBoosted,
+      'boost_type': boostType,
+      'boost_expires_at': boostExpiresAt?.toIso8601String(),
     };
   }
 
@@ -109,6 +128,10 @@ class Store {
     String? email,
     String? phone,
     String? logoUrl,
+    int? pointsBalance,
+    bool? isBoosted,
+    String? boostType,
+    DateTime? boostExpiresAt,
   }) {
     return Store(
       id: id ?? this.id,
@@ -127,6 +150,10 @@ class Store {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       logoUrl: logoUrl ?? this.logoUrl,
+      pointsBalance: pointsBalance ?? this.pointsBalance,
+      isBoosted: isBoosted ?? this.isBoosted,
+      boostType: boostType ?? this.boostType,
+      boostExpiresAt: boostExpiresAt ?? this.boostExpiresAt,
     );
   }
 

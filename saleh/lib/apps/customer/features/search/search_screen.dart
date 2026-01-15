@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
 
 class SearchScreen extends ConsumerStatefulWidget {
   final String? storeId;
@@ -15,7 +16,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isSearching = false;
+  bool _isLoading = false;
+  bool _hasSearched = false;
   String _selectedSort = 'relevance';
+  Timer? _debounce;
+
+  // Filter state
+  RangeValues _priceRange = const RangeValues(0, 5000);
+  int? _minRating;
 
   // TODO: Replace with API data
   final List<String> _recentSearches = [
@@ -46,6 +54,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void dispose() {
     _searchController.dispose();
     _focusNode.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -53,6 +62,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     if (query.isEmpty) {
       setState(() {
         _isSearching = false;
+        _isLoading = false;
+        _hasSearched = false;
         _searchResults.clear();
       });
       return;
@@ -60,14 +71,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     setState(() {
       _isSearching = true;
+      _isLoading = true;
+      _hasSearched = true;
     });
 
     // TODO: Call API
-    // Simulating search results
-    Future.delayed(const Duration(milliseconds: 500), () {
+    // Simulating search results with delay
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) {
         setState(() {
+          _isLoading = false;
           _searchResults.clear();
+          // محاكاة عدم وجود نتائج لبعض الكلمات
+          if (query.toLowerCase() == 'غير موجود' ||
+              query.toLowerCase() == 'xyz') {
+            return;
+          }
           _searchResults.addAll(
             List.generate(
               10,
@@ -85,9 +104,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
           );
+          _applySorting();
         });
       }
     });
+  }
+
+  void _applySorting() {
+    switch (_selectedSort) {
+      case 'price_low':
+        _searchResults.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'price_high':
+        _searchResults.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case 'rating':
+        _searchResults.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+      case 'newest':
+        // في الواقع سيكون حسب التاريخ
+        break;
+      default:
+        // relevance - الترتيب الأصلي
+        break;
+    }
   }
 
   @override
@@ -106,14 +146,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           textInputAction: TextInputAction.search,
           onChanged: (value) {
-            if (value.length >= 2) {
-              _performSearch(value);
-            } else if (value.isEmpty) {
-              setState(() {
-                _isSearching = false;
-                _searchResults.clear();
-              });
-            }
+            // Debounce search
+            if (_debounce?.isActive ?? false) _debounce!.cancel();
+            _debounce = Timer(const Duration(milliseconds: 500), () {
+              if (value.length >= 2) {
+                _performSearch(value);
+              } else if (value.isEmpty) {
+                setState(() {
+                  _isSearching = false;
+                  _isLoading = false;
+                  _hasSearched = false;
+                  _searchResults.clear();
+                });
+              }
+            });
           },
           onSubmitted: _performSearch,
         ),
@@ -207,8 +253,52 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
-    if (_searchResults.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+    // حالة التحميل
+    if (_isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('جاري البحث...'),
+          ],
+        ),
+      );
+    }
+
+    // حالة لا توجد نتائج
+    if (_searchResults.isEmpty && _hasSearched) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 80, color: Colors.grey[300]),
+            const SizedBox(height: 16),
+            const Text(
+              'لا توجد نتائج',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'جرب كلمات بحث مختلفة',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: () {
+                _searchController.clear();
+                setState(() {
+                  _isSearching = false;
+                  _hasSearched = false;
+                });
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('بحث جديد'),
+            ),
+          ],
+        ),
+      );
     }
 
     return Column(
@@ -249,8 +339,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   DropdownMenuItem(value: 'newest', child: Text('الأحدث')),
                 ],
                 onChanged: (value) {
-                  setState(() => _selectedSort = value!);
-                  // TODO: Re-sort results
+                  setState(() {
+                    _selectedSort = value!;
+                    _applySorting();
+                  });
                 },
               ),
               const SizedBox(width: 8),
@@ -324,6 +416,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         );
                       },
                     ),
+                    // Discount Badge
                     if (result.originalPrice != null)
                       Positioned(
                         top: 8,
@@ -344,6 +437,37 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
+                          ),
+                        ),
+                      ),
+                    // Boosted Badge
+                    if (result.isBoosted)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.star, size: 10, color: Colors.white),
+                              SizedBox(width: 2),
+                              Text(
+                                'مميز',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -422,6 +546,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   void _showFilterSheet() {
+    // نسخ محلية للفلاتر للتعديل داخل الـ bottom sheet
+    RangeValues tempPriceRange = _priceRange;
+    int? tempMinRating = _minRating;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -429,103 +557,152 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.7,
+              minChildSize: 0.5,
+              maxChildSize: 0.9,
+              expand: false,
+              builder: (context, scrollController) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'تصفية النتائج',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'تصفية النتائج',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setModalState(() {
+                                tempPriceRange = const RangeValues(0, 5000);
+                                tempMinRating = null;
+                              });
+                            },
+                            child: const Text('إعادة تعيين'),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        onPressed: () {
-                          // Reset filters
+                      const Divider(),
+                      const SizedBox(height: 16),
+
+                      // Price Range
+                      const Text(
+                        'نطاق السعر',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('${tempPriceRange.start.toInt()} ر.س'),
+                          Text('${tempPriceRange.end.toInt()} ر.س'),
+                        ],
+                      ),
+                      RangeSlider(
+                        values: tempPriceRange,
+                        min: 0,
+                        max: 5000,
+                        divisions: 50,
+                        labels: RangeLabels(
+                          '${tempPriceRange.start.toInt()} ر.س',
+                          '${tempPriceRange.end.toInt()} ر.س',
+                        ),
+                        onChanged: (values) {
+                          setModalState(() {
+                            tempPriceRange = values;
+                          });
                         },
-                        child: const Text('إعادة تعيين'),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Rating
+                      const Text(
+                        'التقييم',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: [4, 3, 2, 1].map((rating) {
+                          return FilterChip(
+                            label: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('$rating'),
+                                const Icon(
+                                  Icons.star,
+                                  size: 14,
+                                  color: Colors.amber,
+                                ),
+                                const Text(' وأعلى'),
+                              ],
+                            ),
+                            selected: tempMinRating == rating,
+                            onSelected: (selected) {
+                              setModalState(() {
+                                tempMinRating = selected ? rating : null;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Apply Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _priceRange = tempPriceRange;
+                              _minRating = tempMinRating;
+                              _applyFilters();
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: const Text('تطبيق الفلتر'),
+                        ),
                       ),
                     ],
                   ),
-                  const Divider(),
-                  const SizedBox(height: 16),
-
-                  // Price Range
-                  const Text(
-                    'نطاق السعر',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  RangeSlider(
-                    values: const RangeValues(0, 1000),
-                    min: 0,
-                    max: 5000,
-                    divisions: 50,
-                    labels: const RangeLabels('0 ر.س', '1000 ر.س'),
-                    onChanged: (values) {},
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Rating
-                  const Text(
-                    'التقييم',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [4, 3, 2, 1].map((rating) {
-                      return FilterChip(
-                        label: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('$rating'),
-                            const Icon(
-                              Icons.star,
-                              size: 14,
-                              color: Colors.amber,
-                            ),
-                            const Text(' وأعلى'),
-                          ],
-                        ),
-                        selected: false,
-                        onSelected: (selected) {},
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Apply Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // Apply filters
-                      },
-                      child: const Text('تطبيق الفلتر'),
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             );
           },
         );
       },
     );
+  }
+
+  void _applyFilters() {
+    // تطبيق الفلاتر على النتائج
+    if (_searchResults.isNotEmpty) {
+      setState(() {
+        _searchResults.removeWhere((result) {
+          // فلتر السعر
+          if (result.price < _priceRange.start ||
+              result.price > _priceRange.end) {
+            return true;
+          }
+          // فلتر التقييم
+          if (_minRating != null && result.rating < _minRating!) {
+            return true;
+          }
+          return false;
+        });
+      });
+    }
   }
 }
 
@@ -538,6 +715,8 @@ class SearchResult {
   final double rating;
   final int reviewsCount;
   final String storeName;
+  final bool isBoosted;
+  final String? boostType;
 
   SearchResult({
     required this.id,
@@ -548,5 +727,23 @@ class SearchResult {
     required this.rating,
     required this.reviewsCount,
     required this.storeName,
+    this.isBoosted = false,
+    this.boostType,
   });
+
+  factory SearchResult.fromJson(Map<String, dynamic> json) {
+    final store = json['store'] as Map<String, dynamic>?;
+    return SearchResult(
+      id: json['id'] as String,
+      name: json['name'] as String? ?? 'منتج',
+      imageUrl: json['image_url'] as String? ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      originalPrice: (json['compare_at_price'] as num?)?.toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewsCount: json['reviews_count'] as int? ?? 0,
+      storeName: store?['name'] as String? ?? '',
+      isBoosted: json['is_boosted'] as bool? ?? false,
+      boostType: json['boost_type'] as String?,
+    );
+  }
 }

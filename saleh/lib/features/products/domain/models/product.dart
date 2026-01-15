@@ -48,6 +48,7 @@ class Product {
   final int stock;
   final String? imageUrl;
   final String? categoryId;
+  final String? platformCategoryId; // فئة المنصة
   final String storeId;
   final bool isActive;
   final DateTime? createdAt;
@@ -58,6 +59,10 @@ class Product {
   final double? weight;
   final int? preparationTime;
   final List<String>? seoKeywords;
+  // Boost fields
+  final int boostPoints;
+  final DateTime? boostExpiresAt;
+  final String? boostType;
 
   Product({
     required this.id,
@@ -67,6 +72,7 @@ class Product {
     required this.stock,
     this.imageUrl,
     this.categoryId,
+    this.platformCategoryId,
     required this.storeId,
     this.isActive = true,
     this.createdAt,
@@ -77,7 +83,14 @@ class Product {
     this.weight,
     this.preparationTime,
     this.seoKeywords,
+    this.boostPoints = 0,
+    this.boostExpiresAt,
+    this.boostType,
   });
+
+  /// هل المنتج مدعوم حالياً؟
+  bool get isBoosted =>
+      boostExpiresAt != null && boostExpiresAt!.isAfter(DateTime.now());
 
   /// الحصول على الصورة الرئيسية
   String? get mainImageUrl {
@@ -160,6 +173,7 @@ class Product {
       stock: json['stock'] as int? ?? 0,
       imageUrl: mainImage,
       categoryId: json['category_id'] as String?,
+      platformCategoryId: json['platform_category_id'] as String?,
       storeId: json['store_id'] as String,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: json['created_at'] != null
@@ -176,6 +190,11 @@ class Product {
       seoKeywords: json['seo_keywords'] != null
           ? List<String>.from(json['seo_keywords'])
           : null,
+      boostPoints: json['boost_points'] as int? ?? 0,
+      boostExpiresAt: json['boost_expires_at'] != null
+          ? DateTime.parse(json['boost_expires_at'] as String)
+          : null,
+      boostType: json['boost_type'] as String?,
     );
   }
 
@@ -189,6 +208,7 @@ class Product {
       'stock': stock,
       'image_url': imageUrl,
       'category_id': categoryId,
+      'platform_category_id': platformCategoryId,
       'store_id': storeId,
       'is_active': isActive,
       'created_at': createdAt?.toIso8601String(),
@@ -198,6 +218,9 @@ class Product {
       'weight': weight,
       'preparation_time': preparationTime,
       'seo_keywords': seoKeywords,
+      'boost_points': boostPoints,
+      'boost_expires_at': boostExpiresAt?.toIso8601String(),
+      'boost_type': boostType,
     };
   }
 
@@ -210,6 +233,7 @@ class Product {
     int? stock,
     String? imageUrl,
     String? categoryId,
+    String? platformCategoryId,
     String? storeId,
     bool? isActive,
     DateTime? createdAt,
@@ -220,6 +244,9 @@ class Product {
     double? weight,
     int? preparationTime,
     List<String>? seoKeywords,
+    int? boostPoints,
+    DateTime? boostExpiresAt,
+    String? boostType,
   }) {
     return Product(
       id: id ?? this.id,
@@ -229,6 +256,7 @@ class Product {
       stock: stock ?? this.stock,
       imageUrl: imageUrl ?? this.imageUrl,
       categoryId: categoryId ?? this.categoryId,
+      platformCategoryId: platformCategoryId ?? this.platformCategoryId,
       storeId: storeId ?? this.storeId,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
@@ -239,11 +267,14 @@ class Product {
       weight: weight ?? this.weight,
       preparationTime: preparationTime ?? this.preparationTime,
       seoKeywords: seoKeywords ?? this.seoKeywords,
+      boostPoints: boostPoints ?? this.boostPoints,
+      boostExpiresAt: boostExpiresAt ?? this.boostExpiresAt,
+      boostType: boostType ?? this.boostType,
     );
   }
 
   @override
   String toString() {
-    return 'Product(id: $id, name: $name, price: $price, stock: $stock)';
+    return 'Product(id: $id, name: $name, price: $price, stock: $stock, boosted: $isBoosted)';
   }
 }

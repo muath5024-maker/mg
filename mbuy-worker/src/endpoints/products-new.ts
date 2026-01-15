@@ -73,8 +73,11 @@ export async function createProductForCurrentMerchant(
       mainImageUrl = mainMedia ? mainMedia.url : (rawBody.media.find((m: any) => m.type === 'image')?.url || mainImageUrl);
     }
 
+    // استخراج platform_category_id من extra_data إذا لم يكن موجوداً في المستوى الأول
+    const platformCategoryId = rawBody.platform_category_id || rawBody.extra_data?.platform_category_id || null;
+
     // تجهيز كائن المنتج
-    const productToInsert = {
+    const productToInsert: Record<string, any> = {
       merchant_id: merchantId,
       category_id: rawBody.category_id,
       name: rawBody.name.trim(),
@@ -84,6 +87,11 @@ export async function createProductForCurrentMerchant(
       main_image_url: mainImageUrl,
       is_active: rawBody.is_active ?? true,
     };
+
+    // إضافة platform_category_id إذا كان موجوداً
+    if (platformCategoryId) {
+      productToInsert.platform_category_id = platformCategoryId;
+    }
 
     // 5. إدخال المنتج
     const { data: newProduct, error: insertError } = await supabase

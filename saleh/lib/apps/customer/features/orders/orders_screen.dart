@@ -247,9 +247,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                 const Spacer(),
                 if (order.status == OrderStatus.delivered)
                   OutlinedButton(
-                    onPressed: () {
-                      // Reorder logic
-                    },
+                    onPressed: () => _reorderItems(order),
                     child: const Text('إعادة الطلب'),
                   )
                 else if (order.status == OrderStatus.pending ||
@@ -369,5 +367,36 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
         ),
       ),
     );
+  }
+
+  /// إعادة طلب المنتجات - إضافتها للسلة
+  void _reorderItems(Order order) async {
+    final cartNotifier = ref.read(cartProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+
+    bool allAdded = true;
+    for (final item in order.items) {
+      final success = await cartNotifier.addToCart(
+        item.productId,
+        quantity: item.quantity,
+      );
+      if (!success) allAdded = false;
+    }
+
+    if (mounted) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            allAdded
+                ? 'تمت إضافة ${order.items.length} منتج للسلة ✅'
+                : 'تم إضافة بعض المنتجات للسلة',
+          ),
+          action: SnackBarAction(
+            label: 'الذهاب للسلة',
+            onPressed: () => context.push('/cart'),
+          ),
+        ),
+      );
+    }
   }
 }

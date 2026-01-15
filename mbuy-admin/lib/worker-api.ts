@@ -327,6 +327,180 @@ export async function getRevenueChart(days = 30): Promise<ApiResponse<RevenueDat
 }
 
 // =====================================================
+// PLATFORM CATEGORIES API
+// =====================================================
+
+export interface PlatformCategory {
+  id: string;
+  slug: string;
+  name_ar: string;
+  name_en: string;
+  icon: string;
+  color?: string;
+  parent_id?: string;
+  display_order: number;
+  is_active: boolean;
+  is_featured: boolean;
+  products_count?: number;
+  merchants_count?: number;
+  created_at: string;
+  updated_at: string;
+  children?: PlatformCategory[];
+}
+
+export interface CreateCategoryRequest {
+  slug: string;
+  name_ar: string;
+  name_en: string;
+  icon: string;
+  color?: string;
+  parent_id?: string;
+  display_order?: number;
+  is_active?: boolean;
+  is_featured?: boolean;
+}
+
+export interface UpdateCategoryRequest {
+  slug?: string;
+  name_ar?: string;
+  name_en?: string;
+  icon?: string;
+  color?: string;
+  parent_id?: string;
+  display_order?: number;
+  is_active?: boolean;
+  is_featured?: boolean;
+}
+
+export interface ReorderCategoriesRequest {
+  orders: { id: string; display_order: number }[];
+}
+
+// Get all categories (admin view with all data)
+export async function getPlatformCategories(
+  includeInactive = true,
+  includeChildren = true
+): Promise<ApiResponse<PlatformCategory[]>> {
+  const params = new URLSearchParams();
+  params.append('include_inactive', String(includeInactive));
+  params.append('include_children', String(includeChildren));
+  
+  return workerFetch(`/admin/api/platform-categories?${params}`);
+}
+
+// Get single category by ID
+export async function getPlatformCategory(id: string): Promise<ApiResponse<PlatformCategory>> {
+  return workerFetch(`/admin/api/platform-categories/${id}`);
+}
+
+// Create new category
+export async function createPlatformCategory(
+  category: CreateCategoryRequest
+): Promise<ApiResponse<PlatformCategory>> {
+  return workerFetch('/admin/api/platform-categories', {
+    method: 'POST',
+    body: JSON.stringify(category),
+  });
+}
+
+// Update category
+export async function updatePlatformCategory(
+  id: string,
+  updates: UpdateCategoryRequest
+): Promise<ApiResponse<PlatformCategory>> {
+  return workerFetch(`/admin/api/platform-categories/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(updates),
+  });
+}
+
+// Delete category
+export async function deletePlatformCategory(id: string): Promise<ApiResponse<void>> {
+  return workerFetch(`/admin/api/platform-categories/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// Reorder categories
+export async function reorderPlatformCategories(
+  orders: ReorderCategoriesRequest
+): Promise<ApiResponse<void>> {
+  return workerFetch('/admin/api/platform-categories/reorder', {
+    method: 'POST',
+    body: JSON.stringify(orders),
+  });
+}
+
+// Toggle category status (active/inactive)
+export async function toggleCategoryStatus(
+  id: string,
+  isActive: boolean
+): Promise<ApiResponse<PlatformCategory>> {
+  return updatePlatformCategory(id, { is_active: isActive });
+}
+
+// Toggle category featured status
+export async function toggleCategoryFeatured(
+  id: string,
+  isFeatured: boolean
+): Promise<ApiResponse<PlatformCategory>> {
+  return updatePlatformCategory(id, { is_featured: isFeatured });
+}
+
+// =====================================================
+// BOOST MANAGEMENT API
+// =====================================================
+
+export interface BoostTransaction {
+  id: string;
+  merchant_id: string;
+  target_type: 'product' | 'store' | 'media';
+  target_id: string;
+  boost_type: string;
+  points_spent: number;
+  duration_days: number;
+  starts_at: string;
+  expires_at: string;
+  status: 'active' | 'expired' | 'cancelled';
+  created_at: string;
+  merchants?: {
+    business_name: string;
+  };
+}
+
+export interface BoostStats {
+  active_boosts: number;
+  total_boosts: number;
+  total_points_spent: number;
+}
+
+// Get all boost transactions (admin)
+export async function getBoostTransactions(
+  page = 1,
+  limit = 20,
+  status?: string,
+  targetType?: string
+): Promise<ApiResponse<BoostTransaction[]>> {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) params.append('status', status);
+  if (targetType) params.append('target_type', targetType);
+
+  return workerFetch(`/admin/api/boosts?${params}`);
+}
+
+// Get boost statistics (admin)
+export async function getBoostStats(): Promise<ApiResponse<BoostStats>> {
+  return workerFetch('/admin/api/boosts/stats');
+}
+
+// Cancel boost (admin)
+export async function adminCancelBoost(id: string): Promise<ApiResponse<void>> {
+  return workerFetch(`/admin/api/boosts/${id}/cancel`, {
+    method: 'POST',
+  });
+}
+
+// =====================================================
 // WORKER HEALTH
 // =====================================================
 

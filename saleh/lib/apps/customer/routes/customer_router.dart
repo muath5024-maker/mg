@@ -12,14 +12,62 @@ import '../features/cart/cart_screen.dart';
 import '../features/categories/category_products_screen.dart';
 import '../features/categories/category_suppliers_screen.dart';
 import '../features/settings/customer_settings_screen.dart';
+import '../features/orders/order_detail_screen.dart';
 import '../../../shared/screens/login_screen.dart';
+import '../../../features/auth/data/auth_controller.dart';
 
 /// Customer Router - التنقل داخل تطبيق العميل
+///
+/// يدعم Deep Linking للمسارات التالية:
+/// - mbuy://product/{id} - صفحة المنتج
+/// - mbuy://store/{id} - صفحة المتجر
+/// - mbuy://order/{id} - تفاصيل الطلب
+/// - mbuy://category/{name} - منتجات الفئة
 class CustomerRouter {
+  /// المسارات المحمية التي تتطلب تسجيل الدخول
+  static const List<String> _protectedRoutes = [
+    '/checkout',
+    '/orders',
+    '/order',
+    '/favorites',
+    '/cart',
+    '/settings',
+  ];
+
+  /// التحقق من أن المسار محمي
+  static bool _isProtectedRoute(String location) {
+    return _protectedRoutes.any((route) => location.startsWith(route));
+  }
+
   static GoRouter createRouter(WidgetRef ref) {
     return GoRouter(
       initialLocation: '/',
       debugLogDiagnostics: true,
+
+      // Route Guard - حماية المسارات
+      redirect: (context, state) {
+        final isAuthenticated = ref
+            .read(authControllerProvider)
+            .isAuthenticated;
+        final isLoggingIn = state.matchedLocation == '/login';
+        final isProtected = _isProtectedRoute(state.matchedLocation);
+
+        // إذا كان المسار محمي والمستخدم غير مسجل دخول
+        if (isProtected && !isAuthenticated) {
+          // حفظ المسار الأصلي للعودة إليه بعد تسجيل الدخول
+          return '/login?redirect=${Uri.encodeComponent(state.matchedLocation)}';
+        }
+
+        // إذا كان مسجل دخول وفي صفحة تسجيل الدخول
+        if (isLoggingIn && isAuthenticated) {
+          // العودة للصفحة المطلوبة أو الرئيسية
+          final redirect = state.uri.queryParameters['redirect'];
+          return redirect != null ? Uri.decodeComponent(redirect) : '/';
+        }
+
+        return null; // لا يوجد توجيه
+      },
+
       routes: [
         // الصفحة الرئيسية (Bottom Navigation)
         GoRoute(
@@ -50,20 +98,20 @@ class CustomerRouter {
 
         // منتجات الفئة (عرض الكل)
         GoRoute(
-          path: '/category/:name/products',
+          path: '/category/:slug/products',
           name: 'category-products',
           builder: (context, state) {
-            final categoryName = state.pathParameters['name'] ?? '';
-            return CategoryProductsScreen(categoryName: categoryName);
+            final categorySlug = state.pathParameters['slug'] ?? '';
+            return CategoryProductsScreen(categorySlug: categorySlug);
           },
         ),
 
         // موردون الفئة (عرض الكل)
         GoRoute(
-          path: '/category/:name/suppliers',
+          path: '/category/:slug/suppliers',
           name: 'category-suppliers',
           builder: (context, state) {
-            final categoryName = state.pathParameters['name'] ?? '';
+            final categoryName = state.pathParameters['slug'] ?? '';
             return CategorySuppliersScreen(categoryName: categoryName);
           },
         ),
@@ -106,6 +154,16 @@ class CustomerRouter {
           path: '/orders',
           name: 'orders',
           builder: (context, state) => const OrdersScreen(),
+        ),
+
+        // تفاصيل الطلب
+        GoRoute(
+          path: '/order/:id',
+          name: 'order-detail',
+          builder: (context, state) {
+            final orderId = state.pathParameters['id'] ?? '';
+            return OrderDetailScreen(orderId: orderId);
+          },
         ),
 
         // Checkout

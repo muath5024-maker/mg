@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
 import 'live_stream_screen.dart';
 import 'video_feed_screen.dart';
 import 'post_detail_screen.dart';
@@ -17,8 +19,6 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
-
-  static const Color _primaryColor = Color(0xFF00BFA5);
 
   final List<String> _tabs = [
     'لك',
@@ -353,14 +353,14 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
       child: TabBar(
         controller: _tabController,
         isScrollable: true,
-        labelColor: _primaryColor,
+        labelColor: AppColors.primary,
         unselectedLabelColor: isDark ? Colors.grey[400] : Colors.grey[600],
         labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         unselectedLabelStyle: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
-        indicatorColor: _primaryColor,
+        indicatorColor: AppColors.primary,
         indicatorWeight: 3,
         indicatorSize: TabBarIndicatorSize.label,
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -407,58 +407,58 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
     int postIndex = 0;
     int videoIndex = 0;
 
-    // Interleave posts and videos (2 posts then 1 video pattern)
+    // Pattern: 4 videos then 1 post (like Posts tab layout)
     while (postIndex < _posts.length || videoIndex < _videos.length) {
-      // Add 2 posts
-      for (int i = 0; i < 2 && postIndex < _posts.length; i++) {
-        mixed.add(_posts[postIndex++]);
-      }
-      // Add 1 video
-      if (videoIndex < _videos.length) {
+      // Add 4 videos
+      for (int i = 0; i < 4 && videoIndex < _videos.length; i++) {
         mixed.add(_videos[videoIndex++]);
+      }
+      // Add 1 post below the 4 videos
+      if (postIndex < _posts.length) {
+        mixed.add(_posts[postIndex++]);
       }
     }
     return mixed;
   }
 
   Widget _buildMixedPostCard(MediaPost post, bool isDark) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PostDetailScreen(
-              postId: post.id,
-              userName: post.userName,
-              userAvatar: post.userAvatar,
-              content: post.title,
-              imageUrl: post.imageUrl,
-              likesCount: post.likesCount,
-              commentsCount: 45,
-              sharesCount: 12,
-              timeAgo: 'منذ ساعتين',
-              isVerified: true,
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: isDark ? const Color(0xFF131B1A) : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: isDark ? const Color(0xFF131B1A) : Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image
-            Stack(
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image - قابل للضغط للانتقال للتفاصيل
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostDetailScreen(
+                    postId: post.id,
+                    userName: post.userName,
+                    userAvatar: post.userAvatar,
+                    content: post.title,
+                    imageUrl: post.imageUrl,
+                    likesCount: post.likesCount,
+                    commentsCount: 45,
+                    sharesCount: 12,
+                    timeAgo: 'منذ ساعتين',
+                    isVerified: true,
+                  ),
+                ),
+              );
+            },
+            child: Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
@@ -475,63 +475,57 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                     ),
                   ),
                 ),
-                // Post indicator badge
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.article, color: Colors.white, size: 12),
-                        SizedBox(width: 4),
-                        Text(
-                          'منشور',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.title,
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+          ),
+          // Content
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  post.title,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundImage: NetworkImage(post.userAvatar),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    // Avatar - قابل للضغط لعرض الملف الشخصي
+                    SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          _showUserProfileSheet(
+                            userName: post.userName,
+                            userAvatar: post.userAvatar,
+                            storeId: 'store_${post.id}',
+                          );
+                        },
+                        icon: CircleAvatar(
+                          radius: 14,
+                          backgroundImage: NetworkImage(post.userAvatar),
+                        ),
                       ),
-                      const SizedBox(width: 6),
-                      Expanded(
+                    ),
+                    // Username - قابل للضغط لعرض الملف الشخصي
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          _showUserProfileSheet(
+                            userName: post.userName,
+                            userAvatar: post.userAvatar,
+                            storeId: 'store_${post.id}',
+                          );
+                        },
                         child: Text(
                           post.userName,
                           style: TextStyle(
@@ -541,19 +535,19 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Icon(Icons.favorite, color: Colors.red[300], size: 14),
-                      const SizedBox(width: 4),
-                      Text(
-                        _formatCount(post.likesCount),
-                        style: TextStyle(color: Colors.grey[600], fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    Icon(Icons.favorite, color: Colors.red[300], size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatCount(post.likesCount),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -643,33 +637,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                 ),
               ),
             ),
-            // Video badge
-            Positioned(
-              top: 8,
-              left: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _primaryColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.play_arrow, color: Colors.white, size: 14),
-                    SizedBox(width: 2),
-                    Text(
-                      'فيديو',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
             // Duration
             Positioned(
               top: 8,
@@ -700,9 +668,18 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundImage: NetworkImage(video.userAvatar),
+                      GestureDetector(
+                        onTap: () {
+                          _showUserProfileSheet(
+                            userName: video.userName,
+                            userAvatar: video.userAvatar,
+                            storeId: 'store_${video.id}',
+                          );
+                        },
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundImage: NetworkImage(video.userAvatar),
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -775,6 +752,133 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
     return count.toString();
   }
 
+  bool _isFollowingProfile = false;
+
+  // Show user profile sheet when clicking on avatar
+  void _showUserProfileSheet({
+    required String userName,
+    required String userAvatar,
+    required String storeId,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 45,
+                  backgroundImage: NetworkImage(userAvatar),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildProfileStatItem('متابعين', '125k'),
+                    _buildProfileStatItem('متابَعين', '89'),
+                    _buildProfileStatItem('إعجابات', '2.5M'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setSheetState(() {
+                            _isFollowingProfile = !_isFollowingProfile;
+                          });
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isFollowingProfile
+                              ? Colors.grey[700]
+                              : AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          _isFollowingProfile ? 'إلغاء المتابعة' : 'متابعة',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          context.push('/store/$storeId');
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.white38),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'زيارة المتجر',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white54, fontSize: 12),
+        ),
+      ],
+    );
+  }
+
   Widget _buildLiveNowSection(bool isDark) {
     return Container(
       padding: const EdgeInsets.only(top: 12, bottom: 8),
@@ -798,7 +902,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                   child: const Text(
                     'عرض الكل',
                     style: TextStyle(
-                      color: _primaryColor,
+                      color: AppColors.primary,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -837,15 +941,30 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
     return GestureDetector(
       onTap: () {
         if (user.isLive) {
+          // Create swipeable list of all live streams
+          final liveStreams = _liveUsers
+              .where((u) => u.isLive)
+              .map(
+                (u) => LiveStreamItem(
+                  streamId: u.id,
+                  userName: u.name,
+                  userAvatar: u.imageUrl,
+                  title: 'بث مباشر من ${u.name}',
+                  viewersCount: 1234,
+                ),
+              )
+              .toList();
+
+          final currentIndex = liveStreams.indexWhere(
+            (s) => s.streamId == user.id,
+          );
+
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => LiveStreamScreen(
-                streamId: user.id,
-                userName: user.name,
-                userAvatar: user.imageUrl,
-                title: 'بث مباشر من ${user.name}',
-                viewersCount: 1234,
+              builder: (context) => SwipeableLiveStreamScreen(
+                streams: liveStreams,
+                initialIndex: currentIndex >= 0 ? currentIndex : 0,
               ),
             ),
           );
@@ -868,7 +987,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                     ? const LinearGradient(
                         colors: [
                           Color(0xFF67E8F9),
-                          _primaryColor,
+                          AppColors.primary,
                           Color(0xFF0D9488),
                         ],
                         begin: Alignment.topLeft,
@@ -919,7 +1038,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                     vertical: 1,
                   ),
                   decoration: BoxDecoration(
-                    color: _primaryColor,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isDark ? const Color(0xFF131B1A) : Colors.white,
@@ -1245,7 +1364,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
                         const SizedBox(width: 4),
                         const Icon(
                           Icons.verified,
-                          color: _primaryColor,
+                          color: AppColors.primary,
                           size: 16,
                         ),
                       ],
@@ -1389,23 +1508,38 @@ class _MediaScreenState extends ConsumerState<MediaScreen>
       itemCount: liveStreams.length,
       itemBuilder: (context, index) {
         final user = liveStreams[index];
-        return _buildLiveStreamCard(user, isDark);
+        return _buildLiveStreamCard(user, isDark, liveStreams, index);
       },
     );
   }
 
-  Widget _buildLiveStreamCard(LiveUser user, bool isDark) {
+  Widget _buildLiveStreamCard(
+    LiveUser user,
+    bool isDark,
+    List<LiveUser> allStreams,
+    int currentIndex,
+  ) {
     return GestureDetector(
       onTap: () {
+        // Create swipeable list of all live streams
+        final liveStreamItems = allStreams
+            .map(
+              (u) => LiveStreamItem(
+                streamId: u.id,
+                userName: u.name,
+                userAvatar: u.imageUrl,
+                title: 'بث مباشر من ${u.name}',
+                viewersCount: 1234,
+              ),
+            )
+            .toList();
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => LiveStreamScreen(
-              streamId: user.id,
-              userName: user.name,
-              userAvatar: user.imageUrl,
-              title: 'بث مباشر من ${user.name}',
-              viewersCount: 1234,
+            builder: (context) => SwipeableLiveStreamScreen(
+              streams: liveStreamItems,
+              initialIndex: currentIndex,
             ),
           ),
         );

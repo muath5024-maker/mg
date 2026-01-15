@@ -199,6 +199,15 @@ class _StorePageScreenState extends ConsumerState<StorePageScreen>
                 isDark: isDark,
               ),
             ),
+
+            // Categories - ثابتة مع التبويب
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _CategoriesDelegate(
+                categories: _store.categories,
+                isDark: isDark,
+              ),
+            ),
           ];
         },
         body: TabBarView(
@@ -622,60 +631,6 @@ class _StorePageScreenState extends ConsumerState<StorePageScreen>
       top: false,
       child: Column(
         children: [
-          // Categories Horizontal List
-          Container(
-            height: 95,
-            color: isDark ? theme.cardColor : Colors.white,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              reverse: true,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              itemCount: _store.categories.length,
-              itemBuilder: (context, index) {
-                final category = _store.categories[index];
-                return Container(
-                  width: 68,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 22,
-                          backgroundImage: NetworkImage(category.imageUrl),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      SizedBox(
-                        height: 28,
-                        child: Text(
-                          category.name,
-                          style: TextStyle(
-                            fontSize: 9,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                            height: 1.2,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
           // Products Grid (Masonry Style)
           Expanded(child: _buildMasonryGrid()),
           // Bottom Discount Tabs
@@ -1461,6 +1416,85 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_TabBarDelegate oldDelegate) =>
       oldDelegate.isDark != isDark;
+}
+
+// Categories Delegate for sticky categories
+class _CategoriesDelegate extends SliverPersistentHeaderDelegate {
+  final List<StoreCategory> categories;
+  final bool isDark;
+
+  _CategoriesDelegate({required this.categories, this.isDark = false});
+
+  @override
+  double get minExtent => 95;
+  @override
+  double get maxExtent => 95;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    final theme = Theme.of(context);
+    return Container(
+      height: 95,
+      color: isDark ? theme.cardColor : Colors.white,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return Container(
+            width: 68,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 22,
+                    backgroundImage: NetworkImage(category.imageUrl),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  height: 28,
+                  child: Text(
+                    category.name,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_CategoriesDelegate oldDelegate) =>
+      oldDelegate.isDark != isDark || oldDelegate.categories != categories;
 }
 
 class Store {

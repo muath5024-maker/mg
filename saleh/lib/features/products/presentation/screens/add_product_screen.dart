@@ -12,7 +12,9 @@ import '../../../../core/services/auth_token_storage.dart';
 import '../../data/products_controller.dart';
 import '../../data/categories_repository.dart';
 import '../../data/products_repository.dart';
+import '../../data/platform_categories_repository.dart';
 import '../../domain/models/category.dart';
+import '../../domain/models/platform_category.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 
 /// أنواع المنتجات المتاحة
@@ -234,8 +236,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   List<Category> _categories = [];
   bool _loadingCategories = false;
   String? _selectedCategoryId;
-  String? _selectedMbuyCategoryId; // تصنيف mbuy
   String? _selectedWholesaleCategoryId; // تصنيف الجملة
+
+  // فئة المنصة (Platform Category)
+  String? _selectedPlatformCategoryId;
+  String? _selectedPlatformSubcategoryId;
+  List<PlatformCategory> _platformCategories = [];
+  List<PlatformCategory> _platformSubcategories = [];
+  bool _loadingPlatformCategories = false;
 
   // قنوات عرض المنتج
   bool _showInStore = true; // المتجر
@@ -340,21 +348,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     'أخرى',
   ];
 
-  // قائمة تصنيفات mbuy
-  final List<Map<String, String>> _mbuyCategories = [
-    {'id': 'electronics', 'name': 'إلكترونيات'},
-    {'id': 'fashion', 'name': 'أزياء وموضة'},
-    {'id': 'home', 'name': 'المنزل والمطبخ'},
-    {'id': 'beauty', 'name': 'الجمال والعناية'},
-    {'id': 'sports', 'name': 'رياضة ولياقة'},
-    {'id': 'toys', 'name': 'ألعاب وهدايا'},
-    {'id': 'food', 'name': 'طعام ومشروبات'},
-    {'id': 'health', 'name': 'صحة وعافية'},
-    {'id': 'automotive', 'name': 'سيارات وإكسسوارات'},
-    {'id': 'books', 'name': 'كتب وقرطاسية'},
-    {'id': 'other', 'name': 'أخرى'},
-  ];
-
   // قائمة تصنيفات الجملة
   final List<Map<String, String>> _wholesaleCategories = [
     {'id': 'retail', 'name': 'تجزئة'},
@@ -393,6 +386,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     }
 
     _loadCategories();
+    _loadPlatformCategories();
     _setupListeners();
   }
 
@@ -537,6 +531,54 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         );
       }
     }
+  }
+
+  /// جلب فئات المنصة من API
+  Future<void> _loadPlatformCategories() async {
+    setState(() => _loadingPlatformCategories = true);
+
+    try {
+      final platformCategoriesRepo = ref.read(
+        platformCategoriesRepositoryProvider,
+      );
+      final categories = await platformCategoriesRepo.getCategories(
+        flat: false,
+      );
+
+      if (mounted) {
+        setState(() {
+          // فقط الفئات الرئيسية (بدون parent_id)
+          _platformCategories = categories
+              .where((c) => c.parentId == null)
+              .toList();
+          _loadingPlatformCategories = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loadingPlatformCategories = false);
+        debugPrint('فشل جلب فئات المنصة: $e');
+      }
+    }
+  }
+
+  /// تحميل الفئات الفرعية للفئة المختارة
+  void _onPlatformCategoryChanged(String? categoryId) {
+    setState(() {
+      _selectedPlatformCategoryId = categoryId;
+      _selectedPlatformSubcategoryId = null;
+
+      if (categoryId != null) {
+        // البحث عن الفئة المختارة وتحميل الفئات الفرعية
+        final selectedCategory = _platformCategories.firstWhere(
+          (c) => c.id == categoryId,
+          orElse: () => _platformCategories.first,
+        );
+        _platformSubcategories = selectedCategory.children;
+      } else {
+        _platformSubcategories = [];
+      }
+    });
   }
 
   /// اختيار صور المنتج
@@ -1630,9 +1672,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         );
       }
 
-      // تصنيف mbuy
-      if (_selectedMbuyCategoryId != null) {
-        _extraData['mbuy_category'] = _selectedMbuyCategoryId;
+      // فئة المنصة (Platform Category)
+      if (_selectedPlatformCategoryId != null) {
+        // استخدام الفئة الفرعية إذا تم اختيارها، وإلا الفئة الرئيسية
+        _extraData['platform_category_id'] =
+            _selectedPlatformSubcategoryId ?? _selectedPlatformCategoryId;
       }
 
       // تصنيف الجملة
@@ -1905,17 +1949,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     ),
                   const SizedBox(height: AppDimensions.spacing16),
 
-                  // تصنيف mbuy
+                  // فئة المنصة (Platform Category) - الفئة الرئيسية
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedMbuyCategoryId,
+                    initialValue: _selectedPlatformCategoryId,
                     decoration: InputDecoration(
-                      labelText: 'تصنيف mbuy',
-                      hintText: 'اختر تصنيف mbuy',
+                      labelText: 'فئة المنصة *',
+                      hintText: 'اختر فئة المنصة',
                       prefixIcon: const Padding(
                         padding: EdgeInsets.all(12),
                         child: Icon(
-                          Icons.shopping_bag,
-                          color: AppTheme.textSecondaryColor,
+                          Icons.category,
+                          color: AppTheme.primaryColor,
                           size: AppDimensions.iconM,
                         ),
                       ),
@@ -1924,18 +1968,93 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                           AppDimensions.radiusM,
                         ),
                       ),
+                      filled: true,
+                      fillColor: AppTheme.primaryColor.withValues(alpha: 0.05),
                     ),
-                    items: _mbuyCategories.map((category) {
-                      return DropdownMenuItem<String>(
-                        value: category['id'],
-                        child: Text(category['name']!),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _selectedMbuyCategoryId = value);
+                    items: _loadingPlatformCategories
+                        ? []
+                        : _platformCategories.map((category) {
+                            return DropdownMenuItem<String>(
+                              value: category.id,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    category.iconData,
+                                    size: 20,
+                                    color: AppTheme.textSecondaryColor,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(category.name),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                    onChanged: _loadingPlatformCategories
+                        ? null
+                        : (value) => _onPlatformCategoryChanged(value),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'الرجاء اختيار فئة المنصة';
+                      }
+                      return null;
                     },
                   ),
+                  if (_loadingPlatformCategories)
+                    const Padding(
+                      padding: EdgeInsets.only(top: AppDimensions.spacing8),
+                      child: Text(
+                        'جاري تحميل فئات المنصة...',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontCaption,
+                          color: AppTheme.textHintColor,
+                        ),
+                      ),
+                    ),
                   const SizedBox(height: AppDimensions.spacing16),
+
+                  // الفئة الفرعية (إذا توفرت)
+                  if (_platformSubcategories.isNotEmpty) ...[
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedPlatformSubcategoryId,
+                      decoration: InputDecoration(
+                        labelText: 'الفئة الفرعية',
+                        hintText: 'اختر الفئة الفرعية',
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Icon(
+                            Icons.subdirectory_arrow_right,
+                            color: AppTheme.textSecondaryColor,
+                            size: AppDimensions.iconM,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
+                        ),
+                      ),
+                      items: _platformSubcategories.map((category) {
+                        return DropdownMenuItem<String>(
+                          value: category.id,
+                          child: Row(
+                            children: [
+                              Icon(
+                                category.iconData,
+                                size: 18,
+                                color: AppTheme.textSecondaryColor,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(category.name),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() => _selectedPlatformSubcategoryId = value);
+                      },
+                    ),
+                    const SizedBox(height: AppDimensions.spacing16),
+                  ],
 
                   // العلامة التجارية
                   MbuyInputField(

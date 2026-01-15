@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../data/customer_providers.dart';
 
 /// شاشة تغذية الفيديو القابلة للتمرير - Swipeable Video Feed
 class VideoFeedScreen extends ConsumerStatefulWidget {
@@ -22,8 +25,6 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
   late PageController _pageController;
   int _currentIndex = 0;
   final Map<int, VideoPlayerController> _controllers = {};
-
-  static const Color _primaryColor = Color(0xFF00BFA5);
 
   @override
   void initState() {
@@ -109,13 +110,29 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Video PageView
-          PageView.builder(
-            controller: _pageController,
-            scrollDirection: Axis.vertical,
-            onPageChanged: _onPageChanged,
-            itemCount: widget.videos.length,
-            itemBuilder: (context, index) => _buildVideoPage(index),
+          // Video PageView with horizontal swipe detection
+          GestureDetector(
+            onHorizontalDragEnd: (details) {
+              // Swipe right to go to profile (velocity > 0 means swipe to right)
+              if (details.primaryVelocity != null &&
+                  details.primaryVelocity! > 200) {
+                final video = widget.videos[_currentIndex];
+                _showStoreConfirmation(video);
+              }
+              // Swipe left to go back (velocity < 0 means swipe to left)
+              if (details.primaryVelocity != null &&
+                  details.primaryVelocity! < -200) {
+                Navigator.pop(context);
+              }
+            },
+            behavior: HitTestBehavior.translucent,
+            child: PageView.builder(
+              controller: _pageController,
+              scrollDirection: Axis.vertical,
+              onPageChanged: _onPageChanged,
+              itemCount: widget.videos.length,
+              itemBuilder: (context, index) => _buildVideoPage(index),
+            ),
           ),
 
           // Back button
@@ -133,6 +150,468 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
                 child: const Icon(Icons.close, color: Colors.white, size: 24),
               ),
             ),
+          ),
+
+          // 3-dot menu button
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            left: 16,
+            child: GestureDetector(
+              onTap: () => _showOptionsMenu(),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+
+          // Swipe hint indicator
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Container(
+                width: 4,
+                height: 60,
+                margin: const EdgeInsets.only(left: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isFollowing = false;
+
+  void _showUserProfileSheet(VideoFeedItem video) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 45,
+                  backgroundImage: NetworkImage(video.userAvatar),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  video.userName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildProfileStat('متابعين', '125k'),
+                    _buildProfileStat('متابَعين', '89'),
+                    _buildProfileStat('إعجابات', '2.5M'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setSheetState(() {
+                            _isFollowing = !_isFollowing;
+                          });
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isFollowing
+                              ? Colors.grey[700]
+                              : AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          _isFollowing ? 'إلغاء المتابعة' : 'متابعة',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          context.push('/store/store_${video.id}');
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.white38),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'زيارة المتجر',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileStat(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white54, fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  void _showStoreConfirmation(VideoFeedItem video) {
+    _showUserProfileSheet(video);
+  }
+
+  void _showOptionsMenu() {
+    final video = widget.videos[_currentIndex];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[700],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildMenuOption(
+              icon: Icons.info_outline,
+              label: 'شرح المنتج',
+              onTap: () {
+                Navigator.pop(context);
+                // Show product explanation
+                _showProductExplanation(video);
+              },
+            ),
+            _buildMenuOption(
+              icon: Icons.visibility_off,
+              label: 'إخفاء هذا النوع',
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم إخفاء هذا النوع من المحتوى'),
+                  ),
+                );
+              },
+            ),
+            _buildMenuOption(
+              icon: Icons.flag_outlined,
+              label: 'إبلاغ',
+              onTap: () {
+                Navigator.pop(context);
+                _showReportDialog();
+              },
+            ),
+            _buildMenuOption(
+              icon: Icons.lightbulb_outline,
+              label: 'اقتراح',
+              onTap: () {
+                Navigator.pop(context);
+                _showSuggestionDialog();
+              },
+            ),
+            _buildMenuOption(
+              icon: Icons.block,
+              label: 'حظر الحساب',
+              isDestructive: true,
+              onTap: () {
+                Navigator.pop(context);
+                _showBlockConfirmation(video);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuOption({
+    required IconData icon,
+    required String label,
+    bool isDestructive = false,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: isDestructive ? Colors.red : Colors.white),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: isDestructive ? Colors.red : Colors.white,
+          fontSize: 16,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+
+  void _showProductExplanation(VideoFeedItem video) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.shopping_bag, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text(
+                  video.productName ?? 'منتج مميز',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'وصف المنتج',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'هذا المنتج يتميز بجودة عالية وتصميم أنيق يناسب جميع الأذواق.',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('السعر', style: TextStyle(color: Colors.white70)),
+                Text(
+                  '${video.productPrice ?? 0} ر.س',
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  Navigator.pop(context);
+                  // Add to cart using cartProvider
+                  final success = await ref
+                      .read(cartProvider.notifier)
+                      .addToCart('product_${video.id}', quantity: 1);
+                  if (mounted) {
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          success ? 'تمت الإضافة للسلة ✅' : 'فشل إضافة المنتج',
+                        ),
+                        backgroundColor: success
+                            ? AppColors.primary
+                            : Colors.red,
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'إضافة للسلة',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: const Text('إبلاغ', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildReportOption('محتوى غير لائق'),
+            _buildReportOption('انتهاك حقوق الملكية'),
+            _buildReportOption('احتيال أو خداع'),
+            _buildReportOption('سلوك ضار'),
+            _buildReportOption('سبب آخر'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReportOption(String label) {
+    return ListTile(
+      title: Text(label, style: const TextStyle(color: Colors.white)),
+      onTap: () {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('شكراً على الإبلاغ')));
+      },
+    );
+  }
+
+  void _showSuggestionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: const Text('اقتراح', style: TextStyle(color: Colors.white)),
+        content: TextField(
+          maxLines: 3,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'اكتب اقتراحك هنا...',
+            hintStyle: const TextStyle(color: Colors.white54),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.white24),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.white24),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppColors.primary),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('شكراً على اقتراحك')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('إرسال', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBlockConfirmation(VideoFeedItem video) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: const Text('حظر الحساب', style: TextStyle(color: Colors.white)),
+        content: Text(
+          'هل تريد حظر ${video.userName}؟ لن ترى محتواه بعد الآن.',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('تم حظر ${video.userName}')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('حظر', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -179,7 +658,9 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
                             Container(color: Colors.grey[900]),
                       ),
                       const Center(
-                        child: CircularProgressIndicator(color: _primaryColor),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
                       ),
                     ],
                   ),
@@ -236,24 +717,78 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
           child: _buildVideoInfo(video),
         ),
 
-        // Progress bar
+        // Enhanced Progress bar with duration
         if (controller != null && controller.value.isInitialized)
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: VideoProgressIndicator(
-              controller,
-              allowScrubbing: true,
-              colors: const VideoProgressColors(
-                playedColor: _primaryColor,
-                bufferedColor: Colors.white30,
-                backgroundColor: Colors.white10,
-              ),
-            ),
+            left: 16,
+            right: 16,
+            bottom: 8,
+            child: _buildEnhancedProgressBar(controller),
           ),
       ],
     );
+  }
+
+  Widget _buildEnhancedProgressBar(VideoPlayerController controller) {
+    return ValueListenableBuilder(
+      valueListenable: controller,
+      builder: (context, VideoPlayerValue value, child) {
+        final position = value.position;
+        final duration = value.duration;
+        final progress = duration.inMilliseconds > 0
+            ? position.inMilliseconds / duration.inMilliseconds
+            : 0.0;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Time display
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _formatDuration(position),
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                ),
+                Text(
+                  _formatDuration(duration),
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            // Slider
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 3,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: Colors.white24,
+                thumbColor: AppColors.primary,
+                overlayColor: AppColors.primary.withValues(alpha: 0.2),
+              ),
+              child: Slider(
+                value: progress.clamp(0.0, 1.0),
+                onChanged: (value) {
+                  final newPosition = Duration(
+                    milliseconds: (value * duration.inMilliseconds).round(),
+                  );
+                  controller.seekTo(newPosition);
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$minutes:$seconds';
   }
 
   Widget _buildActions(VideoFeedItem video, int index) {
@@ -263,7 +798,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
         // User Avatar
         GestureDetector(
           onTap: () {
-            // Navigate to user profile
+            _showUserProfileSheet(video);
           },
           child: Stack(
             clipBehavior: Clip.none,
@@ -295,7 +830,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
                     width: 20,
                     height: 20,
                     decoration: const BoxDecoration(
-                      color: _primaryColor,
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.add, color: Colors.white, size: 14),
@@ -347,7 +882,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
           icon: video.isSaved ? Icons.bookmark : Icons.bookmark_border,
           label: 'حفظ',
           isActive: video.isSaved,
-          activeColor: _primaryColor,
+          activeColor: AppColors.primary,
           onTap: () {
             setState(() {
               widget.videos[index] = video.copyWith(isSaved: !video.isSaved);
@@ -361,7 +896,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
           _buildActionButton(
             icon: Icons.shopping_bag,
             label: 'تسوق',
-            iconColor: _primaryColor,
+            iconColor: AppColors.primary,
             onTap: () {
               // Navigate to product
             },
@@ -421,7 +956,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
             ),
             if (video.isVerified) ...[
               const SizedBox(width: 4),
-              const Icon(Icons.verified, color: _primaryColor, size: 16),
+              const Icon(Icons.verified, color: AppColors.primary, size: 16),
             ],
           ],
         ),
@@ -447,7 +982,11 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.shopping_bag, color: _primaryColor, size: 16),
+                const Icon(
+                  Icons.shopping_bag,
+                  color: AppColors.primary,
+                  size: 16,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   video.productName ?? 'منتج مميز',
@@ -457,7 +996,7 @@ class _VideoFeedScreenState extends ConsumerState<VideoFeedScreen> {
                 Text(
                   '${video.productPrice ?? 0} ر.س',
                   style: const TextStyle(
-                    color: _primaryColor,
+                    color: AppColors.primary,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -570,7 +1109,6 @@ class _CommentsSheet extends StatefulWidget {
 
 class _CommentsSheetState extends State<_CommentsSheet> {
   final TextEditingController _controller = TextEditingController();
-  static const Color _primaryColor = Color(0xFF00BFA5);
 
   final List<VideoComment> _comments = [
     VideoComment(
@@ -706,7 +1244,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: const BoxDecoration(
-                      color: _primaryColor,
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

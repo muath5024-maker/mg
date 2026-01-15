@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 import 'routes/customer_router.dart';
 
 /// تطبيق العميل - السوق للتسوق والشراء
@@ -20,23 +21,41 @@ class _CustomerAppState extends ConsumerState<CustomerApp> {
   @override
   void initState() {
     super.initState();
-    // Set status bar style
+    // Set status bar style based on theme
+    _updateSystemUI();
+  }
+
+  void _updateSystemUI() {
+    final themeState = ref.read(themeProvider);
+    final isDark = themeState.themeMode == AppThemeMode.dark;
+
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch theme changes
+    final themeState = ref.watch(themeProvider);
+
+    // Update system UI when theme changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateSystemUIForContext(context, themeState);
+    });
+
     return MaterialApp.router(
       title: 'MBUY',
       debugShowCheckedModeBanner: false,
 
-      // Theme - Dark Brown Theme
+      // Theme - Light & Dark Mode Support
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeState.flutterThemeMode,
 
       // Arabic RTL Support
       locale: const Locale('ar'),
@@ -54,6 +73,22 @@ class _CustomerAppState extends ConsumerState<CustomerApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ar'), Locale('en')],
+    );
+  }
+
+  void _updateSystemUIForContext(BuildContext context, ThemeState themeState) {
+    final isDark = themeState.isDarkMode(context);
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor:
+            isDark ? AppTheme.darkSurface : AppTheme.navBarBackground,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+      ),
     );
   }
 }

@@ -23,7 +23,18 @@
       "Bash(powershell:*)",
       "Bash(npm run build:*)",
       "Bash(rm:*)",
-      "Bash(flutter create:*)"
+      "Bash(flutter create:*)",
+      "Bash(comm:*)",
+      "Bash(cmdkey /list:*)",
+      "Bash(cmdkey /delete:\"LegacyGeneric:target=GitHub - https://api.github.com/mbuy1\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"c:\\\\muath\\\\delete-github-cred.ps1\")",
+      "Bash(cmdkey \"/delete:LegacyGeneric:target=GitHub - https://api.github.com/mbuy1\")",
+      "Bash(cmdkey \"/delete:GitHub - https://api.github.com/mbuy1\")",
+      "Bash(git fetch:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"c:\\\\muath\\\\clean-github-creds.ps1\")",
+      "Bash(powershell.exe -Command \"Start-Process ''control.exe'' -ArgumentList ''/name Microsoft.CredentialManager''\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -Command \"\nWrite-Host ''╔══════════════════════════════════════════════════════════╗'' -ForegroundColor Cyan\nWrite-Host ''║       GitHub Authentication Status - saleh Project       ║'' -ForegroundColor Cyan\nWrite-Host ''╚══════════════════════════════════════════════════════════╝'' -ForegroundColor Cyan\nWrite-Host ''''\n\n# Check git config\nWrite-Host ''📋 Git Configuration:'' -ForegroundColor Yellow\n$username = git config --global user.name\n$email = git config --global user.email\nWrite-Host \"\"  Username: $username\"\" -ForegroundColor Green\nWrite-Host \"\"  Email:    $email\"\" -ForegroundColor Green\nWrite-Host ''''\n\n# Check remote\nWrite-Host ''🔗 Remote URL:'' -ForegroundColor Yellow\n$remote = git remote get-url origin\nWrite-Host \"\"  $remote\"\" -ForegroundColor Green\nWrite-Host ''''\n\n# Check branch\nWrite-Host ''🌿 Current Branch:'' -ForegroundColor Yellow\n$branch = git branch --show-current\nWrite-Host \"\"  $branch\"\" -ForegroundColor Cyan\nWrite-Host ''''\n\nWrite-Host ''══════════════════════════════════════════════════════════'' -ForegroundColor Cyan\nWrite-Host ''''\nWrite-Host ''✅ Configuration is correct!'' -ForegroundColor Green\nWrite-Host ''''\n\")",
+      "Bash(powershell.exe -Command \"Start-Process ''c:\\\\muath\\\\QUICK-START.md''\")"
     ]
   }
 }

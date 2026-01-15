@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/data.dart';
 import '../home/home_screen.dart';
 import '../categories/categories_screen.dart';
 import '../media/media_screen.dart';
@@ -92,12 +93,16 @@ class _CustomerMainScreenState extends ConsumerState<CustomerMainScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(_navItems.length, (index) {
               final item = _navItems[index];
+              // ربط Badge السلة بـ Provider
+              final cartCount = index == 3
+                  ? ref.watch(cartProvider).cart?.totalItems ?? 0
+                  : 0;
               return _buildNavItem(
                 index: index,
                 icon: item['icon'] as IconData,
                 activeIcon: item['activeIcon'] as IconData,
                 label: item['label'] as String,
-                badgeCount: index == 3 ? 2 : null, // Badge on cart
+                badgeCount: index == 3 ? cartCount : null,
               );
             }),
           ),

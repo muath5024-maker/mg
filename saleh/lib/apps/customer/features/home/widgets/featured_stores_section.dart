@@ -1,43 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../../features/products/data/platform_categories_repository.dart';
 
 class FeaturedStoresSection extends ConsumerWidget {
   const FeaturedStoresSection({super.key});
 
-  // TODO: Replace with API data
-  static final List<FeaturedStore> _stores = [
-    FeaturedStore(
-      id: '1',
-      name: 'متجر الإلكترونيات',
-      logoUrl: 'https://picsum.photos/100?random=20',
-      coverUrl: 'https://picsum.photos/400/200?random=21',
-      rating: 4.8,
-      productsCount: 156,
-      isVerified: true,
-    ),
-    FeaturedStore(
-      id: '2',
-      name: 'أزياء العائلة',
-      logoUrl: 'https://picsum.photos/100?random=22',
-      coverUrl: 'https://picsum.photos/400/200?random=23',
-      rating: 4.6,
-      productsCount: 324,
-      isVerified: true,
-    ),
-    FeaturedStore(
-      id: '3',
-      name: 'بيت الجمال',
-      logoUrl: 'https://picsum.photos/100?random=24',
-      coverUrl: 'https://picsum.photos/400/200?random=25',
-      rating: 4.9,
-      productsCount: 89,
-      isVerified: false,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final storesAsync = ref.watch(featuredStoresProvider);
+
     return Container(
       margin: const EdgeInsets.only(top: 24),
       child: Column(
@@ -67,13 +39,44 @@ class FeaturedStoresSection extends ConsumerWidget {
           // Stores List
           SizedBox(
             height: 160,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _stores.length,
-              itemBuilder: (context, index) {
-                return _buildStoreCard(context, _stores[index]);
+            child: storesAsync.when(
+              data: (stores) {
+                if (stores.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'لا توجد متاجر مميزة حالياً',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: stores.length,
+                  itemBuilder: (context, index) {
+                    return _buildStoreCard(context, stores[index]);
+                  },
+                );
               },
+              loading: () => ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: 3,
+                itemBuilder: (context, index) => _buildStoreCardSkeleton(),
+              ),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red),
+                    const SizedBox(height: 8),
+                    Text(
+                      'خطأ في تحميل المتاجر',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -81,10 +84,29 @@ class FeaturedStoresSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildStoreCard(BuildContext context, FeaturedStore store) {
+  Widget _buildStoreCardSkeleton() {
+    return Container(
+      width: 200,
+      margin: const EdgeInsets.only(left: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+
+  Widget _buildStoreCard(BuildContext context, Map<String, dynamic> store) {
+    final id = store['id'] as String? ?? '';
+    final name = store['business_name'] as String? ?? 'متجر';
+    final logoUrl = store['logo_url'] as String? ?? '';
+    final boostPoints = store['boost_points'] as int? ?? 0;
+
+    // Generate placeholder cover image
+    final coverUrl = 'https://picsum.photos/400/200?random=${id.hashCode}';
+
     return GestureDetector(
       onTap: () {
-        context.push('/store/${store.id}');
+        context.push('/store/$id');
       },
       child: Container(
         width: 200,
@@ -111,7 +133,7 @@ class FeaturedStoresSection extends ConsumerWidget {
                     top: Radius.circular(16),
                   ),
                   child: Image.network(
-                    store.coverUrl,
+                    coverUrl,
                     height: 80,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -125,6 +147,37 @@ class FeaturedStoresSection extends ConsumerWidget {
                     },
                   ),
                 ),
+                // Featured Badge
+                if (boostPoints > 0)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, size: 12, color: Colors.white),
+                          SizedBox(width: 2),
+                          Text(
+                            'مميز',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 // Store Logo
                 Positioned(
                   bottom: -25,
@@ -145,11 +198,14 @@ class FeaturedStoresSection extends ConsumerWidget {
                       ),
                       child: CircleAvatar(
                         radius: 25,
-                        backgroundImage: NetworkImage(store.logoUrl),
+                        backgroundImage: logoUrl.isNotEmpty
+                            ? NetworkImage(logoUrl)
+                            : null,
                         onBackgroundImageError: (_, _) {},
-                        child: store.logoUrl.isEmpty
+                        backgroundColor: Colors.grey[200],
+                        child: logoUrl.isEmpty
                             ? Text(
-                                store.name[0],
+                                name.isNotEmpty ? name[0] : '?',
                                 style: const TextStyle(fontSize: 20),
                               )
                             : null,
@@ -169,40 +225,19 @@ class FeaturedStoresSection extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        store.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                      Flexible(
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (store.isVerified) ...[
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.verified,
-                          color: Colors.blue,
-                          size: 16,
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${store.rating}',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${store.productsCount} منتج',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.verified, color: Colors.blue, size: 16),
                     ],
                   ),
                 ],
@@ -213,24 +248,4 @@ class FeaturedStoresSection extends ConsumerWidget {
       ),
     );
   }
-}
-
-class FeaturedStore {
-  final String id;
-  final String name;
-  final String logoUrl;
-  final String coverUrl;
-  final double rating;
-  final int productsCount;
-  final bool isVerified;
-
-  FeaturedStore({
-    required this.id,
-    required this.name,
-    required this.logoUrl,
-    required this.coverUrl,
-    required this.rating,
-    required this.productsCount,
-    required this.isVerified,
-  });
 }

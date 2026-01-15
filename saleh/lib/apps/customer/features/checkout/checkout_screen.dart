@@ -275,7 +275,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: () {
-                // Add new address
+                _showAddAddressDialog();
               },
               icon: const Icon(Icons.add),
               label: const Text('إضافة عنوان جديد'),
@@ -303,7 +303,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () {
-              // Add new address
+              _showAddAddressDialog();
             },
             icon: const Icon(Icons.add),
             label: const Text('إضافة عنوان جديد'),
@@ -831,6 +831,166 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         setState(() => _isPlacingOrder = false);
       }
     }
+  }
+
+  /// نافذة إضافة عنوان جديد
+  void _showAddAddressDialog() {
+    final labelController = TextEditingController();
+    final streetController = TextEditingController();
+    final cityController = TextEditingController(text: 'الرياض');
+    final phoneController = TextEditingController();
+    bool isDefault = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) => Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'إضافة عنوان جديد',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // تسمية العنوان
+                TextField(
+                  controller: labelController,
+                  decoration: const InputDecoration(
+                    labelText: 'تسمية العنوان',
+                    hintText: 'مثال: المنزل، العمل',
+                    prefixIcon: Icon(Icons.label_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // العنوان التفصيلي
+                TextField(
+                  controller: streetController,
+                  decoration: const InputDecoration(
+                    labelText: 'العنوان التفصيلي *',
+                    hintText: 'الحي، الشارع، رقم المبنى',
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 16),
+
+                // المدينة
+                TextField(
+                  controller: cityController,
+                  decoration: const InputDecoration(
+                    labelText: 'المدينة *',
+                    prefixIcon: Icon(Icons.location_city),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // رقم الجوال
+                TextField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'رقم الجوال *',
+                    hintText: '05XXXXXXXX',
+                    prefixIcon: Icon(Icons.phone_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 16),
+
+                // عنوان افتراضي
+                CheckboxListTile(
+                  value: isDefault,
+                  onChanged: (val) =>
+                      setSheetState(() => isDefault = val ?? false),
+                  title: const Text('تعيين كعنوان افتراضي'),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 20),
+
+                // زر الحفظ
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (streetController.text.isEmpty ||
+                          cityController.text.isEmpty ||
+                          phoneController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('يرجى ملء جميع الحقول المطلوبة'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final newAddress = ShippingAddress(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        name: labelController.text.isEmpty
+                            ? 'عنوان جديد'
+                            : labelController.text,
+                        address: streetController.text,
+                        city: cityController.text,
+                        phone: phoneController.text,
+                        isDefault: isDefault,
+                      );
+
+                      // حفظ العنوان محلياً
+                      ref
+                          .read(checkoutProvider.notifier)
+                          .addLocalAddress(newAddress);
+
+                      if (context.mounted) {
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('تم إضافة العنوان بنجاح ✅'),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('حفظ العنوان'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

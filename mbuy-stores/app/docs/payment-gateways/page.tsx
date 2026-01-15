@@ -337,13 +337,13 @@ export default function PaymentGatewaysDocsPage() {
                   <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
                     {gateway.apiKeyLabels.key}
                   </span>
-                  <span className="text-gray-600">← أدخله في حقل "المفتاح العام"</span>
+                  <span className="text-gray-600">← أدخله في حقل &quot;المفتاح العام&quot;</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3 rounded-lg">
                   <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
                     {gateway.apiKeyLabels.secret}
                   </span>
-                  <span className="text-gray-600">← أدخله في حقل "المفتاح السري"</span>
+                  <span className="text-gray-600">← أدخله في حقل &quot;المفتاح السري&quot;</span>
                 </div>
               </div>
               <p className="text-yellow-700 text-sm mt-4">

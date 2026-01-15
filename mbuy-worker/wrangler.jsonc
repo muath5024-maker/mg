@@ -28,14 +28,15 @@
 	},
 	
 	/**
-	 * R2 Storage Bucket
+	 * R2 Storage Bucket - DISABLED until enabled in Dashboard
+	 * Enable R2 in Cloudflare Dashboard first
 	 */
-	"r2_buckets": [
-		{
-			"binding": "R2",
-			"bucket_name": "muath-saleh"
-		}
-	],
+	// "r2_buckets": [
+	// 	{
+	// 		"binding": "R2",
+	// 		"bucket_name": "muath-saleh"
+	// 	}
+	// ],
 	
 	/**
 	 * Durable Objects

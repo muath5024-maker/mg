@@ -344,6 +344,273 @@ class AppTheme {
   }
 
   // ============================================================================
+  // Dark Theme
+  // ============================================================================
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+
+      colorScheme: ColorScheme.dark(
+        primary: primaryColor,
+        onPrimary: Colors.white,
+        secondary: accentColor,
+        onSecondary: Colors.white,
+        tertiary: secondaryColor,
+        surface: const Color(0xFF1E1E1E),
+        onSurface: Colors.white,
+        error: errorColor,
+        onError: Colors.white,
+        surfaceContainerHighest: const Color(0xFF2D2D2D),
+      ),
+
+      scaffoldBackgroundColor: const Color(0xFF121212),
+
+      // AppBar - Dark Header
+      appBarTheme: AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 0.5,
+        backgroundColor: const Color(0xFF1E1E1E),
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        titleTextStyle: GoogleFonts.cairo(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white, size: 24),
+      ),
+
+      // Text Theme - Cairo for Arabic (Dark Mode)
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.cairo(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        displayMedium: GoogleFonts.cairo(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        displaySmall: GoogleFonts.cairo(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        headlineLarge: GoogleFonts.cairo(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        headlineMedium: GoogleFonts.cairo(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        headlineSmall: GoogleFonts.cairo(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        titleLarge: GoogleFonts.cairo(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        titleMedium: GoogleFonts.cairo(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        titleSmall: GoogleFonts.cairo(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        bodyLarge: GoogleFonts.cairo(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: Colors.white,
+        ),
+        bodyMedium: GoogleFonts.cairo(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: Colors.white,
+        ),
+        bodySmall: GoogleFonts.cairo(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: Colors.white70,
+        ),
+        labelLarge: GoogleFonts.cairo(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        labelMedium: GoogleFonts.cairo(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: Colors.white70,
+        ),
+        labelSmall: GoogleFonts.cairo(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: Colors.white54,
+        ),
+      ),
+
+      // Elevated Button
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadiusLarge),
+          ),
+          textStyle: GoogleFonts.cairo(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      // Outlined Button
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadiusLarge),
+          ),
+          side: const BorderSide(color: Colors.white54, width: 1.5),
+          textStyle: GoogleFonts.cairo(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      // Input Decoration
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF2D2D2D),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+        hintStyle: GoogleFonts.cairo(color: Colors.white54, fontSize: 14),
+        labelStyle: GoogleFonts.cairo(color: Colors.white70, fontSize: 14),
+      ),
+
+      // Card Theme
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+        ),
+        margin: EdgeInsets.zero,
+      ),
+
+      // Bottom Navigation Bar
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: const Color(0xFF1E1E1E),
+        elevation: 8,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
+        selectedLabelStyle: GoogleFonts.cairo(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: GoogleFonts.cairo(
+          fontSize: 10,
+          fontWeight: FontWeight.normal,
+        ),
+        type: BottomNavigationBarType.fixed,
+        showUnselectedLabels: true,
+      ),
+
+      // Tab Bar
+      tabBarTheme: TabBarThemeData(
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.white54,
+        indicatorSize: TabBarIndicatorSize.label,
+        labelStyle: GoogleFonts.cairo(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: GoogleFonts.cairo(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        indicator: const UnderlineTabIndicator(
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+      ),
+
+      // Divider
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFF3D3D3D),
+        thickness: 1,
+        space: 1,
+      ),
+
+      // Icon Theme
+      iconTheme: const IconThemeData(color: Colors.white, size: 24),
+
+      // Chip Theme
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xFF2D2D2D),
+        selectedColor: primaryColor,
+        labelStyle: GoogleFonts.cairo(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadiusRound),
+        ),
+      ),
+
+      // Badge Theme
+      badgeTheme: BadgeThemeData(
+        backgroundColor: badgeColor,
+        textColor: Colors.white,
+        textStyle: GoogleFonts.cairo(fontSize: 10, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  // ============================================================================
+  // Dark Mode Colors (for manual usage)
+  // ============================================================================
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkSurface = Color(0xFF1E1E1E);
+  static const Color darkCard = Color(0xFF1E1E1E);
+  static const Color darkBorder = Color(0xFF3D3D3D);
+  static const Color darkDivider = Color(0xFF3D3D3D);
+  static const Color darkTextPrimary = Colors.white;
+  static const Color darkTextSecondary = Colors.white70;
+  static const Color darkTextHint = Colors.white54;
+
+  // ============================================================================
   // Custom Styles
   // ============================================================================
 

@@ -34,6 +34,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   bool _isFavorite = false;
   bool _showTabs = false;
   int _selectedTabIndex = 0;
+  bool _isAddingToCart = false;
 
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _overviewKey = GlobalKey();
@@ -394,12 +395,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   setState(() => _currentImageIndex = index),
               itemCount: _product.images.length,
               itemBuilder: (context, index) {
-                return Image.network(
-                  _product.images[index],
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stack) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.image, size: 50),
+                return GestureDetector(
+                  onTap: () => _showZoomableImage(index),
+                  child: Image.network(
+                    _product.images[index],
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stack) => Container(
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.image, size: 50),
+                    ),
                   ),
                 );
               },
@@ -429,6 +433,87 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showZoomableImage(int initialIndex) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (context) {
+        int currentIndex = initialIndex;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Stack(
+              children: [
+                // Swipeable Image Gallery
+                PageView.builder(
+                  controller: PageController(initialPage: initialIndex),
+                  onPageChanged: (index) {
+                    setDialogState(() => currentIndex = index);
+                  },
+                  itemCount: _product.images.length,
+                  itemBuilder: (context, index) {
+                    return InteractiveViewer(
+                      minScale: 0.5,
+                      maxScale: 4.0,
+                      child: Center(
+                        child: Image.network(
+                          _product.images[index],
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stack) => const Icon(
+                            Icons.image,
+                            size: 100,
+                            color: Colors.white54,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                // Close Button
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 8,
+                  right: 16,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                // Image Counter
+                Positioned(
+                  bottom: 40,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${currentIndex + 1} / ${_product.images.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1465,50 +1550,55 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             // Add to Cart Button
             Expanded(
               child: OutlinedButton(
-                onPressed: () async {
-                  // تحقق من تسجيل الدخول أولاً
-                  final isAuthenticated = ref
-                      .read(authControllerProvider)
-                      .isAuthenticated;
-                  if (!isAuthenticated) {
-                    // عرض رسالة وفتح صفحة تسجيل الدخول
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'الرجاء تسجيل الدخول لإضافة المنتج للسلة',
-                        ),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                    context.push('/login');
-                    return;
-                  }
+                onPressed: _isAddingToCart
+                    ? null
+                    : () async {
+                        // تحقق من تسجيل الدخول أولاً
+                        final isAuthenticated = ref
+                            .read(authControllerProvider)
+                            .isAuthenticated;
+                        if (!isAuthenticated) {
+                          // عرض رسالة وفتح صفحة تسجيل الدخول
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'الرجاء تسجيل الدخول لإضافة المنتج للسلة',
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          context.push('/login');
+                          return;
+                        }
 
-                  final notifier = ref.read(cartProvider.notifier);
-                  final success = await notifier.addToCart(
-                    _product.id,
-                    quantity: 1,
-                  );
+                        setState(() => _isAddingToCart = true);
 
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          success
-                              ? 'تمت الإضافة إلى السلة'
-                              : 'فشل في الإضافة إلى السلة',
-                        ),
-                        duration: const Duration(seconds: 2),
-                        action: success
-                            ? SnackBarAction(
-                                label: 'عرض السلة',
-                                onPressed: () => context.push('/cart'),
-                              )
-                            : null,
-                      ),
-                    );
-                  }
-                },
+                        final notifier = ref.read(cartProvider.notifier);
+                        final success = await notifier.addToCart(
+                          _product.id,
+                          quantity: 1,
+                        );
+
+                        if (mounted) {
+                          setState(() => _isAddingToCart = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'تمت الإضافة إلى السلة'
+                                    : 'فشل في الإضافة إلى السلة',
+                              ),
+                              duration: const Duration(seconds: 2),
+                              action: success
+                                  ? SnackBarAction(
+                                      label: 'عرض السلة',
+                                      onPressed: () => context.push('/cart'),
+                                    )
+                                  : null,
+                            ),
+                          );
+                        }
+                      },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.black,
                   side: BorderSide(color: Colors.grey[300]!),
@@ -1517,7 +1607,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                child: const Text('أضف للسلة', style: TextStyle(fontSize: 13)),
+                child: _isAddingToCart
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('أضف للسلة', style: TextStyle(fontSize: 13)),
               ),
             ),
             const SizedBox(width: 8),

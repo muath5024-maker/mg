@@ -342,97 +342,157 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   Widget _buildCartItem(models.CartItem item) {
     final cartNotifier = ref.read(cartProvider.notifier);
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+    return Dismissible(
+      key: Key(item.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: 20),
+        color: Colors.red,
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.delete, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              'حذف',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 20),
+          ],
+        ),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              item.productImage ??
-                  'https://picsum.photos/80?random=${item.productId}',
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 80,
-                  height: 80,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.image),
-                );
+      confirmDismiss: (direction) async {
+        return await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('حذف المنتج'),
+                content: Text('هل تريد حذف "${item.productName}" من السلة؟'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text('إلغاء'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                    child: const Text('حذف'),
+                  ),
+                ],
+              ),
+            ) ??
+            false;
+      },
+      onDismissed: (direction) {
+        cartNotifier.removeItem(item.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('تم حذف "${item.productName}"'),
+            action: SnackBarAction(
+              label: 'تراجع',
+              onPressed: () {
+                // TODO: Implement undo
+                cartNotifier.addToCart(item.productId, quantity: item.quantity);
               },
             ),
           ),
-          const SizedBox(width: 12),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                item.productImage ??
+                    'https://picsum.photos/80?random=${item.productId}',
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.image),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
 
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.productName,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${item.price.toStringAsFixed(0)} ر.س',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold,
+            // Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.productName,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(height: 8),
-
-                // Quantity Controls
-                Row(
-                  children: [
-                    _buildQuantityButton(
-                      icon: Icons.remove,
-                      onPressed: item.quantity > 1
-                          ? () => cartNotifier.updateQuantity(
-                              item.id,
-                              item.quantity - 1,
-                            )
-                          : null,
+                  const SizedBox(height: 4),
+                  Text(
+                    '${item.price.toStringAsFixed(0)} ر.س',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        '${item.quantity}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Quantity Controls
+                  Row(
+                    children: [
+                      _buildQuantityButton(
+                        icon: Icons.remove,
+                        onPressed: item.quantity > 1
+                            ? () => cartNotifier.updateQuantity(
+                                item.id,
+                                item.quantity - 1,
+                              )
+                            : null,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          '${item.quantity}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                    ),
-                    _buildQuantityButton(
-                      icon: Icons.add,
-                      onPressed: () => cartNotifier.updateQuantity(
-                        item.id,
-                        item.quantity + 1,
+                      _buildQuantityButton(
+                        icon: Icons.add,
+                        onPressed: () => cartNotifier.updateQuantity(
+                          item.id,
+                          item.quantity + 1,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          // Delete Button
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: () => _confirmDelete(item),
-          ),
-        ],
+            // Delete Button (keep for accessibility)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: () => _confirmDelete(item),
+            ),
+          ],
+        ),
       ),
     );
   }

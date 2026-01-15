@@ -6,6 +6,18 @@
 import { Hono } from 'hono';
 import { Env } from '../types';
 import { adminAuthMiddleware } from '../middleware/adminAuth';
+import {
+  adminListCategories,
+  adminCreateCategory,
+  adminUpdateCategory,
+  adminDeleteCategory,
+  adminReorderCategories,
+} from '../endpoints/platform-categories';
+import {
+  adminListBoosts,
+  adminBoostStats,
+  adminCancelBoost,
+} from '../endpoints/boost';
 
 type AdminVariables = {
   adminEmail: string;
@@ -39,5 +51,21 @@ adminRoutes.get('/stats', async (c) => {
     }
   });
 });
+
+// ========================================
+// Platform Categories Management
+// ========================================
+adminRoutes.get('/platform-categories', adminListCategories as any);
+adminRoutes.post('/platform-categories', adminCreateCategory as any);
+adminRoutes.put('/platform-categories/reorder', adminReorderCategories as any);
+adminRoutes.put('/platform-categories/:id', adminUpdateCategory as any);
+adminRoutes.delete('/platform-categories/:id', adminDeleteCategory as any);
+
+// ========================================
+// Boost Management (إدارة دعم الظهور)
+// ========================================
+adminRoutes.get('/boosts', adminListBoosts as any);
+adminRoutes.get('/boosts/stats', adminBoostStats as any);
+adminRoutes.post('/boosts/:id/cancel', adminCancelBoost as any);
 
 export default adminRoutes;

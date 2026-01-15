@@ -6,7 +6,7 @@ import '../services/studio_api_service.dart';
 final studioApiServiceProvider = Provider<StudioApiService>((ref) {
   // TODO: استخدم الـ baseUrl الصحيح من البيئة
   return StudioApiService(
-    baseUrl: 'https://api.mbuy.app',
+    baseUrl: 'https://misty-mode-b68b.baharista1.workers.dev',
     getAuthToken: () {
       // TODO: احصل على التوكن من auth provider
       return '';

@@ -773,6 +773,33 @@
 
 ---
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ## 🗂️ Table: boost_transactions
+
+### Columns
+- **id** (uuid) NULLABLE: NO, DEFAULT: gen_random_uuid()
+- **merchant_id** (uuid) NULLABLE: NO
+- **target_type** (text) NULLABLE: NO
+- **target_id** (uuid) NULLABLE: NO
+- **boost_type** (text) NULLABLE: NO
+- **points_spent** (integer) NULLABLE: NO
+- **duration_days** (integer) NULLABLE: NO
+- **starts_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+- **expires_at** (timestamp with time zone) NULLABLE: NO
+- **status** (text) NULLABLE: YES, DEFAULT: 'active'::text
+- **created_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+
+### Constraints
+- **PRIMARY KEY**: boost_transactions_pkey → boost_transactions(id)
+- **FOREIGN KEY**: boost_transactions_merchant_id_fkey → merchants(id)
+
+### Indexes
+- boost_transactions_pkey: CREATE UNIQUE INDEX boost_transactions_pkey ON public.boost_transactions USING btree (id)
+- idx_boost_transactions_merchant_id: CREATE INDEX idx_boost_transactions_merchant_id ON public.boost_transactions USING btree (merchant_id)
+- idx_boost_transactions_status: CREATE INDEX idx_boost_transactions_status ON public.boost_transactions USING btree (status)
+- idx_boost_transactions_expires_at: CREATE INDEX idx_boost_transactions_expires_at ON public.boost_transactions USING btree (expires_at)
+
+---
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ## 🗂️ Table: bundle_analytics
 
 ### Columns
@@ -2346,6 +2373,36 @@
 
 ---
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ## 🗂️ Table: merchant_payment_methods
+
+### Columns
+- **id** (uuid) NULLABLE: NO, DEFAULT: gen_random_uuid()
+- **merchant_id** (uuid) NULLABLE: NO
+- **provider** (character varying) NULLABLE: NO
+- **display_name** (character varying) NULLABLE: YES
+- **api_key** (character varying) NULLABLE: YES
+- **api_secret** (character varying) NULLABLE: NO
+- **webhook_secret** (character varying) NULLABLE: YES
+- **is_active** (boolean) NULLABLE: YES, DEFAULT: true
+- **is_default** (boolean) NULLABLE: YES, DEFAULT: false
+- **is_live_mode** (boolean) NULLABLE: YES, DEFAULT: false
+- **supported_methods** (ARRAY) NULLABLE: YES, DEFAULT: '{}'::text[]
+- **extra_data** (jsonb) NULLABLE: YES, DEFAULT: '{}'::jsonb
+- **created_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+- **updated_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+
+### Constraints
+- **PRIMARY KEY**: merchant_payment_methods_pkey → merchant_payment_methods(id)
+- **FOREIGN KEY**: merchant_payment_methods_merchant_id_fkey → merchants(id)
+- **UNIQUE**: merchant_payment_methods_merchant_id_provider_key → merchant_payment_methods(merchant_id, provider)
+
+### Indexes
+- merchant_payment_methods_pkey: CREATE UNIQUE INDEX merchant_payment_methods_pkey ON public.merchant_payment_methods USING btree (id)
+- merchant_payment_methods_merchant_id_provider_key: CREATE UNIQUE INDEX merchant_payment_methods_merchant_id_provider_key ON public.merchant_payment_methods USING btree (merchant_id, provider)
+- idx_merchant_payment_methods_merchant_id: CREATE INDEX idx_merchant_payment_methods_merchant_id ON public.merchant_payment_methods USING btree (merchant_id)
+
+---
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ## 🗂️ Table: merchant_reviews
 
 ### Columns
@@ -2872,6 +2929,27 @@
 
 ---
                                                                     |
+| ## 🗂️ Table: payment_gateways_reference
+
+### Columns
+- **id** (character varying) NULLABLE: NO
+- **name** (character varying) NULLABLE: NO
+- **name_ar** (character varying) NULLABLE: NO
+- **description** (text) NULLABLE: YES
+- **description_ar** (text) NULLABLE: YES
+- **website** (character varying) NULLABLE: YES
+- **supported_methods** (ARRAY) NULLABLE: YES, DEFAULT: '{}'::text[]
+- **supported_countries** (ARRAY) NULLABLE: YES, DEFAULT: '{}'::text[]
+- **is_available** (boolean) NULLABLE: YES, DEFAULT: true
+
+### Constraints
+- **PRIMARY KEY**: payment_gateways_reference_pkey → payment_gateways_reference(id)
+
+### Indexes
+- payment_gateways_reference_pkey: CREATE UNIQUE INDEX payment_gateways_reference_pkey ON public.payment_gateways_reference USING btree (id)
+
+---
+                                                                    |
 | ## 🗂️ Table: payment_logs
 
 ### Columns
@@ -2990,6 +3068,57 @@
 - payment_transactions_pkey: CREATE UNIQUE INDEX payment_transactions_pkey ON public.payment_transactions USING btree (id)
 - idx_payment_transactions_order_id: CREATE INDEX idx_payment_transactions_order_id ON public.payment_transactions USING btree (order_id)
 - idx_payment_transactions_status: CREATE INDEX idx_payment_transactions_status ON public.payment_transactions USING btree (status)
+
+---
+                                                                                                                                                                                                                                                                                                                                                           |
+| ## 🗂️ Table: platform_categories
+
+### Columns
+- **id** (uuid) NULLABLE: NO, DEFAULT: gen_random_uuid()
+- **name** (text) NULLABLE: NO
+- **name_en** (text) NULLABLE: YES
+- **slug** (text) NULLABLE: NO
+- **icon** (text) NULLABLE: YES
+- **image_url** (text) NULLABLE: YES
+- **parent_id** (uuid) NULLABLE: YES
+- **order** (integer) NULLABLE: YES, DEFAULT: 0
+- **is_active** (boolean) NULLABLE: YES, DEFAULT: true
+- **is_featured** (boolean) NULLABLE: YES, DEFAULT: false
+- **metadata** (jsonb) NULLABLE: YES, DEFAULT: '{}'::jsonb
+- **created_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+- **updated_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+
+### Constraints
+- **PRIMARY KEY**: platform_categories_pkey → platform_categories(id)
+- **FOREIGN KEY**: platform_categories_parent_id_fkey → platform_categories(id)
+- **UNIQUE**: platform_categories_slug_key → platform_categories(slug)
+
+### Indexes
+- platform_categories_pkey: CREATE UNIQUE INDEX platform_categories_pkey ON public.platform_categories USING btree (id)
+- platform_categories_slug_key: CREATE UNIQUE INDEX platform_categories_slug_key ON public.platform_categories USING btree (slug)
+- idx_platform_categories_parent_id: CREATE INDEX idx_platform_categories_parent_id ON public.platform_categories USING btree (parent_id)
+- idx_platform_categories_is_active: CREATE INDEX idx_platform_categories_is_active ON public.platform_categories USING btree (is_active)
+
+---
+                                                                                                                                                                                                                                                                                                                                                           |
+| ## 🗂️ Table: platform_settings
+
+### Columns
+- **id** (uuid) NULLABLE: NO, DEFAULT: gen_random_uuid()
+- **key** (text) NULLABLE: NO
+- **value** (jsonb) NULLABLE: NO, DEFAULT: '{}'::jsonb
+- **description** (text) NULLABLE: YES
+- **category** (text) NULLABLE: YES, DEFAULT: 'general'::text
+- **created_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+- **updated_at** (timestamp with time zone) NULLABLE: YES, DEFAULT: now()
+
+### Constraints
+- **PRIMARY KEY**: platform_settings_pkey → platform_settings(id)
+- **UNIQUE**: platform_settings_key_key → platform_settings(key)
+
+### Indexes
+- platform_settings_pkey: CREATE UNIQUE INDEX platform_settings_pkey ON public.platform_settings USING btree (id)
+- platform_settings_key_key: CREATE UNIQUE INDEX platform_settings_key_key ON public.platform_settings USING btree (key)
 
 ---
                                                                                                                                                                                                                                                                                                                                                            |
@@ -4105,4 +4234,525 @@
 - idx_webhooks_retry_queue_next_attempt_at: CREATE INDEX idx_webhooks_retry_queue_next_attempt_at ON public.webhooks_retry_queue USING btree (next_attempt_at)
 
 ---
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+
+## 🎨 Enums
+
+### product_status
+- `draft`
+- `active`
+- `inactive`
+- `archived`
+
+### product_type
+- `simple`
+- `variable`
+- `digital`
+- `service`
+- `bundle`
+
+### media_type
+- `image`
+- `video`
+- `file`
+
+### order_status
+- `pending`
+- `paid`
+- `processing`
+- `shipped`
+- `delivered`
+- `cancelled`
+- `refunded`
+- `failed`
+
+### order_source
+- `web`
+- `mobile`
+- `pos`
+- `api`
+
+### order_item_type
+- `product`
+- `variant`
+- `bundle`
+- `service`
+- `digital`
+
+### address_type
+- `shipping`
+- `billing`
+
+### payment_status
+- `pending`
+- `paid`
+- `failed`
+- `refunded`
+- `partially_refunded`
+
+### shipment_status
+- `pending`
+- `ready_for_pickup`
+- `picked_up`
+- `in_transit`
+- `out_for_delivery`
+- `delivered`
+- `delayed`
+- `failed`
+- `returned`
+- `cancelled`
+
+### status_actor
+- `system`
+- `user`
+- `admin`
+- `automation`
+
+### refund_status
+- `pending`
+- `approved`
+- `rejected`
+- `processing`
+- `refunded`
+- `failed`
+
+### refund_type
+- `full`
+- `partial`
+
+### movement_type
+- `in`
+- `out`
+- `adjustment`
+- `return`
+- `reservation`
+- `release`
+
+### transaction_status
+- `pending`
+- `authorized`
+- `captured`
+- `failed`
+- `refunded`
+- `voided`
+
+### customer_status
+- `active`
+- `inactive`
+- `blocked`
+
+### customer_address_type
+- `shipping`
+- `billing`
+
+### merchant_user_role
+- `owner`
+- `admin`
+- `manager`
+- `staff`
+- `viewer`
+
+### coupon_type
+- `percentage`
+- `fixed`
+- `free_shipping`
+
+### coupon_status
+- `active`
+- `inactive`
+- `expired`
+- `scheduled`
+
+### ai_task_type
+- `recommendation`
+- `prediction`
+- `classification`
+- `summarization`
+- `embedding`
+- `analysis`
+
+### ai_task_status
+- `pending`
+- `processing`
+- `completed`
+- `failed`
+
+### recommendation_type
+- `product_to_customer`
+- `product_to_product`
+- `cart_cross_sell`
+- `cart_upsell`
+- `dynamic_pricing`
+
+### prediction_type
+- `sales_forecast`
+- `inventory_forecast`
+- `customer_churn`
+- `customer_ltv`
+- `product_demand`
+
+### messaging_provider_type
+- `sms`
+- `email`
+- `whatsapp`
+- `push`
+
+### template_type
+- `sms`
+- `email`
+- `whatsapp`
+- `push`
+
+### message_status
+- `queued`
+- `sent`
+- `delivered`
+- `failed`
+
+### automation_trigger
+- `order_created`
+- `order_paid`
+- `order_shipped`
+- `customer_created`
+- `customer_segment_changed`
+- `abandoned_cart`
+- `custom_event`
+
+### loyalty_point_type
+- `earn`
+- `burn`
+- `adjustment`
+
+### lesson_type
+- `video`
+- `text`
+- `quiz`
+- `file`
+
+### subscription_status
+- `active`
+- `past_due`
+- `canceled`
+- `expired`
+- `trialing`
+
+### invoice_status
+- `pending`
+- `paid`
+- `failed`
+- `refunded`
+
+### support_ticket_status
+- `open`
+- `in_progress`
+- `resolved`
+- `closed`
+
+### support_ticket_priority
+- `low`
+- `medium`
+- `high`
+- `urgent`
+
+### support_message_sender
+- `customer`
+- `agent`
+- `system`
+
+### review_status_adv
+- `pending`
+- `approved`
+- `rejected`
+
+### coupon_type_adv
+- `percentage`
+- `fixed`
+- `free_shipping`
+
+---
+
+## ⚙️ Functions
+
+### update_updated_at_column
+```sql
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$function$
+```
+
+### expire_boosts
+```sql
+CREATE OR REPLACE FUNCTION public.expire_boosts()
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    -- Expire product boosts
+    UPDATE products
+    SET boost_points = 0, boost_type = NULL, boost_expires_at = NULL
+    WHERE boost_expires_at < now() AND boost_expires_at IS NOT NULL;
+
+    -- Expire merchant boosts
+    UPDATE merchants
+    SET boost_points = 0, boost_type = NULL, boost_expires_at = NULL
+    WHERE boost_expires_at < now() AND boost_expires_at IS NOT NULL;
+
+    -- Update boost_transactions status
+    UPDATE boost_transactions
+    SET status = 'expired'
+    WHERE expires_at < now() AND status = 'active';
+END;
+$function$
+```
+
+### update_merchant_payment_methods_updated_at
+```sql
+CREATE OR REPLACE FUNCTION public.update_merchant_payment_methods_updated_at()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$function$
+```
+
+### get_current_user_id
+```sql
+CREATE OR REPLACE FUNCTION public.get_current_user_id()
+ RETURNS uuid
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+AS $function$
+DECLARE
+  jwt_claims JSONB;
+  auth_uid UUID;
+  mbuy_uid UUID;
+BEGIN
+  -- Try auth.uid() (Supabase Auth)
+  BEGIN
+    auth_uid := auth.uid();
+    IF auth_uid IS NOT NULL THEN
+      SELECT mu.id INTO mbuy_uid
+      FROM public.mbuy_users mu
+      WHERE mu.auth_user_id = auth_uid
+      LIMIT 1;
+
+      IF mbuy_uid IS NOT NULL THEN
+        RETURN mbuy_uid;
+      END IF;
+
+      SELECT up.mbuy_user_id INTO mbuy_uid
+      FROM public.user_profiles up
+      WHERE up.auth_user_id = auth_uid
+      LIMIT 1;
+
+      IF mbuy_uid IS NOT NULL THEN
+        RETURN mbuy_uid;
+      END IF;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+
+  -- Try JWT claims
+  BEGIN
+    jwt_claims := current_setting('request.jwt.claims', true)::JSONB;
+
+    IF jwt_claims IS NOT NULL AND jwt_claims ? 'sub' THEN
+      mbuy_uid := (jwt_claims->>'sub')::UUID;
+      IF mbuy_uid IS NOT NULL THEN
+        RETURN mbuy_uid;
+      END IF;
+    END IF;
+
+    IF jwt_claims IS NOT NULL AND jwt_claims ? 'mbuy_user_id' THEN
+      mbuy_uid := (jwt_claims->>'mbuy_user_id')::UUID;
+      IF mbuy_uid IS NOT NULL THEN
+        RETURN mbuy_uid;
+      END IF;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+
+  RETURN NULL;
+END;
+$function$
+```
+
+### create_user_credits
+```sql
+CREATE OR REPLACE FUNCTION public.create_user_credits()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+    INSERT INTO user_credits (user_id, balance, total_earned)
+    VALUES (NEW.id, 100, 100)
+    ON CONFLICT (user_id) DO NOTHING;
+    RETURN NEW;
+END;
+$function$
+```
+
+### create_abandoned_cart
+```sql
+CREATE OR REPLACE FUNCTION public.create_abandoned_cart(
+    p_store_id uuid,
+    p_customer_id uuid,
+    p_cart_items jsonb,
+    p_cart_total numeric,
+    p_customer_email varchar DEFAULT NULL,
+    p_customer_phone varchar DEFAULT NULL
+)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_cart_id UUID;
+    v_items_count INTEGER;
+BEGIN
+    v_items_count := jsonb_array_length(p_cart_items);
+
+    INSERT INTO public.abandoned_carts (
+        store_id, customer_id, cart_items, cart_total, items_count,
+        customer_email, customer_phone, status
+    ) VALUES (
+        p_store_id, p_customer_id, p_cart_items, p_cart_total, v_items_count,
+        p_customer_email, p_customer_phone, 'abandoned'
+    ) RETURNING id INTO v_cart_id;
+
+    UPDATE public.cart_recovery_settings
+    SET total_abandoned = total_abandoned + 1, updated_at = NOW()
+    WHERE store_id = p_store_id;
+
+    RETURN v_cart_id;
+END;
+$function$
+```
+
+### ensure_single_default_merchant_payment
+```sql
+CREATE OR REPLACE FUNCTION public.ensure_single_default_merchant_payment()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF NEW.is_default = true THEN
+        UPDATE merchant_payment_methods
+        SET is_default = false
+        WHERE merchant_id = NEW.merchant_id
+          AND id != NEW.id
+          AND is_default = true;
+    END IF;
+    RETURN NEW;
+END;
+$function$
+```
+
+### update_course_progress
+```sql
+CREATE OR REPLACE FUNCTION public.update_course_progress(p_course_id uuid, p_customer_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_total INTEGER;
+    v_completed INTEGER;
+    v_percent INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_total
+    FROM course_lessons
+    WHERE course_id = p_course_id AND is_required = true;
+
+    SELECT COUNT(*) INTO v_completed
+    FROM lesson_progress lp
+    JOIN course_lessons cl ON cl.id = lp.lesson_id
+    WHERE cl.course_id = p_course_id
+    AND lp.customer_id = p_customer_id
+    AND lp.status = 'completed'
+    AND cl.is_required = true;
+
+    v_percent := CASE WHEN v_total > 0 THEN (v_completed * 100 / v_total) ELSE 0 END;
+
+    INSERT INTO course_progress (course_id, customer_id, progress_percent, completed_lessons, total_lessons, status, started_at)
+    VALUES (p_course_id, p_customer_id, v_percent, v_completed, v_total,
+        CASE WHEN v_percent = 100 THEN 'completed' WHEN v_completed > 0 THEN 'in_progress' ELSE 'not_started' END,
+        NOW())
+    ON CONFLICT (course_id, customer_id) DO UPDATE SET
+        progress_percent = EXCLUDED.progress_percent,
+        completed_lessons = EXCLUDED.completed_lessons,
+        total_lessons = EXCLUDED.total_lessons,
+        status = EXCLUDED.status,
+        completed_at = CASE WHEN EXCLUDED.progress_percent = 100 AND course_progress.completed_at IS NULL THEN NOW() ELSE course_progress.completed_at END,
+        updated_at = NOW();
+END;
+$function$
+```
+
+### generate_qr_code
+```sql
+CREATE OR REPLACE FUNCTION public.generate_qr_code()
+ RETURNS varchar
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    chars VARCHAR(62) := 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    result VARCHAR(8) := '';
+    i INTEGER;
+BEGIN
+    FOR i IN 1..8 LOOP
+        result := result || substr(chars, floor(random() * 62 + 1)::int, 1);
+    END LOOP;
+    RETURN result;
+END;
+$function$
+```
+
+### increment_story_views
+```sql
+CREATE OR REPLACE FUNCTION public.increment_story_views(story_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+  UPDATE stories
+  SET views_count = views_count + 1,
+      updated_at = NOW()
+  WHERE id = story_id;
+END;
+$function$
+```
+
+### update_story_likes_count
+```sql
+CREATE OR REPLACE FUNCTION public.update_story_likes_count(story_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+  UPDATE stories
+  SET likes_count = (
+    SELECT COUNT(*)
+    FROM story_likes
+    WHERE story_likes.story_id = update_story_likes_count.story_id
+  ),
+  updated_at = NOW()
+  WHERE id = story_id;
+END;
+$function$
+```
+
+---
+*Note: Vector functions (pgvector extension) are also available but not listed here for brevity.*

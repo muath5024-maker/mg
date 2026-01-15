@@ -36,7 +36,7 @@ import '../../../apps/merchant/features/payments/payment_methods_screen.dart';
 import '../../../features/marketing/presentation/screens/marketing_screen.dart';
 import '../../../features/marketing/presentation/screens/coupons_screen.dart';
 import '../../../features/marketing/presentation/screens/flash_sales_screen.dart';
-import '../../../features/marketing/presentation/screens/boost_sales_screen.dart';
+import '../../../features/marketing/presentation/screens/boost_visibility_screen.dart';
 // Products
 import '../../../features/products/presentation/screens/add_product_screen.dart';
 import '../../../features/products/presentation/screens/product_details_screen.dart';
@@ -180,7 +180,7 @@ List<GoRoute> _homeSubRoutes = [
   GoRoute(
     path: 'boost-sales',
     name: 'boost-sales',
-    builder: (context, state) => const BoostSalesScreen(),
+    builder: (context, state) => const BoostVisibilityScreen(),
   ),
   // Webstore & Settings
   GoRoute(

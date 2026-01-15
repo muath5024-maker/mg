@@ -61,5 +61,22 @@
 		<string>نحتاج موقعك لعرض المتاجر القريبة منك</string>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<!-- Deep Linking - Custom URL Scheme -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>app.mbuy</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>mbuy</string>
+				</array>
+			</dict>
+		</array>
+		<!-- Universal Links -->
+		<key>FlutterDeepLinkingEnabled</key>
+		<true/>
 	</dict>
 </plist>

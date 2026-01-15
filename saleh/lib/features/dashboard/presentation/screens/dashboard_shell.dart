@@ -22,7 +22,7 @@ import '../../../finance/presentation/screens/wallet_screen.dart';
 import '../../../finance/presentation/screens/points_screen.dart';
 import '../../../finance/presentation/screens/sales_screen.dart';
 import '../../../marketing/presentation/screens/marketing_screen.dart';
-import '../../../marketing/presentation/screens/boost_sales_screen.dart';
+import '../../../marketing/presentation/screens/boost_visibility_screen.dart';
 import '../../../settings/presentation/screens/about_screen.dart';
 import '../../../projects/presentation/screens/projects_screen.dart';
 
@@ -304,7 +304,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
       case overlay.OverlayType.store:
         return AppStoreScreen(onClose: _closeOverlay);
       case overlay.OverlayType.boostSales:
-        return BoostSalesScreen(onClose: _closeOverlay);
+        return BoostVisibilityScreen(onClose: _closeOverlay);
       case overlay.OverlayType.projects:
         return ProjectsScreen(onClose: _closeOverlay);
       case overlay.OverlayType.custom:
