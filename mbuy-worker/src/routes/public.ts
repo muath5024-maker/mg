@@ -197,9 +197,9 @@ publicRoutes.get('/products/flash-deals', async (c) => {
   const limit = url.searchParams.get('limit') || '20';
   
   try {
-    // Get products with discount
+    // NEW SCHEMA: Get products with compare_at_price > base_price (discounted)
     const response = await fetch(
-      `${c.env.SUPABASE_URL}/rest/v1/products?discount_percent=gt.0&is_active=eq.true&select=*&order=discount_percent.desc&limit=${limit}`,
+      `${c.env.SUPABASE_URL}/rest/v1/products?select=id,name,slug,description,merchant_id,is_featured,created_at,product_pricing(base_price,compare_at_price,currency),product_media(url,alt,type,position)&status=eq.active&is_published=eq.true&limit=${limit}`,
       {
         headers: {
           'apikey': c.env.SUPABASE_ANON_KEY,
@@ -207,8 +207,38 @@ publicRoutes.get('/products/flash-deals', async (c) => {
         },
       }
     );
-    const data = await response.json();
-    return c.json({ ok: true, data: data || [] });
+    const rawData: any[] = await response.json();
+    
+    // Filter and transform products with discounts
+    const data = rawData
+      .filter((p: any) => {
+        const pricing = p.product_pricing?.[0];
+        return pricing && pricing.compare_at_price && pricing.compare_at_price > pricing.base_price;
+      })
+      .map((p: any) => {
+        const pricing = p.product_pricing?.[0] || {};
+        const discountPercent = pricing.compare_at_price 
+          ? Math.round((1 - pricing.base_price / pricing.compare_at_price) * 100)
+          : 0;
+        return {
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          description: p.description,
+          merchant_id: p.merchant_id,
+          is_featured: p.is_featured,
+          created_at: p.created_at,
+          price: pricing.base_price ?? 0,
+          compare_at_price: pricing.compare_at_price,
+          currency: pricing.currency ?? 'SAR',
+          discount_percent: discountPercent,
+          images: (p.product_media || []).map((m: any) => m.url).filter(Boolean),
+          main_image_url: p.product_media?.[0]?.url,
+        };
+      })
+      .sort((a: any, b: any) => b.discount_percent - a.discount_percent);
+      
+    return c.json({ ok: true, data });
   } catch (error: any) {
     return c.json({ ok: false, error: error.message }, 500);
   }
@@ -220,9 +250,9 @@ publicRoutes.get('/products/trending', async (c) => {
   const limit = url.searchParams.get('limit') || '20';
   
   try {
-    // Get popular products by views/orders
+    // NEW SCHEMA: Get featured/recent products
     const response = await fetch(
-      `${c.env.SUPABASE_URL}/rest/v1/products?is_active=eq.true&select=*&order=views_count.desc.nullslast,created_at.desc&limit=${limit}`,
+      `${c.env.SUPABASE_URL}/rest/v1/products?select=id,name,slug,description,merchant_id,is_featured,created_at,product_pricing(base_price,compare_at_price,currency),product_media(url,alt,type,position)&status=eq.active&is_published=eq.true&order=is_featured.desc,created_at.desc&limit=${limit}`,
       {
         headers: {
           'apikey': c.env.SUPABASE_ANON_KEY,
@@ -230,8 +260,28 @@ publicRoutes.get('/products/trending', async (c) => {
         },
       }
     );
-    const data = await response.json();
-    return c.json({ ok: true, data: data || [] });
+    const rawData: any[] = await response.json();
+    
+    // Transform to expected format
+    const data = rawData.map((p: any) => {
+      const pricing = p.product_pricing?.[0] || {};
+      return {
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        description: p.description,
+        merchant_id: p.merchant_id,
+        is_featured: p.is_featured,
+        created_at: p.created_at,
+        price: pricing.base_price ?? 0,
+        compare_at_price: pricing.compare_at_price,
+        currency: pricing.currency ?? 'SAR',
+        images: (p.product_media || []).map((m: any) => m.url).filter(Boolean),
+        main_image_url: p.product_media?.[0]?.url,
+      };
+    });
+    
+    return c.json({ ok: true, data });
   } catch (error: any) {
     return c.json({ ok: false, error: error.message }, 500);
   }
@@ -244,17 +294,19 @@ publicRoutes.get('/products', async (c) => {
     const limit = url.searchParams.get('limit') || '20';
     const offset = url.searchParams.get('offset') || '0';
     const categoryId = url.searchParams.get('category_id');
-    const storeId = url.searchParams.get('store_id');
+    const merchantId = url.searchParams.get('merchant_id') || url.searchParams.get('store_id');
     const sortBy = url.searchParams.get('sort_by') || 'created_at';
-    const desc = url.searchParams.get('desc') === 'true';
+    const desc = url.searchParams.get('desc') !== 'false'; // Default to desc
 
-    let query = `${c.env.SUPABASE_URL}/rest/v1/products?select=*,merchants\!products_merchant_id_fkey(name,logo_url),product_categories(name)&is_active=eq.true&stock=gt.0&limit=${limit}&offset=${offset}`;
+    // NEW SCHEMA: Query products with related tables
+    let query = `${c.env.SUPABASE_URL}/rest/v1/products?select=id,name,slug,description,short_description,type,status,sku,brand,tags,is_featured,created_at,merchant_id,product_pricing(base_price,compare_at_price,currency),product_media(id,url,alt,type,position)&status=eq.active&is_published=eq.true&limit=${limit}&offset=${offset}`;
     
     if (categoryId) {
-      query += `&category_id=eq.${categoryId}`;
+      // For category filtering, we need separate query via product_category_assignments
+      query += `&product_category_assignments.category_id=eq.${categoryId}`;
     }
-    if (storeId) {
-      query += `&store_id=eq.${storeId}`;
+    if (merchantId) {
+      query += `&merchant_id=eq.${merchantId}`;
     }
     
     query += `&order=${sortBy}.${desc ? 'desc' : 'asc'}`;
@@ -271,7 +323,32 @@ publicRoutes.get('/products', async (c) => {
       return c.json({ ok: false, error: 'Failed to fetch products', detail: error }, response.status as any);
     }
 
-    const data = await response.json();
+    const rawData: any[] = await response.json();
+    
+    // Transform to expected format for Flutter app
+    const data = rawData.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      description: p.description,
+      short_description: p.short_description,
+      type: p.type,
+      status: p.status,
+      sku: p.sku,
+      brand: p.brand,
+      tags: p.tags,
+      is_featured: p.is_featured,
+      created_at: p.created_at,
+      merchant_id: p.merchant_id,
+      // Flatten pricing
+      price: p.product_pricing?.[0]?.base_price ?? 0,
+      compare_at_price: p.product_pricing?.[0]?.compare_at_price,
+      currency: p.product_pricing?.[0]?.currency ?? 'SAR',
+      // Flatten media to images array
+      images: (p.product_media || []).map((m: any) => m.url).filter(Boolean),
+      main_image_url: p.product_media?.[0]?.url,
+    }));
+    
     return c.json({ ok: true, data });
   } catch (error: any) {
     return c.json({ ok: false, error: 'Internal server error', detail: error.message }, 500);
@@ -283,8 +360,9 @@ publicRoutes.get('/products/:id', async (c) => {
   try {
     const productId = c.req.param('id') as string;
 
+    // NEW SCHEMA: Query with related tables
     const response = await fetch(
-      `${c.env.SUPABASE_URL}/rest/v1/products?id=eq.${productId}&select=*,merchants\!products_merchant_id_fkey(name,logo_url),product_categories(name)`,
+      `${c.env.SUPABASE_URL}/rest/v1/products?id=eq.${productId}&select=id,name,slug,description,short_description,type,status,sku,barcode,brand,tags,weight,dimensions,is_featured,created_at,merchant_id,product_pricing(base_price,compare_at_price,currency),product_media(id,url,alt,type,position),inventory_items(quantity,available),product_variants(id,name,sku,price,compare_at_price,weight,options,is_default)&status=eq.active&is_published=eq.true`,
       {
         headers: {
           'apikey': c.env.SUPABASE_ANON_KEY,
@@ -298,12 +376,42 @@ publicRoutes.get('/products/:id', async (c) => {
       return c.json({ ok: false, error: 'Failed to fetch product', detail: error }, response.status as any);
     }
 
-    const data: any = await response.json();
-    if (!data || data.length === 0) {
+    const rawData: any[] = await response.json();
+    if (!rawData || rawData.length === 0) {
       return c.json({ ok: false, error: 'Product not found' }, 404);
     }
 
-    return c.json({ ok: true, data: data[0] });
+    const p = rawData[0];
+    const pricing = p.product_pricing?.[0] || {};
+    
+    // Transform to expected format
+    const data = {
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      description: p.description,
+      short_description: p.short_description,
+      type: p.type,
+      status: p.status,
+      sku: p.sku,
+      barcode: p.barcode,
+      brand: p.brand,
+      tags: p.tags,
+      weight: p.weight,
+      dimensions: p.dimensions,
+      is_featured: p.is_featured,
+      created_at: p.created_at,
+      merchant_id: p.merchant_id,
+      price: pricing.base_price ?? 0,
+      compare_at_price: pricing.compare_at_price,
+      currency: pricing.currency ?? 'SAR',
+      images: (p.product_media || []).map((m: any) => m.url).filter(Boolean),
+      main_image_url: p.product_media?.[0]?.url,
+      stock: p.inventory_items?.[0]?.available ?? 0,
+      variants: p.product_variants || [],
+    };
+
+    return c.json({ ok: true, data });
   } catch (error: any) {
     return c.json({ ok: false, error: 'Internal server error', detail: error.message }, 500);
   }
@@ -319,9 +427,9 @@ publicRoutes.get('/stores/featured', async (c) => {
     const url = new URL(c.req.url);
     const limit = url.searchParams.get('limit') || '10';
     
-    // Get stores that are boosted with 'featured' type or verified stores
+    // Get merchants with active status
     const response = await fetch(
-      `${c.env.SUPABASE_URL}/rest/v1/merchants?or=(boost_type.eq.featured,is_verified.eq.true)&is_active=eq.true&select=id,business_name,logo_url,boost_points,is_verified,rating,city&order=boost_points.desc.nullslast,rating.desc.nullslast&limit=${limit}`,
+      `${c.env.SUPABASE_URL}/rest/v1/merchants?status=eq.active&select=id,name,logo_url,created_at&order=created_at.desc&limit=${limit}`,
       {
         headers: {
           'apikey': c.env.SUPABASE_ANON_KEY,
@@ -340,12 +448,11 @@ publicRoutes.get('/stores/featured', async (c) => {
     // Transform to match expected format
     const transformedStores = (stores || []).map((store: any) => ({
       id: store.id,
-      name: store.business_name,
+      name: store.name,
       logo_url: store.logo_url,
-      is_verified: store.is_verified || false,
-      is_boosted: !!store.boost_points,
-      rating: store.rating,
-      city: store.city,
+      is_verified: false,
+      is_boosted: false,
+      created_at: store.created_at,
     }));
     
     return c.json({ ok: true, data: transformedStores });
@@ -360,23 +467,11 @@ publicRoutes.get('/stores', async (c) => {
     const url = new URL(c.req.url);
     const limit = url.searchParams.get('limit') || '20';
     const offset = url.searchParams.get('offset') || '0';
-    const city = url.searchParams.get('city');
-    const isVerified = url.searchParams.get('is_verified');
-    const isBoosted = url.searchParams.get('is_boosted');
     const sortBy = url.searchParams.get('sort_by') || 'created_at';
     const desc = url.searchParams.get('desc') === 'true';
 
-    let query = `${c.env.SUPABASE_URL}/rest/v1/merchants?select=*,products\!products_merchant_id_fkey(count)&is_active=eq.true&limit=${limit}&offset=${offset}`;
-    
-    if (city) {
-      query += `&city=eq.${city}`;
-    }
-    if (isVerified === 'true') {
-      query += `&is_verified=eq.true`;
-    }
-    if (isBoosted === 'true') {
-      query += `&is_boosted=eq.true`;
-    }
+    // NEW SCHEMA: Use merchants table with correct column names
+    let query = `${c.env.SUPABASE_URL}/rest/v1/merchants?select=id,name,logo_url,status,created_at&status=eq.active&limit=${limit}&offset=${offset}`;
     
     query += `&order=${sortBy}.${desc ? 'desc' : 'asc'}`;
 
@@ -384,7 +479,6 @@ publicRoutes.get('/stores', async (c) => {
       headers: {
         'apikey': c.env.SUPABASE_ANON_KEY,
         'Content-Type': 'application/json',
-        'Prefer': 'count=exact',
       },
     });
 
@@ -393,15 +487,19 @@ publicRoutes.get('/stores', async (c) => {
       return c.json({ ok: false, error: 'Failed to fetch stores', detail: error }, response.status as any);
     }
 
-    const data: any = await response.json();
+    const rawData: any[] = await response.json();
     
-    const transformedData = data.map((store: any) => ({
-      ...store,
-      products_count: store.products?.[0]?.count || 0,
-      products: undefined,
+    // Transform to expected format
+    const data = (rawData || []).map((store: any) => ({
+      id: store.id,
+      name: store.name,
+      logo_url: store.logo_url,
+      is_verified: false,
+      is_boosted: false,
+      created_at: store.created_at,
     }));
     
-    return c.json({ ok: true, data: transformedData });
+    return c.json({ ok: true, data });
   } catch (error: any) {
     return c.json({ ok: false, error: 'Internal server error', detail: error.message }, 500);
   }

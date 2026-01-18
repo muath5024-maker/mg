@@ -138,60 +138,111 @@ npm run test:coverage
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/auth/supabase/register` | Register new user |
-| POST | `/auth/supabase/login` | Login user |
-| POST | `/auth/supabase/logout` | Logout user |
-| POST | `/auth/supabase/refresh` | Refresh token |
-| GET | `/auth/profile` | Get user profile |
+| POST | `/auth/login` | تسجيل الدخول |
+| POST | `/auth/register` | إنشاء حساب جديد |
+| POST | `/auth/refresh` | تجديد التوكن |
+| POST | `/auth/logout` | تسجيل الخروج |
+| GET | `/auth/me` | بيانات المستخدم الحالي |
+| POST | `/auth/forgot-password` | استعادة كلمة المرور |
 
-### Public Routes (`/public/*`)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/public/products` | List products |
-| GET | `/public/products/:id` | Get product |
-| GET | `/public/stores` | List stores |
-| GET | `/public/stores/:id` | Get store |
-| GET | `/categories` | List categories |
-
-### Merchant Routes (`/secure/merchant/*`)
+### Public Routes (`/api/public/*`) - بدون مصادقة
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/secure/merchant/store` | Get merchant store |
-| POST | `/secure/merchant/store` | Create store |
-| PUT | `/secure/merchant/store` | Update store |
-| GET | `/secure/merchant/products` | List merchant products |
-| POST | `/secure/merchant/products` | Create product |
-| PUT | `/secure/merchant/products/:id` | Update product |
-| DELETE | `/secure/merchant/products/:id` | Delete product |
+| GET | `/api/public/products` | قائمة المنتجات |
+| GET | `/api/public/products/:id` | تفاصيل منتج |
+| GET | `/api/public/products/trending` | المنتجات الرائجة |
+| GET | `/api/public/products/flash-deals` | عروض فلاش |
+| GET | `/api/public/stores` | قائمة المتاجر |
+| GET | `/api/public/stores/featured` | المتاجر المميزة |
+| GET | `/api/public/categories/all` | جميع الأقسام |
+| GET | `/api/public/platform-categories` | أقسام المنصة |
+| GET | `/api/public/boosted-products` | المنتجات المعززة |
+| GET | `/api/public/search/products` | بحث المنتجات |
+| GET | `/api/public/search/stores` | بحث المتاجر |
+| GET | `/api/public/search/suggestions` | اقتراحات البحث |
 
-### Marketing Routes (`/secure/marketing/*`)
+### Customer Routes (`/api/customer/*`) - تتطلب مصادقة
+
+#### السلة (Cart)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/customer/cart` | جلب السلة |
+| POST | `/api/customer/cart` | إضافة للسلة |
+| PUT | `/api/customer/cart/:itemId` | تحديث الكمية |
+| DELETE | `/api/customer/cart/:itemId` | حذف عنصر |
+| DELETE | `/api/customer/cart` | تفريغ السلة |
+| GET | `/api/customer/cart/count` | عدد العناصر |
+
+#### المفضلة (Favorites)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/customer/favorites` | جلب المفضلة |
+| POST | `/api/customer/favorites` | إضافة للمفضلة |
+| DELETE | `/api/customer/favorites/:productId` | حذف من المفضلة |
+| GET | `/api/customer/favorites/check/:productId` | تحقق من المفضلة |
+| POST | `/api/customer/favorites/toggle` | تبديل المفضلة |
+| GET | `/api/customer/favorites/count` | عدد المفضلة |
+| DELETE | `/api/customer/favorites` | تفريغ المفضلة |
+
+#### الدفع والطلبات (Checkout & Orders)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/customer/checkout/validate` | التحقق قبل الدفع |
+| POST | `/api/customer/checkout` | إنشاء طلب |
+| GET | `/api/customer/checkout/orders` | طلباتي |
+| GET | `/api/customer/checkout/orders/:id` | تفاصيل طلب |
+| POST | `/api/customer/checkout/orders/:id/cancel` | إلغاء طلب |
+
+#### العناوين (Addresses)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/customer/addresses` | جلب العناوين |
+| POST | `/api/customer/addresses` | إضافة عنوان |
+| PUT | `/api/customer/addresses/:id` | تحديث عنوان |
+| DELETE | `/api/customer/addresses/:id` | حذف عنوان |
+| PUT | `/api/customer/addresses/:id/default` | تعيين افتراضي |
+
+### Merchant Routes (`/api/merchant/*`) - تتطلب صلاحية تاجر
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/secure/marketing/coupons` | List coupons |
-| POST | `/secure/marketing/coupons` | Create coupon |
-| GET | `/secure/marketing/flash-sales` | List flash sales |
-| POST | `/secure/marketing/flash-sales` | Create flash sale |
-| GET | `/secure/marketing/abandoned-carts` | List abandoned carts |
+| GET | `/api/merchant/products` | قائمة منتجات التاجر |
+| GET | `/api/merchant/products/:id` | تفاصيل منتج |
+| POST | `/api/merchant/products` | إنشاء منتج |
+| PUT | `/api/merchant/products/:id` | تحديث منتج |
+| DELETE | `/api/merchant/products/:id` | حذف منتج |
+| GET | `/api/merchant/orders` | طلبات التاجر |
+| GET | `/api/merchant/orders/:id` | تفاصيل طلب |
+| PUT | `/api/merchant/orders/:id/status` | تحديث حالة الطلب |
+| GET | `/api/merchant/categories` | أقسام التاجر |
+| POST | `/api/merchant/categories` | إنشاء قسم |
+| PUT | `/api/merchant/categories/:id` | تحديث قسم |
+| DELETE | `/api/merchant/categories/:id` | حذف قسم |
+| GET | `/api/merchant/inventory` | المخزون |
+| PUT | `/api/merchant/inventory/:productId` | تحديث المخزون |
+
+### Admin Routes (`/api/admin/*`) - تتطلب صلاحية إدارية
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/admin/dashboard/stats` | إحصائيات لوحة التحكم |
+| GET | `/api/admin/dashboard/revenue` | تقرير الإيرادات |
+| GET | `/api/admin/merchants` | قائمة التجار |
+| GET | `/api/admin/merchants/:id` | تفاصيل تاجر |
+| PUT | `/api/admin/merchants/:id` | تحديث تاجر |
+| GET | `/api/admin/customers` | قائمة العملاء |
+| GET | `/api/admin/customers/:id` | تفاصيل عميل |
+| GET | `/api/admin/orders` | جميع الطلبات |
+| GET | `/api/admin/products` | جميع المنتجات |
 
 ### AI Routes (`/ai/*`)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/ai/generate` | Generate content |
-| POST | `/ai/studio/image` | Generate image |
-| POST | `/ai/studio/video` | Generate video |
-| POST | `/ai/jobs/description` | Generate product description |
-
-### Analytics Routes (`/secure/analytics/*`)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/secure/analytics/dashboard` | Dashboard overview |
-| GET | `/secure/analytics/products` | Product analytics |
-| GET | `/secure/analytics/insights` | Smart insights |
+| POST | `/ai/generate` | توليد محتوى |
+| POST | `/ai/studio/image` | توليد صورة |
+| POST | `/ai/jobs/description` | توليد وصف منتج |
 
 ---
 

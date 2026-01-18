@@ -33,7 +33,7 @@ import {
   cancelCustomerOrder,
 } from '../endpoints/orders-crud';
 
-// Customer-specific endpoints
+// Customer-specific endpoints (New Schema)
 import {
   getCart,
   addToCart,
@@ -62,6 +62,7 @@ import {
   getProductsByCategory,
 } from '../endpoints/search';
 
+// Checkout & Addresses (New Schema)
 import {
   validateCheckout,
   createOrder,
@@ -69,6 +70,10 @@ import {
   getOrderDetails,
   cancelOrder,
   getAddresses,
+  addAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress,
 } from '../endpoints/checkout';
 
 import {
@@ -204,7 +209,13 @@ customerApi.post('/checkout', createOrder);
 customerApi.get('/checkout/orders', getCheckoutOrders);
 customerApi.get('/checkout/orders/:id', getOrderDetails);
 customerApi.post('/checkout/orders/:id/cancel', cancelOrder);
+
+// Addresses
 customerApi.get('/addresses', getAddresses);
+customerApi.post('/addresses', addAddress);
+customerApi.put('/addresses/:id', updateAddress);
+customerApi.delete('/addresses/:id', deleteAddress);
+customerApi.put('/addresses/:id/default', setDefaultAddress);
 
 // Mount customer routes
 apiRoutes.route('/customer', customerApi);
