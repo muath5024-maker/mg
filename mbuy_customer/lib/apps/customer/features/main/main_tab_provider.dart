@@ -1,7 +1,6 @@
 /// Provider للتحكم في التبويب المحدد في Bottom Navigation
 library;
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart'; // StateProvider moved to legacy in Riverpod 3.x
 
 /// Provider لإدارة التبويب الحالي في Bottom Navigation

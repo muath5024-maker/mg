@@ -1579,73 +1579,7 @@ class _StorePageScreenState extends ConsumerState<StorePageScreen>
   }
 }
 
-class _CategoriesHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final List<StoreCategory> categories;
-  final bool isDark;
-
-  _CategoriesHeaderDelegate({required this.categories, this.isDark = false});
-
-  @override
-  double get minExtent => 100;
-  @override
-  double get maxExtent => 100;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final theme = Theme.of(context);
-    return Container(
-      height: 100,
-      color: isDark ? theme.cardColor : Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: 80,
-            child: Column(
-              children: [
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: NetworkImage(category.imageUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Expanded(
-                  child: Text(
-                    category.name,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(_CategoriesHeaderDelegate oldDelegate) =>
-      oldDelegate.isDark != isDark || oldDelegate.categories != categories;
-}
-
-/// ويدجت بسيط لعرض فئات المتجر (بدلاً من SliverPersistentHeaderDelegate)
+/// ويدجت بسيط لعرض فئات المتجر
 class _CategoriesHeader extends StatelessWidget {
   final List<StoreCategory> categories;
   final bool isDark;
@@ -1725,35 +1659,6 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(_TabBarDelegate oldDelegate) =>
-      oldDelegate.isDark != isDark;
-}
-
-class _ContentTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
-  final bool isDark;
-
-  _ContentTabBarDelegate(this._tabBar, {this.isDark = false});
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final theme = Theme.of(context);
-    return Container(
-      color: isDark ? theme.cardColor : Colors.white,
-      child: _tabBar,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_ContentTabBarDelegate oldDelegate) =>
       oldDelegate.isDark != isDark;
 }
 

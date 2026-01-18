@@ -391,6 +391,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
           isDestructive: true,
         ),
         const SizedBox(height: 16),
+        // زر التبديل لوضع التسوق
+        _buildSwitchToCustomerButton(context, isDark),
+        const SizedBox(height: 16),
         _buildLogoutButton(context, isDark),
       ],
     );
