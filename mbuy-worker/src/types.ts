@@ -3,6 +3,12 @@
  */
 
 export interface Env {
+  // Database (Direct PostgreSQL via Drizzle)
+  DATABASE_URL: string;
+
+  // JWT Secret for custom auth
+  JWT_SECRET: string;
+
   // Cloudflare Account
   CF_ACCOUNT_ID: string;
 
@@ -71,6 +77,13 @@ export interface Env {
 
   // Admin Panel
   ADMIN_EMAILS?: string;
+
+  // FCM Push Notifications
+  FCM_SERVER_KEY?: string;
+
+  // n8n Webhooks
+  N8N_WEBHOOK_URL?: string;
+  N8N_WEBHOOK_SECRET?: string;
 }
 
 /**

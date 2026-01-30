@@ -2,37 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
-// ║                    MBUY CUSTOMER - Modern E-Commerce Design               ║
+// ║                    MBUY - Alibaba Style Theme                             ║
 // ║                                                                           ║
-// ║   الألوان المعتمدة:                                                       ║
-// ║   • Primary: Dark Brown #372018                                           ║
-// ║   • Accent: Deep Brown #2A1810                                            ║
+// ║   الألوان المعتمدة (نمط علي بابا):                                        ║
+// ║   • Primary: Orange #FF6A00 (برتقالي)                                     ║
+// ║   • Accent: Red #FF0036 (أحمر للعروض)                                     ║
 // ║   • Background: White #FFFFFF                                             ║
-// ║   • Secondary: Light Grey #F5F5F5                                         ║
+// ║   • Surface: Light Grey #F5F5F5                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
 class AppTheme {
   // ============================================================================
-  // Primary Colors - Dark Brown Theme
+  // Primary Colors - Alibaba Orange Theme
   // ============================================================================
-  static const Color primaryColor = Color(0xFF372018); // Dark Brown
-  static const Color accentColor = Color(0xFF2A1810); // Deeper Brown
-  static const Color secondaryColor = Color(0xFF4A2E20); // Medium Brown
+  static const Color primaryColor = Color(0xFFFF6A00); // Alibaba Orange
+  static const Color primaryLight = Color(0xFFFF8C00); // Light Orange
+  static const Color primaryDark = Color(0xFFE65100); // Dark Orange
+  static const Color accentColor = Color(0xFFFF0036); // Red for deals/sales
+  static const Color secondaryColor = Color(0xFFFF4747); // Soft Red
 
   // ============================================================================
   // Background & Surface
   // ============================================================================
   static const Color backgroundColor = Color(0xFFFFFFFF); // Pure White
-  static const Color surfaceColor = Color(0xFFF8F9FA); // Light Grey
+  static const Color surfaceColor = Color(0xFFF5F5F5); // Light Grey
   static const Color cardColor = Color(0xFFFFFFFF); // White
 
   // ============================================================================
   // Text Colors
   // ============================================================================
-  static const Color textPrimary = Color(0xFF1A1A1A); // Dark Text
+  static const Color textPrimary = Color(0xFF191919); // Almost Black
+  static const Color textPrimaryColor = Color(
+    0xFF191919,
+  ); // Alias for compatibility
   static const Color textSecondary = Color(0xFF666666); // Grey Text
+  static const Color textSecondaryColor = Color(
+    0xFF666666,
+  ); // Alias for compatibility
   static const Color textHint = Color(0xFF999999); // Light Grey
+  static const Color textHintColor = Color(
+    0xFF999999,
+  ); // Alias for compatibility
   static const Color textWhite = Color(0xFFFFFFFF); // White Text
+  static const Color mutedSlate = Color(
+    0xFF6B7280,
+  ); // Muted grey for secondary text
+  static const Color darkSlate = Color(0xFF334155); // Dark slate
+  static const Color purpleColor = Color(
+    0xFFFF6A00,
+  ); // Using orange instead of purple
+  static const Color slate400 = Color(0xFF94A3B8);
+  static const Color slate500 = Color(0xFF64748B);
+  static const Color backgroundLight = Color(0xFFFAFAFA);
 
   // ============================================================================
   // Border & Divider
@@ -43,36 +64,87 @@ class AppTheme {
   // ============================================================================
   // Status Colors
   // ============================================================================
-  static const Color successColor = Color(0xFF372018);
-  static const Color warningColor = Color(0xFFFF9800);
-  static const Color errorColor = Color(0xFFFF5252);
-  static const Color infoColor = Color(0xFF2196F3);
+  static const Color successColor = Color(0xFF00C853); // Green
+  static const Color warningColor = Color(0xFFFFAB00); // Amber
+  static const Color errorColor = Color(0xFFFF5252); // Red
+  static const Color infoColor = Color(0xFF2196F3); // Blue
 
   // ============================================================================
   // Price Colors
   // ============================================================================
-  static const Color priceColor = Color(0xFF372018); // Dark Brown for price
-  static const Color salePriceColor = Color(0xFFFF5252); // Red for sale
-  static const Color discountBadgeColor = Color(0xFF372018);
+  static const Color priceColor = Color(0xFFFF6A00); // Orange for price
+  static const Color salePriceColor = Color(0xFFFF0036); // Red for sale
+  static const Color discountBadgeColor = Color(0xFFFF0036); // Red badge
 
   // ============================================================================
   // Rating
   // ============================================================================
-  static const Color ratingStarColor = Color(0xFFFFB800);
+  static const Color ratingStarColor = Color(0xFFFFB800); // Gold
 
   // ============================================================================
   // Navigation Bar Colors
   // ============================================================================
   static const Color navBarBackground = Color(0xFFFFFFFF);
-  static const Color navBarSelected = Color(
-    0xFF372018,
-  ); // Dark Brown when selected
+  static const Color navBarSelected = Color(0xFFFF6A00); // Orange when selected
   static const Color navBarUnselected = Color(0xFF999999);
 
   // ============================================================================
   // Badge Colors
   // ============================================================================
-  static const Color badgeColor = Color(0xFFFF5252); // Red for notifications
+  static const Color badgeColor = Color(0xFFFF0036); // Red for notifications
+
+  // ============================================================================
+  // Gradients
+  // ============================================================================
+  static const LinearGradient metallicGradient = LinearGradient(
+    colors: [primaryColor, primaryLight],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [primaryColor, primaryDark],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient cardGradient = LinearGradient(
+    colors: [Color(0xFFFFFFFF), Color(0xFFFAFAFA)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // ============================================================================
+  // Dark Mode Colors
+  // ============================================================================
+  static const Color backgroundColorDark = Color(0xFF121212);
+  static const Color surfaceColorDark = Color(0xFF1E1E1E);
+  static const Color cardColorDark = Color(0xFF1E1E1E);
+  static const Color textPrimaryColorDark = Color(0xFFFFFFFF);
+  static const Color textSecondaryColorDark = Color(0xB3FFFFFF); // 70% white
+  static const Color textHintColorDark = Color(0x8AFFFFFF); // 54% white
+  static const Color borderColorDark = Color(0xFF3D3D3D);
+  static const Color cardBorderDark = Color(0xFF3D3D3D);
+  static const Color dividerColorDark = Color(0xFF3D3D3D);
+
+  // ============================================================================
+  // Helper Functions for Dark Mode
+  // ============================================================================
+  static Color textPrimary2(bool isDark) =>
+      isDark ? textPrimaryColorDark : textPrimaryColor;
+
+  static Color textSecondary2(bool isDark) =>
+      isDark ? textSecondaryColorDark : textSecondaryColor;
+
+  static Color textHint2(bool isDark) =>
+      isDark ? textHintColorDark : textHintColor;
+
+  static Color background(bool isDark) =>
+      isDark ? backgroundColorDark : backgroundColor;
+
+  static Color surface(bool isDark) => isDark ? surfaceColorDark : surfaceColor;
+
+  static Color card(bool isDark) => isDark ? cardColorDark : cardColor;
 
   // ============================================================================
   // Dimensions
@@ -111,7 +183,7 @@ class AppTheme {
 
       scaffoldBackgroundColor: backgroundColor,
 
-      // AppBar - Clean White Header
+      // AppBar - White Header with Orange accents
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
@@ -206,7 +278,7 @@ class AppTheme {
         ),
       ),
 
-      // Elevated Button
+      // Elevated Button - Orange
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
@@ -481,12 +553,12 @@ class AppTheme {
       // Outlined Button
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.white,
+          foregroundColor: primaryLight,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadiusLarge),
           ),
-          side: const BorderSide(color: Colors.white54, width: 1.5),
+          side: const BorderSide(color: primaryLight, width: 1.5),
           textStyle: GoogleFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -532,7 +604,7 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: const Color(0xFF1E1E1E),
         elevation: 8,
-        selectedItemColor: Colors.white,
+        selectedItemColor: primaryColor,
         unselectedItemColor: Colors.white54,
         selectedLabelStyle: GoogleFonts.cairo(
           fontSize: 10,
@@ -548,7 +620,7 @@ class AppTheme {
 
       // Tab Bar
       tabBarTheme: TabBarThemeData(
-        labelColor: Colors.white,
+        labelColor: primaryColor,
         unselectedLabelColor: Colors.white54,
         indicatorSize: TabBarIndicatorSize.label,
         labelStyle: GoogleFonts.cairo(
@@ -614,14 +686,14 @@ class AppTheme {
   // Custom Styles
   // ============================================================================
 
-  /// Price Style
+  /// Price Style - Orange
   static TextStyle get priceStyle => GoogleFonts.cairo(
     fontSize: 16,
     fontWeight: FontWeight.bold,
     color: priceColor,
   );
 
-  /// Sale Price Style
+  /// Sale Price Style - Red
   static TextStyle get salePriceStyle => GoogleFonts.cairo(
     fontSize: 16,
     fontWeight: FontWeight.bold,

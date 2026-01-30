@@ -59,7 +59,9 @@ class EmptyStateWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppDimensions.fontDisplay3,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary(isDark),
+                color: isDark
+                    ? AppTheme.textPrimaryColorDark
+                    : AppTheme.textPrimaryColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -70,7 +72,9 @@ class EmptyStateWidget extends StatelessWidget {
               message ?? 'لم يتم العثور على أي عناصر حتى الآن',
               style: TextStyle(
                 fontSize: AppDimensions.fontBody,
-                color: AppTheme.textSecondary(isDark),
+                color: isDark
+                    ? AppTheme.textSecondaryColorDark
+                    : AppTheme.textSecondaryColor,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -122,14 +126,20 @@ class CompactEmptyStateWidget extends StatelessWidget {
           Icon(
             icon ?? Icons.inbox_outlined,
             size: 48,
-            color: AppTheme.textSecondary(isDark).withValues(alpha: 0.5),
+            color:
+                (isDark
+                        ? AppTheme.textSecondaryColorDark
+                        : AppTheme.textSecondaryColor)
+                    .withValues(alpha: 0.5),
           ),
           const SizedBox(height: 12),
           Text(
             message ?? 'لا توجد عناصر',
             style: TextStyle(
               fontSize: AppDimensions.fontBody2,
-              color: AppTheme.textSecondary(isDark),
+              color: isDark
+                  ? AppTheme.textSecondaryColorDark
+                  : AppTheme.textSecondaryColor,
             ),
             textAlign: TextAlign.center,
           ),

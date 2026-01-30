@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_service.dart';
 import '../domain/models/platform_category.dart';
@@ -21,16 +22,26 @@ class PlatformCategoriesRepository {
       if (flat) queryParams['flat'] = 'true';
       if (featuredOnly) queryParams['featured'] = 'true';
 
+      debugPrint(
+        '🌐 [PlatformCategoriesRepo] Fetching /public/platform-categories',
+      );
+
       final response = await _apiService.get(
         '/public/platform-categories',
         queryParams: queryParams.isNotEmpty ? queryParams : null,
       );
 
+      debugPrint('📥 [PlatformCategoriesRepo] Status: ${response.statusCode}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        debugPrint('📦 [PlatformCategoriesRepo] Response ok: ${data['ok']}');
 
         if (data['ok'] == true && data['data'] != null) {
           final List categoriesList = data['data'] as List;
+          debugPrint(
+            '✅ [PlatformCategoriesRepo] Found ${categoriesList.length} categories',
+          );
           return categoriesList
               .map(
                 (json) =>
@@ -38,11 +49,14 @@ class PlatformCategoriesRepository {
               )
               .toList();
         }
+        debugPrint('⚠️ [PlatformCategoriesRepo] No data in response');
         return [];
       } else {
+        debugPrint('❌ [PlatformCategoriesRepo] Failed: ${response.body}');
         throw Exception('فشل جلب الفئات (رمز ${response.statusCode})');
       }
     } catch (e) {
+      debugPrint('❌ [PlatformCategoriesRepo] Error: $e');
       if (e is Exception) rethrow;
       throw Exception('خطأ في الاتصال بالخادم: $e');
     }

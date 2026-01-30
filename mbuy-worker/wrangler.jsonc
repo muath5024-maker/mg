@@ -132,6 +132,8 @@
 	/**
 	 * Secrets (must be set via: wrangler secret put <KEY>)
 	 * Core Secrets:
+	 * - DATABASE_URL (PostgreSQL connection string from Supabase)
+	 * - JWT_SECRET (Custom JWT signing secret)
 	 * - CF_IMAGES_API_TOKEN
 	 * - CF_STREAM_API_TOKEN
 	 * - R2_ACCESS_KEY_ID

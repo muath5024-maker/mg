@@ -53,6 +53,9 @@ import platformSettingsRoutes from './routes/platform-settings'; // Platform Set
 import searchRoutes from './routes/search';
 // import geminiRoutes from './routes/gemini';
 // import autoReports from './routes/auto-reports';
+
+// GraphQL
+import { createGraphQLHandler } from './graphql';
 // import heatmap from './routes/heatmap';
 // import aiAssistant from './routes/ai-assistant';
 // import contentGenerator from './routes/content-generator';
@@ -138,6 +141,14 @@ app.use('/secure/*', authMiddleware);
 
 app.get('/', (c) => {
   return c.json({ ok: true, message: 'MBUY API Gateway', version: '2.0.0' });
+});
+
+// ============================================================================
+// GRAPHQL ENDPOINT
+// ============================================================================
+app.all('/graphql', async (c) => {
+  const yoga = createGraphQLHandler(c.env);
+  return yoga.handle(c.req.raw, c.env);
 });
 
 app.get('/test-ai', async (c) => {

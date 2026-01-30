@@ -52,7 +52,9 @@ class ErrorStateWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppDimensions.fontDisplay3,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary(isDark),
+                color: isDark
+                    ? AppTheme.textPrimaryColorDark
+                    : AppTheme.textPrimaryColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -63,7 +65,9 @@ class ErrorStateWidget extends StatelessWidget {
               message ?? 'عذراً، حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى.',
               style: TextStyle(
                 fontSize: AppDimensions.fontBody,
-                color: AppTheme.textSecondary(isDark),
+                color: isDark
+                    ? AppTheme.textSecondaryColorDark
+                    : AppTheme.textSecondaryColor,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -122,7 +126,9 @@ class CompactErrorStateWidget extends StatelessWidget {
             message ?? 'حدث خطأ أثناء التحميل',
             style: TextStyle(
               fontSize: AppDimensions.fontBody2,
-              color: AppTheme.textSecondary(isDark),
+              color: isDark
+                  ? AppTheme.textSecondaryColorDark
+                  : AppTheme.textSecondaryColor,
             ),
             textAlign: TextAlign.center,
           ),

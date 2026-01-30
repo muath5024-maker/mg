@@ -536,6 +536,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   /// جلب فئات المنصة من API
   Future<void> _loadPlatformCategories() async {
     setState(() => _loadingPlatformCategories = true);
+    debugPrint('🔄 [AddProduct] بدء تحميل فئات المنصة...');
 
     try {
       final platformCategoriesRepo = ref.read(
@@ -545,6 +546,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         flat: false,
       );
 
+      debugPrint('✅ [AddProduct] تم جلب ${categories.length} فئة من API');
+
       if (mounted) {
         setState(() {
           // فقط الفئات الرئيسية (بدون parent_id)
@@ -552,12 +555,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               .where((c) => c.parentId == null)
               .toList();
           _loadingPlatformCategories = false;
+          debugPrint(
+            '✅ [AddProduct] الفئات الرئيسية: ${_platformCategories.length}',
+          );
+          for (final cat in _platformCategories) {
+            debugPrint('   - ${cat.name} (${cat.id})');
+          }
         });
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('❌ [AddProduct] خطأ في جلب فئات المنصة: $e');
+      debugPrint('   Stack: $stack');
       if (mounted) {
         setState(() => _loadingPlatformCategories = false);
-        debugPrint('فشل جلب فئات المنصة: $e');
       }
     }
   }

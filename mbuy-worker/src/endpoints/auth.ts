@@ -196,15 +196,19 @@ export async function registerHandler(c: Context<{ Bindings: Env }>) {
     } else {
       table = TABLES.customers;
       userType = 'customer';
-      userData = {
+      // Build customer data - only include fields with actual values
+      const customerData: Partial<Customer> = {
         email: email.toLowerCase().trim(),
         password_hash: passwordHash,
-        phone: phone || null,
-        first_name: first_name || null,
-        last_name: last_name || null,
-        full_name: first_name && last_name ? `${first_name} ${last_name}` : null,
         status: 'active' as CustomerStatus,
-      } as Partial<Customer>;
+      };
+      // Add optional fields only if they have values
+      if (phone) customerData.phone = phone;
+      if (first_name) customerData.first_name = first_name;
+      if (last_name) customerData.last_name = last_name;
+      if (first_name && last_name) customerData.full_name = `${first_name} ${last_name}`;
+      
+      userData = customerData;
     }
 
     // Insert user using SupabaseClient

@@ -48,7 +48,9 @@ class MbuySectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = AppTheme.textPrimary(isDark);
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
     final primaryColor = AppTheme.primaryColor;
 
     return Padding(

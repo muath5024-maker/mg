@@ -1,0 +1,139 @@
+{
+  "name": "mBuy - Low Stock Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mbuy-inventory-webhook",
+        "options": {}
+      },
+      "id": "inventory-webhook",
+      "name": "Inventory Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "operation": "contains",
+              "value2": "low_stock"
+            }
+          ]
+        }
+      },
+      "id": "check-low-stock",
+      "name": "Is Low Stock?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "operation": "contains",
+              "value2": "out_of_stock"
+            }
+          ]
+        }
+      },
+      "id": "check-out-of-stock",
+      "name": "Is Out of Stock?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "channel": "#inventory-alerts",
+        "text": "⚠️ *تنبيه مخزون منخفض*\n\nالمنتج: {{ $json.data.name }}\nSKU: {{ $json.data.sku }}\nالمخزون الحالي: {{ $json.data.new_stock }}\nالحد الأدنى: {{ $json.data.threshold }}",
+        "otherOptions": {}
+      },
+      "id": "slack-low-stock",
+      "name": "Slack Low Stock Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "channel": "#inventory-alerts",
+        "text": "🚨 *تنبيه نفاد المخزون*\n\nالمنتج: {{ $json.data.name }}\nSKU: {{ $json.data.sku }}\n\n*يرجى إعادة التوريد فوراً!*",
+        "otherOptions": {}
+      },
+      "id": "slack-out-of-stock",
+      "name": "Slack Out of Stock Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [700, 500]
+    },
+    {
+      "parameters": {
+        "toEmail": "inventory@mbuy.sa",
+        "subject": "🚨 نفاد مخزون: {{ $json.data.name }}",
+        "text": "تنبيه: نفد مخزون المنتج التالي:\n\nالمنتج: {{ $json.data.name }}\nSKU: {{ $json.data.sku }}\n\nيرجى اتخاذ الإجراء اللازم."
+      },
+      "id": "email-out-of-stock",
+      "name": "Email Out of Stock",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [900, 500]
+    }
+  ],
+  "connections": {
+    "Inventory Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is Low Stock?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Out of Stock?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Low Stock?": {
+      "main": [
+        [
+          {
+            "node": "Slack Low Stock Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Out of Stock?": {
+      "main": [
+        [
+          {
+            "node": "Slack Out of Stock Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Out of Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["mBuy", "inventory", "alerts"]
+}

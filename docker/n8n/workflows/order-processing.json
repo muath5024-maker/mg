@@ -1,0 +1,198 @@
+{
+  "name": "mBuy - Order Processing Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mbuy-order-webhook",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "operation": "equals",
+              "value2": "order.created"
+            }
+          ]
+        }
+      },
+      "id": "check-order-created",
+      "name": "Is Order Created?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "operation": "equals",
+              "value2": "order.shipped"
+            }
+          ]
+        }
+      },
+      "id": "check-order-shipped",
+      "name": "Is Order Shipped?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@mbuy.sa",
+        "toEmail": "={{ $json.data.customer_email }}",
+        "subject": "تم استلام طلبك #{{ $json.data.order_number }}",
+        "text": "شكراً لك {{ $json.data.customer_name }}!\n\nتم استلام طلبك رقم {{ $json.data.order_number }} بنجاح.\n\nقيمة الطلب: {{ $json.data.total_amount }} {{ $json.data.currency }}\n\nسنقوم بإشعارك عند شحن طلبك."
+      },
+      "id": "send-order-confirmation",
+      "name": "Send Order Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [700, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.unifonic.com/rest/Messages/Send",
+        "options": {},
+        "method": "POST",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "AppSid",
+              "value": "={{ $env.UNIFONIC_APP_SID }}"
+            },
+            {
+              "name": "Recipient",
+              "value": "={{ $json.data.customer_phone }}"
+            },
+            {
+              "name": "Body",
+              "value": "تم استلام طلبك #{{ $json.data.order_number }} بنجاح. شكراً لتسوقك معنا!"
+            },
+            {
+              "name": "SenderID",
+              "value": "mBuy"
+            }
+          ]
+        }
+      },
+      "id": "send-sms-confirmation",
+      "name": "Send SMS Confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [700, 350]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@mbuy.sa",
+        "toEmail": "={{ $json.data.customer_email }}",
+        "subject": "تم شحن طلبك #{{ $json.data.order_number }}",
+        "text": "مرحباً {{ $json.data.customer_name }}!\n\nتم شحن طلبك رقم {{ $json.data.order_number }}.\n\nرقم التتبع: {{ $json.data.tracking_number }}\n\nيمكنك تتبع شحنتك من خلال التطبيق."
+      },
+      "id": "send-shipping-notification",
+      "name": "Send Shipping Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [700, 500]
+    },
+    {
+      "parameters": {
+        "url": "https://api.unifonic.com/rest/Messages/Send",
+        "options": {},
+        "method": "POST",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "AppSid",
+              "value": "={{ $env.UNIFONIC_APP_SID }}"
+            },
+            {
+              "name": "Recipient",
+              "value": "={{ $json.data.customer_phone }}"
+            },
+            {
+              "name": "Body",
+              "value": "تم شحن طلبك #{{ $json.data.order_number }}. رقم التتبع: {{ $json.data.tracking_number }}"
+            },
+            {
+              "name": "SenderID",
+              "value": "mBuy"
+            }
+          ]
+        }
+      },
+      "id": "send-sms-shipping",
+      "name": "Send SMS Shipping",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [700, 650]
+    }
+  ],
+  "connections": {
+    "Order Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is Order Created?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Order Shipped?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Order Created?": {
+      "main": [
+        [
+          {
+            "node": "Send Order Confirmation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send SMS Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Order Shipped?": {
+      "main": [
+        [
+          {
+            "node": "Send Shipping Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send SMS Shipping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["mBuy", "orders", "notifications"]
+}

@@ -1,0 +1,196 @@
+{
+  "name": "mBuy - Customer Welcome & Loyalty",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mbuy-customer-webhook",
+        "options": {}
+      },
+      "id": "customer-webhook",
+      "name": "Customer Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "operation": "equals",
+              "value2": "customer.created"
+            }
+          ]
+        }
+      },
+      "id": "check-new-customer",
+      "name": "Is New Customer?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "operation": "equals",
+              "value2": "loyalty.tier_upgraded"
+            }
+          ]
+        }
+      },
+      "id": "check-tier-upgrade",
+      "name": "Is Tier Upgrade?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "welcome@mbuy.sa",
+        "toEmail": "={{ $json.data.email }}",
+        "subject": "مرحباً بك في mBuy! 🎉",
+        "html": "<div dir='rtl' style='font-family: Arial, sans-serif;'><h1>مرحباً {{ $json.data.full_name }}!</h1><p>نرحب بك في عائلة mBuy.</p><p>استخدم الكود <strong>WELCOME10</strong> للحصول على خصم 10% على طلبك الأول!</p><p>مع تحيات فريق mBuy</p></div>"
+      },
+      "id": "send-welcome-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [700, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://api.unifonic.com/rest/Messages/Send",
+        "method": "POST",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "AppSid",
+              "value": "={{ $env.UNIFONIC_APP_SID }}"
+            },
+            {
+              "name": "Recipient",
+              "value": "={{ $json.data.phone }}"
+            },
+            {
+              "name": "Body",
+              "value": "مرحباً {{ $json.data.full_name }}! 🎉 شكراً لتسجيلك في mBuy. استخدم كود WELCOME10 للحصول على خصم 10% على طلبك الأول!"
+            },
+            {
+              "name": "SenderID",
+              "value": "mBuy"
+            }
+          ]
+        }
+      },
+      "id": "send-welcome-sms",
+      "name": "Send Welcome SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [700, 250]
+    },
+    {
+      "parameters": {
+        "fromEmail": "loyalty@mbuy.sa",
+        "toEmail": "={{ $json.data.email }}",
+        "subject": "🎊 تهانينا! لقد ترقيت إلى {{ $json.data.new_tier }}",
+        "html": "<div dir='rtl' style='font-family: Arial, sans-serif;'><h1>تهانينا {{ $json.data.customer_name }}! 🎊</h1><p>لقد ترقيت إلى مستوى <strong>{{ $json.data.new_tier }}</strong> في برنامج الولاء!</p><p>استمتع بمزايا حصرية جديدة.</p></div>"
+      },
+      "id": "send-tier-upgrade-email",
+      "name": "Send Tier Upgrade Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [700, 400]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.MBUY_API_URL }}/webhooks/send-notification",
+        "method": "POST",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "customerId",
+              "value": "={{ $json.data.customer_id }}"
+            },
+            {
+              "name": "type",
+              "value": "tier_upgrade"
+            },
+            {
+              "name": "title",
+              "value": "تهانينا! 🎊"
+            },
+            {
+              "name": "message",
+              "value": "لقد ترقيت إلى مستوى {{ $json.data.new_tier }}!"
+            }
+          ]
+        }
+      },
+      "id": "send-push-notification",
+      "name": "Send Push Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [700, 550]
+    }
+  ],
+  "connections": {
+    "Customer Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is New Customer?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Tier Upgrade?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is New Customer?": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Welcome SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Tier Upgrade?": {
+      "main": [
+        [
+          {
+            "node": "Send Tier Upgrade Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Push Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["mBuy", "customers", "loyalty"]
+}
