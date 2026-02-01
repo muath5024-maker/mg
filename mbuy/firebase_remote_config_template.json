@@ -1,0 +1,199 @@
+{
+  "parameters": {
+    "app_name": {
+      "defaultValue": {
+        "value": "MBUY"
+      },
+      "description": "اسم التطبيق"
+    },
+    "welcome_text": {
+      "defaultValue": {
+        "value": "أهلاً بك في MBUY"
+      },
+      "description": "نص الترحيب"
+    },
+    "login_button_text": {
+      "defaultValue": {
+        "value": "تسجيل الدخول"
+      },
+      "description": "نص زر تسجيل الدخول"
+    },
+    "register_button_text": {
+      "defaultValue": {
+        "value": "إنشاء حساب جديد"
+      },
+      "description": "نص زر إنشاء حساب"
+    },
+    "no_products_text": {
+      "defaultValue": {
+        "value": "لا توجد منتجات"
+      },
+      "description": "نص عدم وجود منتجات"
+    },
+    "loading_text": {
+      "defaultValue": {
+        "value": "جاري التحميل..."
+      },
+      "description": "نص التحميل"
+    },
+    "error_text": {
+      "defaultValue": {
+        "value": "حدث خطأ، حاول مرة أخرى"
+      },
+      "description": "نص الخطأ العام"
+    },
+    "primary_color": {
+      "defaultValue": {
+        "value": "00BCD4"
+      },
+      "description": "اللون الرئيسي (Hex بدون #)"
+    },
+    "secondary_color": {
+      "defaultValue": {
+        "value": "0A1628"
+      },
+      "description": "اللون الثانوي"
+    },
+    "accent_color": {
+      "defaultValue": {
+        "value": "FF9800"
+      },
+      "description": "لون التمييز"
+    },
+    "error_color": {
+      "defaultValue": {
+        "value": "F44336"
+      },
+      "description": "لون الخطأ"
+    },
+    "success_color": {
+      "defaultValue": {
+        "value": "4CAF50"
+      },
+      "description": "لون النجاح"
+    },
+    "enable_boost_feature": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "تفعيل ميزة دعم الظهور"
+    },
+    "enable_studio_feature": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "تفعيل استوديو AI"
+    },
+    "enable_wallet_feature": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "تفعيل المحفظة"
+    },
+    "enable_coupons_feature": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "تفعيل الكوبونات"
+    },
+    "enable_loyalty_feature": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "تفعيل برنامج الولاء"
+    },
+    "enable_referral_feature": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "تفعيل دعوة الأصدقاء"
+    },
+    "show_ads": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "عرض الإعلانات"
+    },
+    "maintenance_mode": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "وضع الصيانة"
+    },
+    "min_order_amount": {
+      "defaultValue": {
+        "value": "10"
+      },
+      "description": "الحد الأدنى للطلب (ريال)"
+    },
+    "max_product_images": {
+      "defaultValue": {
+        "value": "10"
+      },
+      "description": "أقصى عدد صور للمنتج"
+    },
+    "max_products_per_store": {
+      "defaultValue": {
+        "value": "1000"
+      },
+      "description": "حد المنتجات للمتجر"
+    },
+    "free_boost_days": {
+      "defaultValue": {
+        "value": "3"
+      },
+      "description": "أيام Boost المجانية"
+    },
+    "points_per_sar": {
+      "defaultValue": {
+        "value": "10"
+      },
+      "description": "نقاط لكل ريال"
+    },
+    "support_whatsapp": {
+      "defaultValue": {
+        "value": "966500000000"
+      },
+      "description": "رقم واتساب الدعم"
+    },
+    "terms_url": {
+      "defaultValue": {
+        "value": "https://mbuy.pro/terms"
+      },
+      "description": "رابط الشروط والأحكام"
+    },
+    "privacy_url": {
+      "defaultValue": {
+        "value": "https://mbuy.pro/privacy"
+      },
+      "description": "رابط سياسة الخصوصية"
+    },
+    "help_url": {
+      "defaultValue": {
+        "value": "https://mbuy.pro/help"
+      },
+      "description": "رابط مركز المساعدة"
+    },
+    "announcement_text": {
+      "defaultValue": {
+        "value": ""
+      },
+      "description": "نص الإعلان"
+    },
+    "announcement_enabled": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "تفعيل بانر الإعلان"
+    },
+    "maintenance_message": {
+      "defaultValue": {
+        "value": "التطبيق تحت الصيانة، سنعود قريباً"
+      },
+      "description": "رسالة الصيانة"
+    }
+  },
+  "version": {
+    "versionNumber": "1"
+  }
+}
