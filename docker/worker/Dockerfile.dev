@@ -1,0 +1,34 @@
+# ============================================
+# Dockerfile للـ Worker - بيئة التطوير
+# ============================================
+
+FROM node:20-alpine AS base
+
+# تثبيت المتطلبات الأساسية
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    postgresql-client
+
+WORKDIR /app
+
+# ============================================
+# مرحلة التطوير
+# ============================================
+FROM base AS development
+
+# نسخ package files
+COPY package*.json ./
+
+# تثبيت جميع dependencies (including dev dependencies)
+RUN npm install
+
+# نسخ باقي الملفات
+COPY . .
+
+# منفذ التطبيق
+EXPOSE 8787
+
+# الأمر الافتراضي
+CMD ["npm", "run", "dev"]
