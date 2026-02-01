@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm
+    container_name: anythingllm
+    ports:
+      - "3001:3001"
+    environment:
+      - STORAGE_DIR=/app/server/storage
+    volumes:
+      - ./storage:/app/server/storage
+      - ./collector:/app/collector/hotdir
+    restart: always

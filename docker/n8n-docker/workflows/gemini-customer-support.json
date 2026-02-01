@@ -1,0 +1,182 @@
+{
+    "name": "MBUY - AI Customer Support Agent",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "customer-support",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook",
+            "name": "Customer Message Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1.1,
+            "position": [
+                50,
+                300
+            ],
+            "webhookId": "customer-support-webhook"
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "SELECT id, name, email, phone FROM customers WHERE phone = '{{ $json.body.customer_phone }}' OR email = '{{ $json.body.customer_email }}' LIMIT 1"
+            },
+            "id": "get-customer",
+            "name": "Get Customer Info",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "SELECT id, order_number, status, total_amount, created_at FROM orders WHERE customer_id = '{{ $json.id }}' ORDER BY created_at DESC LIMIT 5"
+            },
+            "id": "get-orders",
+            "name": "Get Recent Orders",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "model": "gemini-1.5-pro",
+                "prompt": "أنت مساعد خدمة عملاء ودود ومحترف لمتجر mBuy للتجارة الإلكترونية.\n\n**معلومات العميل:**\n- الاسم: {{ $('Get Customer Info').first().json.name || 'عميل جديد' }}\n- آخر الطلبات: {{ JSON.stringify($('Get Recent Orders').all().map(o => ({رقم: o.json.order_number, الحالة: o.json.status, المبلغ: o.json.total_amount}))) }}\n\n**رسالة العميل:**\n{{ $('Customer Message Webhook').first().json.body.message }}\n\n**التعليمات:**\n1. رد بالعربية بشكل ودود ومختصر\n2. إذا كان السؤال عن طلب، استخدم المعلومات أعلاه\n3. إذا لم تعرف الإجابة، اطلب التواصل مع الدعم على: support@mbuy.app\n4. لا تعطِ معلومات خاطئة أبداً\n5. الرد يجب ألا يتجاوز 100 كلمة\n\n**الرد:**",
+                "options": {
+                    "temperature": 0.7,
+                    "maxOutputTokens": 500
+                }
+            },
+            "id": "gemini-respond",
+            "name": "Generate AI Response",
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                700,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "create",
+                "tableId": "support_conversations",
+                "fieldsUi": {
+                    "fieldValues": [
+                        {
+                            "fieldName": "customer_phone",
+                            "fieldValue": "={{ $('Customer Message Webhook').first().json.body.customer_phone }}"
+                        },
+                        {
+                            "fieldName": "customer_message",
+                            "fieldValue": "={{ $('Customer Message Webhook').first().json.body.message }}"
+                        },
+                        {
+                            "fieldName": "ai_response",
+                            "fieldValue": "={{ $json.text }}"
+                        },
+                        {
+                            "fieldName": "created_at",
+                            "fieldValue": "={{ $now.toISO() }}"
+                        }
+                    ]
+                }
+            },
+            "id": "save-conversation",
+            "name": "Save Conversation",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                950,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: true, response: $('Generate AI Response').first().json.text, timestamp: $now.toISO() }) }}"
+            },
+            "id": "respond",
+            "name": "Send Response",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1150,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Customer Message Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Get Customer Info",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Customer Info": {
+            "main": [
+                [
+                    {
+                        "node": "Get Recent Orders",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Recent Orders": {
+            "main": [
+                [
+                    {
+                        "node": "Generate AI Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Generate AI Response": {
+            "main": [
+                [
+                    {
+                        "node": "Save Conversation",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Save Conversation": {
+            "main": [
+                [
+                    {
+                        "node": "Send Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        "mbuy",
+        "gemini",
+        "customer-support",
+        "ai-agent"
+    ]
+}

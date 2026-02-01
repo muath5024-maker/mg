@@ -1,0 +1,210 @@
+{
+    "name": "MBUY - Review Sentiment Analyzer",
+    "nodes": [
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "SELECT id, review_text, product_id, customer_id FROM reviews WHERE sentiment_analyzed = false ORDER BY created_at DESC LIMIT 20"
+            },
+            "id": "get-reviews",
+            "name": "Get Unanalyzed Reviews",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "model": "gemini-1.5-flash",
+                "prompt": "حلل sentiment هذه المراجعة وأرجع JSON فقط:\n\nالمراجعة: \"{{ $json.review_text }}\"\n\nأرجع بهذا التنسيق بالضبط:\n{\n  \"sentiment\": \"positive\" أو \"negative\" أو \"neutral\",\n  \"score\": رقم من 1-5,\n  \"keywords\": [\"كلمة1\", \"كلمة2\"],\n  \"summary\": \"ملخص قصير جداً\"\n}",
+                "options": {
+                    "temperature": 0.3,
+                    "maxOutputTokens": 300
+                }
+            },
+            "id": "gemini-analyze",
+            "name": "Analyze with Gemini",
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const response = $input.first().json.text;\ntry {\n  // Extract JSON from response\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    const parsed = JSON.parse(jsonMatch[0]);\n    return [{ json: {\n      ...parsed,\n      review_id: $('Get Unanalyzed Reviews').first().json.id\n    }}];\n  }\n} catch (e) {\n  return [{ json: { error: e.message, raw: response }}];\n}"
+            },
+            "id": "parse-json",
+            "name": "Parse JSON Response",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                700,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "tableId": "reviews",
+                "filterType": "string",
+                "filterString": "id=eq.{{ $json.review_id }}",
+                "fieldsUi": {
+                    "fieldValues": [
+                        {
+                            "fieldName": "sentiment",
+                            "fieldValue": "={{ $json.sentiment }}"
+                        },
+                        {
+                            "fieldName": "sentiment_score",
+                            "fieldValue": "={{ $json.score }}"
+                        },
+                        {
+                            "fieldName": "sentiment_analyzed",
+                            "fieldValue": "true"
+                        }
+                    ]
+                }
+            },
+            "id": "update-review",
+            "name": "Update Review with Sentiment",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.sentiment }}",
+                            "operation": "equals",
+                            "value2": "negative"
+                        }
+                    ]
+                }
+            },
+            "id": "check-negative",
+            "name": "Is Negative?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                900,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "channel": "#alerts",
+                "text": "⚠️ مراجعة سلبية جديدة!\n\nالمنتج: {{ $('Get Unanalyzed Reviews').first().json.product_id }}\nالتقييم: {{ $json.score }}/5\nالملخص: {{ $json.summary }}",
+                "otherOptions": {}
+            },
+            "id": "slack-alert",
+            "name": "Alert on Slack",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 2.1,
+            "position": [
+                1100,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 1
+                        }
+                    ]
+                }
+            },
+            "id": "schedule",
+            "name": "Run Hourly",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                50,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Run Hourly": {
+            "main": [
+                [
+                    {
+                        "node": "Get Unanalyzed Reviews",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Unanalyzed Reviews": {
+            "main": [
+                [
+                    {
+                        "node": "Analyze with Gemini",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Analyze with Gemini": {
+            "main": [
+                [
+                    {
+                        "node": "Parse JSON Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse JSON Response": {
+            "main": [
+                [
+                    {
+                        "node": "Update Review with Sentiment",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Is Negative?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Is Negative?": {
+            "main": [
+                [
+                    {
+                        "node": "Alert on Slack",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        "mbuy",
+        "gemini",
+        "sentiment",
+        "reviews"
+    ]
+}

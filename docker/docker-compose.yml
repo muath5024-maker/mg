@@ -1,114 +1,76 @@
-version: '3.8'
+version: "3.8"
 
-# MBUY Studio - Docker Compose
-# يتضمن: n8n (Workflow Automation) + FFmpeg (Media Processing)
+# ============================================
+# MBUY Local AI Stack
+# ============================================
+# الخدمات:
+# - AnythingLLM: واجهة ذكية لتحليل بيانات التجار
+# - n8n: أتمتة العمليات
+# - FFmpeg: معالجة الوسائط
+# ============================================
 
 services:
   # ============================================
-  # n8n - Workflow Automation
+  # AnythingLLM - تحليل بيانات التجار
+  # الوصول: http://localhost:3001
+  # ============================================
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    ports:
+      - "3001:3001"
+    environment:
+      - STORAGE_DIR=/app/server/storage
+    volumes:
+      - ./anythingllm-docker/storage:/app/server/storage
+      - ./anythingllm-docker/collector:/app/collector/hotdir
+    extra_hosts:
+      # هذا يسمح للحاوية بالاتصال بـ Ollama على Windows
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    networks:
+      - mbuy-ai
+
+  # ============================================
+  # n8n - الأتمتة
+  # الوصول: http://localhost:5678
   # ============================================
   n8n:
-    image: docker.n8n.io/n8nio/n8n:latest
-    container_name: mbuy-n8n
-    restart: unless-stopped
+    image: n8nio/n8n:latest
+    container_name: n8n
     ports:
       - "5678:5678"
     environment:
-      # General Settings
       - N8N_HOST=localhost
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
-      - NODE_ENV=production
-      - WEBHOOK_URL=http://localhost:5678/
-      
-      # Security
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=mbuy_studio_2024
-      
-      # Execution
-      - EXECUTIONS_MODE=queue
-      - EXECUTIONS_DATA_PRUNE=true
-      - EXECUTIONS_DATA_MAX_AGE=168
-      
-      # Timezone
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-change-this-to-random-string}
       - GENERIC_TIMEZONE=Asia/Riyadh
       - TZ=Asia/Riyadh
-      
-      # Database (SQLite for simplicity)
-      - DB_TYPE=sqlite
-      - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
-      
-      # External Services (to be configured)
-      # - FAL_AI_API_KEY=${FAL_AI_API_KEY}
-      # - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      # - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-      # - DID_API_KEY=${DID_API_KEY}
-      # - SUPABASE_URL=${SUPABASE_URL}
-      # - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
-      
     volumes:
-      - n8n_data:/home/node/.n8n
-      - ./n8n/workflows:/home/node/.n8n/workflows
-      - ./shared/input:/data/input
-      - ./shared/output:/data/output
+      - ./n8n-docker/n8n_data:/home/node/.n8n
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
     networks:
-      - mbuy-studio
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - mbuy-ai
 
   # ============================================
-  # FFmpeg Service - Media Processing
+  # FFmpeg - معالجة الفيديو والصور
+  # استخدام: docker exec ffmpeg ffmpeg [options]
   # ============================================
   ffmpeg:
-    build:
-      context: ./ffmpeg
-      dockerfile: Dockerfile
-    container_name: mbuy-ffmpeg
-    restart: unless-stopped
+    image: linuxserver/ffmpeg:latest
+    container_name: ffmpeg
     volumes:
-      - ./shared/input:/data/input
-      - ./shared/output:/data/output
-      - ./ffmpeg/scripts:/scripts
+      - ./media/input:/input
+      - ./media/output:/output
+    entrypoint: [ "tail", "-f", "/dev/null" ]
+    restart: unless-stopped
     networks:
-      - mbuy-studio
-    # This service is triggered by n8n via exec or API
-    command: ["tail", "-f", "/dev/null"]  # Keep container running
-    
-  # ============================================
-  # Redis (Optional - for n8n queue mode)
-  # ============================================
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: mbuy-redis
-  #   restart: unless-stopped
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   networks:
-  #     - mbuy-studio
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
+      - mbuy-ai
 
-# ============================================
-# Networks
-# ============================================
 networks:
-  mbuy-studio:
+  mbuy-ai:
     driver: bridge
-
-# ============================================
-# Volumes
-# ============================================
-volumes:
-  n8n_data:
-    driver: local
-  # redis_data:
-  #   driver: local
+    name: mbuy-ai-network

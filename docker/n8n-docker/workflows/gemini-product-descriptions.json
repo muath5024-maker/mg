@@ -1,0 +1,134 @@
+{
+    "name": "MBUY - Gemini Product Description Generator",
+    "nodes": [
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "SELECT id, name, category, price FROM products WHERE description IS NULL OR description = '' LIMIT 10"
+            },
+            "id": "supabase-trigger",
+            "name": "Get Products Without Description",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "model": "gemini-1.5-pro",
+                "prompt": "أنت خبير تسويق محترف. اكتب وصفاً جذاباً ومختصراً بالعربية لهذا المنتج:\n\n- الاسم: {{ $json.name }}\n- الفئة: {{ $json.category }}\n- السعر: {{ $json.price }} ريال سعودي\n\nالوصف يجب أن يكون:\n- 2-3 جمل فقط\n- يبرز الفوائد والمميزات\n- يشجع على الشراء\n- لا يتجاوز 150 حرف\n\nأرجع الوصف فقط بدون أي إضافات.",
+                "options": {
+                    "temperature": 0.7,
+                    "maxOutputTokens": 200
+                }
+            },
+            "id": "gemini-generate",
+            "name": "Generate Description with Gemini",
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ],
+            "credentials": {
+                "googleGeminiApi": {
+                    "id": "1",
+                    "name": "Google Gemini API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "tableId": "products",
+                "filterType": "string",
+                "filterString": "id=eq.{{ $('Get Products Without Description').item.json.id }}",
+                "fieldsUi": {
+                    "fieldValues": [
+                        {
+                            "fieldName": "description",
+                            "fieldValue": "={{ $json.text }}"
+                        },
+                        {
+                            "fieldName": "updated_at",
+                            "fieldValue": "={{ $now.toISO() }}"
+                        }
+                    ]
+                }
+            },
+            "id": "supabase-update",
+            "name": "Update Product Description",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 6
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "Run Every 6 Hours",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                50,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Run Every 6 Hours": {
+            "main": [
+                [
+                    {
+                        "node": "Get Products Without Description",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Products Without Description": {
+            "main": [
+                [
+                    {
+                        "node": "Generate Description with Gemini",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Generate Description with Gemini": {
+            "main": [
+                [
+                    {
+                        "node": "Update Product Description",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        "mbuy",
+        "gemini",
+        "automation"
+    ]
+}
