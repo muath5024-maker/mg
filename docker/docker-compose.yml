@@ -21,11 +21,13 @@ services:
       - "3001:3001"
     environment:
       - STORAGE_DIR=/app/server/storage
-      - ANYTHINGLLM_API_KEY=${ANYTHINGLLM_API_KEY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - GITHUB_REPO=${GITHUB_REPO:-muath5024-maker/mg}
-      - GITHUB_BRANCH=${GITHUB_BRANCH:-main}
-      - ENABLE_GITHUB_SYNC=true
+      - NODE_ENV=production
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_PATH=http://host.docker.internal:11434
+      - EMBEDDING_ENGINE=ollama
+      - EMBEDDING_MODEL_PREF=nomic-embed-text:latest
+      - VECTOR_DB=lancedb
+      - DISABLE_TELEMETRY=true
     volumes:
       - ./anythingllm-docker/storage:/app/server/storage
       - ./anythingllm-docker/collector:/app/collector/hotdir

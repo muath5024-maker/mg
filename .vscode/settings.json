@@ -2,8 +2,7 @@
     "deno.enable": false,
     "dart.showTodos": false,
     
-    // AnythingLLM Integration
-    "anything-llm.apiKey": "",
+    // AnythingLLM Integration (لا يحتاج API Key للاستخدام المحلي)
     "anything-llm.baseURL": "http://localhost:3001",
     "anything-llm.workspace": "luh",
     "anything-llm.enabled": true,

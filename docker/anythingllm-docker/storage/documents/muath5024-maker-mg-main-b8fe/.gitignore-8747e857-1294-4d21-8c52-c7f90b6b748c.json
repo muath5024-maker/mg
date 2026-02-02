@@ -1,0 +1,13 @@
+{
+    "id": "8747e857-1294-4d21-8c52-c7f90b6b748c",
+    "url": "github://.gitignore",
+    "title": ".gitignore",
+    "docAuthor": "muath5024-maker",
+    "description": "No description found.",
+    "docSource": ".gitignore",
+    "chunkSource": "github://https://github.com/muath5024-maker/mg?payload=4a0d2f9966b62e0b5f61f05fdd8f4e2f257e349b9abdec16164bdda024ba33e6da7cc7e4bfba54d9b459148f393e6f95c097f133a44a1b48715e7ce563a9a78ceca6a23f1bef7bfacd03296a251ba6879927afc46b68cf8924d0606842d63d0b:83c1534a38bc7527d9dbb08301bb0c50",
+    "published": "2/2/2026, 9:49:56 PM",
+    "wordCount": 14,
+    "pageContent": "# AnythingLLM storage and models\ndocker/anythingllm-docker/storage/models/\ndocker/anythingllm-docker/storage/*.db\ndocker/anythingllm-docker/storage/comkey/\n\n# Crash journals\ndocker/n8n-docker/n8n_data/crash.journal\n\n# Build directories\nbuild/\n**/build/\n\n# Dependencies\nnode_modules/\n**/node_modules/\n\n# IDE\n.vscode/\n.idea/\n*.iml\n\n# OS\n.DS_Store\nThumbs.db\n\n# Local environment\n.env\n.env.local\n*.log\n",
+    "token_count_estimate": 116
+}
