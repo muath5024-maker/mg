@@ -1,0 +1,29 @@
+# AnythingLLM storage and models
+docker/anythingllm-docker/storage/models/
+docker/anythingllm-docker/storage/*.db
+docker/anythingllm-docker/storage/comkey/
+
+# Crash journals
+docker/n8n-docker/n8n_data/crash.journal
+
+# Build directories
+build/
+**/build/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env
+.env.local
+*.log
