@@ -1,4 +1,20 @@
 {
     "deno.enable": false,
-    "dart.showTodos": false
+    "dart.showTodos": false,
+    
+    // AnythingLLM Integration
+    "anything-llm.apiKey": "",
+    "anything-llm.baseURL": "http://localhost:3001",
+    "anything-llm.workspace": "luh",
+    "anything-llm.enabled": true,
+    
+    // GitHub Settings
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    
+    // Auto-save Settings
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "editor.formatOnSave": true
 }

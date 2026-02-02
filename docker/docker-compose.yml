@@ -21,9 +21,15 @@ services:
       - "3001:3001"
     environment:
       - STORAGE_DIR=/app/server/storage
+      - ANYTHINGLLM_API_KEY=${ANYTHINGLLM_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPO=${GITHUB_REPO:-muath5024-maker/mg}
+      - GITHUB_BRANCH=${GITHUB_BRANCH:-main}
+      - ENABLE_GITHUB_SYNC=true
     volumes:
       - ./anythingllm-docker/storage:/app/server/storage
       - ./anythingllm-docker/collector:/app/collector/hotdir
+      - ../:/workspace:ro  # ربط المشروع للقراءة فقط
     extra_hosts:
       # هذا يسمح للحاوية بالاتصال بـ Ollama على Windows
       - "host.docker.internal:host-gateway"
